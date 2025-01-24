@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ChatWindow from './ChatWindow';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ChatBubbleProps {
   apiKey?: string;
   agentId?: string;
+  title?: string;
   theme?: {
     primary: string;
     background: string;
@@ -14,41 +21,82 @@ interface ChatBubbleProps {
   };
 }
 
-export default function ChatBubble({ apiKey, agentId, theme }: ChatBubbleProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function ChatBubble({ apiKey, agentId, title = "AI Assistant", theme }: ChatBubbleProps) {
+  const [showTerms, setShowTerms] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'listening' | 'speaking'>('idle');
+
+  const handleStartCall = () => {
+    setShowTerms(true);
+  };
+
+  const handleAcceptTerms = () => {
+    setShowTerms(false);
+    setIsActive(true);
+    // Initialize WebSocket connection here
+  };
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <AnimatePresence>
-        {isOpen ? (
+        {!isActive ? (
           <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            className="mb-4"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
           >
-            <ChatWindow onClose={() => setIsOpen(false)} apiKey={apiKey} agentId={agentId} theme={theme} />
+            <div className="flex flex-col items-end gap-2">
+              <div className="bg-white rounded-lg shadow-lg p-2 mb-2">
+                <span className="text-sm font-medium">{title}</span>
+              </div>
+              <Button
+                size="default"
+                className="rounded-full shadow-lg"
+                style={{ 
+                  backgroundColor: theme?.primary || 'hsl(var(--primary))',
+                  color: theme?.text || 'hsl(var(--primary-foreground))'
+                }}
+                onClick={handleStartCall}
+              >
+                Start a call
+              </Button>
+            </div>
           </motion.div>
         ) : (
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            whileHover={{ scale: 1.1 }}
+            exit={{ scale: 0 }}
+            className="bg-white rounded-lg shadow-lg p-4"
           >
-            <Button
-              size="icon"
-              className="w-14 h-14 rounded-full shadow-lg"
-              style={{ 
-                backgroundColor: theme?.primary || 'hsl(var(--primary))',
-                color: theme?.text || 'hsl(var(--primary-foreground))'
-              }}
-              onClick={() => setIsOpen(true)}
-            >
-              <MessageCircle className="h-6 w-6" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-sm font-medium">
+                {status === 'listening' ? 'Listening' : status === 'speaking' ? 'Talk to interrupt' : 'Ready'}
+              </span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Dialog open={showTerms} onOpenChange={setShowTerms}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Terms and conditions</DialogTitle>
+            <DialogDescription>
+              By clicking "Agree," and each time I interact with this AI agent, I consent to the recording, storage, and sharing of my communications with third-party service providers, and as described in the Privacy Policy. If you do not wish to have your conversations recorded, please refrain from using this service.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTerms(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAcceptTerms}>
+              Agree
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
