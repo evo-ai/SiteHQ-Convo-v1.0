@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
 import { useConversation } from '@11labs/react';
+import { Mic, MicOff, Volume2 } from 'lucide-react';
 
 interface ChatBubbleProps {
   apiKey?: string;
@@ -128,18 +129,53 @@ export default function ChatBubble({
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
-            className="bg-white rounded-lg shadow-lg p-4"
+            className="bg-white rounded-lg shadow-lg p-4 min-w-[300px]"
           >
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-sm font-medium">
-                {conversation.isSpeaking ? 'AI is speaking - Talk to interrupt' : 'Listening to you'}
-              </span>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  animate={{
+                    scale: conversation.isSpeaking ? [1, 1.2, 1] : 1,
+                  }}
+                  transition={{
+                    repeat: conversation.isSpeaking ? Infinity : 0,
+                    duration: 1.5,
+                  }}
+                  className={`w-3 h-3 rounded-full ${
+                    conversation.isSpeaking 
+                      ? 'bg-blue-500' 
+                      : 'bg-green-500'
+                  }`}
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">
+                    {conversation.isSpeaking ? (
+                      <div className="flex items-center gap-2">
+                        <Volume2 className="w-4 h-4" />
+                        <motion.span
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-blue-600"
+                        >
+                          AI Speaking - Click to Interrupt
+                        </motion.span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Mic className="w-4 h-4" />
+                        <span className="text-green-600">Listening to you</span>
+                      </div>
+                    )}
+                  </span>
+                </div>
+              </div>
               <Button
                 size="sm"
                 variant="outline"
+                className="gap-2"
                 onClick={() => conversation.endSession()}
               >
+                <MicOff className="w-4 h-4" />
                 End Call
               </Button>
             </div>
