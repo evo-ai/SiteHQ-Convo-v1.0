@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,8 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { createChatConnection } from '@/lib/chat';
 import { useToast } from '@/hooks/use-toast';
+import { useConversation } from '@11labs/react';
 
 interface ChatBubbleProps {
   apiKey?: string;
@@ -23,79 +23,66 @@ interface ChatBubbleProps {
   };
 }
 
-export default function ChatBubble({ apiKey, agentId, title = "AI Assistant", theme }: ChatBubbleProps) {
+export default function ChatBubble({ apiKey, agentId = "FnTVTPK2FfEkaktJIFFx", title = "AI Assistant", theme }: ChatBubbleProps) {
   const [showTerms, setShowTerms] = useState(false);
-  const [isActive, setIsActive] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'listening' | 'speaking'>('idle');
-  const [socket, setSocket] = useState<WebSocket | null>(null);
   const { toast } = useToast();
+
+  const conversation = useConversation({
+    onConnect: () => {
+      console.log('Connected to ElevenLabs');
+      toast({
+        title: "Connected",
+        description: "Successfully connected to AI assistant"
+      });
+    },
+    onDisconnect: () => {
+      console.log('Disconnected from ElevenLabs');
+      toast({
+        title: "Disconnected",
+        description: "The connection to the AI assistant was closed"
+      });
+    },
+    onError: (error) => {
+      console.error('Conversation error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to connect to the AI assistant",
+        variant: "destructive"
+      });
+    },
+    onMessage: (message) => console.log('Message:', message)
+  });
 
   const handleStartCall = () => {
     setShowTerms(true);
   };
 
-  const handleAcceptTerms = useCallback(() => {
-    if (!apiKey || !agentId) {
+  const handleAcceptTerms = useCallback(async () => {
+    try {
+      // Request microphone permission
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Start the conversation
+      await conversation.startSession({
+        agentId: agentId,
+        apiKey: apiKey
+      });
+
+      setShowTerms(false);
+    } catch (error) {
+      console.error('Failed to start conversation:', error);
       toast({
         title: "Error",
-        description: "API key and Agent ID are required",
-        variant: "destructive",
+        description: "Failed to start conversation. Please check your permissions and try again.",
+        variant: "destructive"
       });
-      return;
     }
-
-    setShowTerms(false);
-    setIsActive(true);
-
-    const ws = createChatConnection(apiKey, agentId);
-
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('Received message:', data);
-        if (data.type === 'status') {
-          setStatus(data.status);
-        }
-      } catch (error) {
-        console.error('Error parsing message:', error);
-      }
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket closed');
-      setIsActive(false);
-      setStatus('idle');
-      setSocket(null);
-      toast({
-        title: "Connection closed",
-        description: "The connection to the AI assistant was closed",
-      });
-    };
-
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      toast({
-        title: "Connection error",
-        description: "Failed to connect to the AI assistant",
-        variant: "destructive",
-      });
-    };
-
-    setSocket(ws);
-  }, [apiKey, agentId, toast]);
-
-  useEffect(() => {
-    return () => {
-      if (socket) {
-        socket.close();
-      }
-    };
-  }, [socket]);
+  }, [agentId, apiKey, conversation, toast]);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <AnimatePresence>
-        {!isActive ? (
+        {!conversation.isConnected ? (
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -128,8 +115,15 @@ export default function ChatBubble({ apiKey, agentId, title = "AI Assistant", th
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse" />
               <span className="text-sm font-medium">
-                {status === 'listening' ? 'Listening' : status === 'speaking' ? 'Talk to interrupt' : 'Ready'}
+                {conversation.isSpeaking ? 'Speaking' : 'Listening'}
               </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => conversation.endSession()}
+              >
+                End Call
+              </Button>
             </div>
           </motion.div>
         )}
