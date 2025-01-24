@@ -16,7 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/ui/date-range-picker";
-import { Activity, MessageCircle, ThumbsUp, Timer } from "lucide-react";
+import { Activity, MessageCircle, ThumbsUp, Timer, Smile } from "lucide-react";
 import { format } from "date-fns";
 import ConversationFlow from "@/components/conversation/ConversationFlow";
 
@@ -29,7 +29,6 @@ export default function AnalyticsDashboard() {
     queryKey: ["/api/analytics/feedback"],
   });
 
-  // New query for conversation flow data
   const { data: conversationData, isLoading: isLoadingConversation } = useQuery({
     queryKey: ["/api/analytics/conversation"],
   });
@@ -74,10 +73,11 @@ export default function AnalyticsDashboard() {
           trend={+8}
         />
         <MetricCard
-          title="Satisfaction Rate"
-          value={`${metricsData?.satisfactionRate || 0}%`}
-          icon={<ThumbsUp />}
-          trend={+12}
+          title="Sentiment Score"
+          value={metricsData?.overallSentiment ? 
+            `${(metricsData.overallSentiment * 100).toFixed(1)}%` : '0%'}
+          icon={<Smile />}
+          trend={+15}
         />
       </div>
 
@@ -96,22 +96,22 @@ export default function AnalyticsDashboard() {
       <div className="grid gap-6 md:grid-cols-2 mb-8">
         <Card>
           <CardHeader>
-            <CardTitle>Conversations Over Time</CardTitle>
+            <CardTitle>Sentiment Trend Over Time</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={metricsData?.timeSeriesData || []}>
+                <LineChart data={metricsData?.sentimentTrend || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
-                    dataKey="date" 
+                    dataKey="timestamp" 
                     tickFormatter={(value) => format(new Date(value), 'MMM d')}
                   />
-                  <YAxis />
+                  <YAxis domain={[-1, 1]} />
                   <Tooltip />
                   <Line
                     type="monotone"
-                    dataKey="conversations"
+                    dataKey="sentiment"
                     stroke="hsl(var(--primary))"
                     strokeWidth={2}
                   />
@@ -123,18 +123,32 @@ export default function AnalyticsDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>User Engagement Distribution</CardTitle>
+            <CardTitle>Emotional State Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={metricsData?.engagementDistribution || []}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="range" />
-                  <YAxis />
+                <PieChart>
+                  <Pie
+                    data={metricsData?.emotionalStateDistribution || []}
+                    dataKey="value"
+                    nameKey="mood"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    label
+                  >
+                    {(metricsData?.emotionalStateDistribution || []).map((entry: any, index: number) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.mood === 'positive' ? '#00C49F' : 
+                             entry.mood === 'negative' ? '#FF8042' : 
+                             '#FFBB28'}
+                      />
+                    ))}
+                  </Pie>
                   <Tooltip />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" />
-                </BarChart>
+                </PieChart>
               </ResponsiveContainer>
             </div>
           </CardContent>

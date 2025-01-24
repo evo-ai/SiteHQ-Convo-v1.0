@@ -5,7 +5,7 @@ import { setupChatWebSocket } from './chat';
 import { insertAdminSchema } from '@db/schema';
 import { db } from '@db';
 import { admins, conversations, conversationMetrics, conversationFeedback } from '@db/schema';
-import { eq, and, gte, lte } from 'drizzle-orm';
+import { eq, and, gte, lte, sql } from 'drizzle-orm';
 import { requireAuth, hashPassword, comparePasswords } from './auth';
 import session from 'express-session';
 import MemoryStore from 'memorystore';
@@ -85,7 +85,6 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
-  // Add the get-signed-url endpoint
   app.get('/api/get-signed-url', async (req, res) => {
     try {
       const apiKey = process.env.ELEVENLABS_API_KEY;
@@ -93,7 +92,6 @@ export function registerRoutes(app: Express): Server {
         return res.status(500).json({ message: 'ElevenLabs API key not configured' });
       }
 
-      // Get the signed URL from ElevenLabs
       const response = await fetch(
         'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
         {
@@ -122,10 +120,21 @@ export function registerRoutes(app: Express): Server {
     try {
       const { startDate, endDate } = req.query;
 
-      // Get total conversations
-      const [{ count: totalConversations }] = await db
-        .select({ count: conversations.id })
+      // Get total conversations and metrics
+      const [{ 
+        count: totalConversations,
+        avgDuration,
+        avgEngagement,
+        overallSentiment 
+      }] = await db
+        .select({
+          count: conversations.id,
+          avgDuration: sql<number>`avg(${conversations.duration})`,
+          avgEngagement: sql<number>`avg(${conversationMetrics.userEngagementScore})`,
+          overallSentiment: sql<number>`avg(${conversations.overallSentiment})`
+        })
         .from(conversations)
+        .leftJoin(conversationMetrics, eq(conversations.id, conversationMetrics.conversationId))
         .where(
           and(
             startDate ? gte(conversations.createdAt, new Date(startDate as string)) : undefined,
@@ -133,50 +142,11 @@ export function registerRoutes(app: Express): Server {
           )
         );
 
-      // Get average duration
-      const [{ avgDuration }] = await db
+      // Get sentiment trend
+      const sentimentTrend = await db
         .select({
-          avgDuration: conversations.duration
-        })
-        .from(conversations)
-        .where(
-          and(
-            startDate ? gte(conversations.createdAt, new Date(startDate as string)) : undefined,
-            endDate ? lte(conversations.createdAt, new Date(endDate as string)) : undefined
-          )
-        );
-
-      // Get average engagement score
-      const [{ avgEngagement }] = await db
-        .select({
-          avgEngagement: conversationMetrics.userEngagementScore
-        })
-        .from(conversationMetrics)
-        .where(
-          and(
-            startDate ? gte(conversationMetrics.createdAt, new Date(startDate as string)) : undefined,
-            endDate ? lte(conversationMetrics.createdAt, new Date(endDate as string)) : undefined
-          )
-        );
-
-      // Get satisfaction rate (average rating)
-      const [{ satisfactionRate }] = await db
-        .select({
-          satisfactionRate: conversationFeedback.rating
-        })
-        .from(conversationFeedback)
-        .where(
-          and(
-            startDate ? gte(conversationFeedback.createdAt, new Date(startDate as string)) : undefined,
-            endDate ? lte(conversationFeedback.createdAt, new Date(endDate as string)) : undefined
-          )
-        );
-
-      // Get time series data
-      const timeSeriesData = await db
-        .select({
-          date: conversations.createdAt,
-          conversations: conversations.id
+          timestamp: conversations.createdAt,
+          sentiment: conversations.overallSentiment
         })
         .from(conversations)
         .where(
@@ -187,28 +157,27 @@ export function registerRoutes(app: Express): Server {
         )
         .orderBy(conversations.createdAt);
 
-      // Get engagement distribution
-      const engagementDistribution = await db
+      // Get emotional state distribution
+      const emotionalStates = await db
         .select({
-          range: conversationMetrics.userEngagementScore,
-          count: conversationMetrics.id
+          mood: sql<string>`jsonb_array_elements(${conversations.emotionalStates})->>'mood'`,
+          count: sql<number>`count(*)`
         })
-        .from(conversationMetrics)
-        .where(
-          and(
-            startDate ? gte(conversationMetrics.createdAt, new Date(startDate as string)) : undefined,
-            endDate ? lte(conversationMetrics.createdAt, new Date(endDate as string)) : undefined
-          )
-        )
-        .groupBy(conversationMetrics.userEngagementScore);
+        .from(conversations)
+        .groupBy(sql`jsonb_array_elements(${conversations.emotionalStates})->>'mood'`);
+
+      const emotionalStateDistribution = emotionalStates.map(state => ({
+        mood: state.mood,
+        value: Number(state.count)
+      }));
 
       res.json({
         totalConversations,
         avgDuration,
         avgEngagement,
-        satisfactionRate,
-        timeSeriesData,
-        engagementDistribution
+        overallSentiment,
+        sentimentTrend,
+        emotionalStateDistribution
       });
     } catch (error) {
       console.error('Error fetching analytics metrics:', error);
@@ -222,7 +191,7 @@ export function registerRoutes(app: Express): Server {
       const sentimentDistribution = await db
         .select({
           name: conversationFeedback.sentiment,
-          value: conversationFeedback.id
+          value: sql<number>`count(*)`
         })
         .from(conversationFeedback)
         .groupBy(conversationFeedback.sentiment);
@@ -244,12 +213,10 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Add new conversation flow endpoint
   app.get('/api/analytics/conversation', requireAuth, async (req, res) => {
     try {
       const { conversationId } = req.query;
 
-      // Get conversation with messages
       const conversation = await db
         .select({
           id: conversations.id,
@@ -258,7 +225,9 @@ export function registerRoutes(app: Express): Server {
           endedAt: conversations.endedAt,
           duration: conversations.duration,
           totalTurns: conversations.totalTurns,
-          interruptions: conversations.interruptions
+          interruptions: conversations.interruptions,
+          overallSentiment: conversations.overallSentiment,
+          emotionalStates: conversations.emotionalStates
         })
         .from(conversations)
         .where(conversationId ? eq(conversations.id, Number(conversationId)) : undefined)
@@ -269,7 +238,6 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ message: 'Conversation not found' });
       }
 
-      // Transform the messages for the flow visualization
       const transformedMessages = conversation[0].messages.map((msg: any, index: number) => ({
         id: `msg-${index}`,
         ...msg,
@@ -287,7 +255,6 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ message: 'Failed to fetch conversation flow data' });
     }
   });
-
 
   // WebSocket setup for chat
   const httpServer = createServer(app);
