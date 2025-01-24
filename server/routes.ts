@@ -2,8 +2,90 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocket, WebSocketServer } from 'ws';
 import { setupChatWebSocket } from './chat';
+import { insertAdminSchema } from '@db/schema';
+import { db } from '@db';
+import { admins } from '@db/schema';
+import { eq } from 'drizzle-orm';
+import { requireAuth, hashPassword, comparePasswords } from './auth';
+import session from 'express-session';
+import MemoryStore from 'memorystore';
+
+const MemoryStoreSession = MemoryStore(session);
 
 export function registerRoutes(app: Express): Server {
+  // Session middleware
+  app.use(
+    session({
+      cookie: { maxAge: 86400000 },
+      store: new MemoryStoreSession({
+        checkPeriod: 86400000, // prune expired entries every 24h
+      }),
+      resave: false,
+      secret: 'your-secret-key',
+      saveUninitialized: false,
+    })
+  );
+
+  // Auth routes
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const { email, password } = insertAdminSchema.parse(req.body);
+      const existingAdmin = await db.query.admins.findFirst({
+        where: eq(admins.email, email),
+      });
+
+      if (existingAdmin) {
+        return res.status(400).json({ message: 'Email already registered' });
+      }
+
+      const hashedPassword = await hashPassword(password);
+      const [admin] = await db.insert(admins)
+        .values({
+          email,
+          password: hashedPassword,
+        })
+        .returning();
+
+      req.session.adminId = admin.id;
+      res.json({ admin: { id: admin.id, email: admin.email } });
+    } catch (error) {
+      res.status(400).json({ message: String(error) });
+    }
+  });
+
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const admin = await db.query.admins.findFirst({
+        where: eq(admins.email, email),
+      });
+
+      if (!admin) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      const validPassword = await comparePasswords(password, admin.password);
+      if (!validPassword) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      req.session.adminId = admin.id;
+      res.json({ admin: { id: admin.id, email: admin.email } });
+    } catch (error) {
+      res.status(400).json({ message: String(error) });
+    }
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Failed to logout' });
+      }
+      res.json({ message: 'Logged out successfully' });
+    });
+  });
+
+  // WebSocket setup for chat
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ noServer: true });
 
