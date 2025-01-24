@@ -85,6 +85,38 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
+  // Add the get-signed-url endpoint
+  app.get('/api/get-signed-url', async (req, res) => {
+    try {
+      const apiKey = process.env.ELEVENLABS_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: 'ElevenLabs API key not configured' });
+      }
+
+      // Get the signed URL from ElevenLabs
+      const response = await fetch(
+        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
+        {
+          headers: {
+            'xi-api-key': apiKey
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to get signed URL from ElevenLabs');
+      }
+
+      const data = await response.json();
+      return res.json({ signedUrl: data.signed_url });
+    } catch (error) {
+      console.error('Error getting signed URL:', error);
+      return res.status(500).json({ 
+        message: error instanceof Error ? error.message : 'Failed to get signed URL' 
+      });
+    }
+  });
+
   // WebSocket setup for chat
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ noServer: true });

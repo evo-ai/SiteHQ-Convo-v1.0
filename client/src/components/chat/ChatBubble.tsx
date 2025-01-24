@@ -23,7 +23,12 @@ interface ChatBubbleProps {
   };
 }
 
-export default function ChatBubble({ apiKey, agentId = "FnTVTPK2FfEkaktJIFFx", title = "AI Assistant", theme }: ChatBubbleProps) {
+export default function ChatBubble({ 
+  apiKey = process.env.ELEVENLABS_API_KEY, 
+  agentId = "FnTVTPK2FfEkaktJIFFx", 
+  title = "AI Assistant", 
+  theme 
+}: ChatBubbleProps) {
   const [showTerms, setShowTerms] = useState(false);
   const { toast } = useToast();
 
@@ -42,15 +47,15 @@ export default function ChatBubble({ apiKey, agentId = "FnTVTPK2FfEkaktJIFFx", t
         description: "The connection to the AI assistant was closed"
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Conversation error:', error);
       toast({
         title: "Error",
-        description: "Failed to connect to the AI assistant",
+        description: error.message || "Failed to connect to the AI assistant",
         variant: "destructive"
       });
     },
-    onMessage: (message) => console.log('Message:', message)
+    onMessage: (message: unknown) => console.log('Message:', message)
   });
 
   const handleStartCall = () => {
@@ -62,10 +67,23 @@ export default function ChatBubble({ apiKey, agentId = "FnTVTPK2FfEkaktJIFFx", t
       // Request microphone permission
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      // Start the conversation
+      // Start the conversation using the signed URL approach
+      const response = await fetch('/api/get-signed-url', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get signed URL');
+      }
+
+      const { signedUrl } = await response.json();
+
+      // Start the conversation with the signed URL
       await conversation.startSession({
-        agentId: agentId,
-        apiKey: apiKey
+        signedUrl
       });
 
       setShowTerms(false);
@@ -73,16 +91,16 @@ export default function ChatBubble({ apiKey, agentId = "FnTVTPK2FfEkaktJIFFx", t
       console.error('Failed to start conversation:', error);
       toast({
         title: "Error",
-        description: "Failed to start conversation. Please check your permissions and try again.",
+        description: error instanceof Error ? error.message : "Failed to start conversation. Please check your permissions and try again.",
         variant: "destructive"
       });
     }
-  }, [agentId, apiKey, conversation, toast]);
+  }, [apiKey, conversation, toast]);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <AnimatePresence>
-        {!conversation.isConnected ? (
+        {conversation.status !== 'connected' ? (
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
