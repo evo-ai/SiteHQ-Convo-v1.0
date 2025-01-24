@@ -9,13 +9,16 @@ export default function Demo() {
         <h2>Embedding Instructions</h2>
         <p>To add the widget to your website, include the following code:</p>
         <pre className="bg-slate-900 p-4 rounded-lg overflow-x-auto text-white">
-          {`<script>
-  window.CONVAI_SETTINGS = {
-    apiKey: "your-api-key",
-    agentId: "your-agent-id",
-    title: "Your Assistant Name"
-  };
+          {`<!-- Widget Configuration -->
+<script>
+    window.CONVAI_SETTINGS = {
+        apiKey: "your-elevenlabs-api-key",
+        agentId: "your-agent-id",
+        title: "Your Assistant Name"
+    };
 </script>
+
+<!-- Widget Script -->
 <script src="https://voice-convo-widget-futur-intel.replit.app/widget.js" async></script>`}
         </pre>
 
@@ -40,7 +43,7 @@ export default function Demo() {
         <pre className="bg-slate-900 p-4 rounded-lg overflow-x-auto text-white">
           {`<voice-convo-widget 
     agent-id="your-agent-id"
-    api-key="your-api-key"
+    api-key="your-elevenlabs-api-key"
     theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
 ></voice-convo-widget>`}
         </pre>
