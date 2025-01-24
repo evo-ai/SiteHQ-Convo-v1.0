@@ -133,7 +133,7 @@ export default function ChatBubble({
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse" />
               <span className="text-sm font-medium">
-                {conversation.isSpeaking ? 'Speaking' : 'Listening'}
+                {conversation.isSpeaking ? 'AI is speaking - Talk to interrupt' : 'Listening to you'}
               </span>
               <Button
                 size="sm"
