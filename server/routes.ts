@@ -21,21 +21,8 @@ const MemoryStoreSession = MemoryStore(session);
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
 
-// Default API key for testing
-const DEFAULT_CLIENT_API_KEY = 'vc_live_8f4a9c2e7b6d5x3y1w9v8u4t2p0n7m5k3j1h';
-
 export function registerRoutes(app: Express): Server {
-  // Enable CORS for all routes
-  app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
-    next();
-  });
-
+  // Session middleware with secure settings
   app.use(
     session({
       cookie: {
@@ -56,71 +43,13 @@ export function registerRoutes(app: Express): Server {
 
   // Serve widget.js with CORS enabled
   app.get('/widget.js', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
   });
 
-  // Signed URL endpoint with detailed logging
-  app.get('/api/get-signed-url', async (req, res) => {
-    try {
-      console.log('Received signed URL request');
-      console.log('Headers:', req.headers);
-
-      const authHeader = req.headers.authorization;
-      console.log('Auth header:', authHeader);
-
-      const clientApiKey = authHeader?.replace('Bearer ', '');
-      console.log('Extracted client API key:', clientApiKey);
-
-      if (!clientApiKey) {
-        console.log('No API key provided');
-        return res.status(401).json({ message: 'API key is required' });
-      }
-
-      const validApiKey = process.env.CLIENT_API_KEY || DEFAULT_CLIENT_API_KEY;
-      console.log('Using API key:', validApiKey);
-      console.log('Keys match:', clientApiKey === validApiKey);
-
-      if (clientApiKey !== validApiKey) {
-        console.log('Invalid API key provided');
-        return res.status(401).json({ message: 'Invalid API key' });
-      }
-
-      const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
-      if (!elevenLabsApiKey) {
-        console.log('No ElevenLabs API key configured');
-        return res.status(500).json({ message: 'ElevenLabs API key not configured' });
-      }
-
-      console.log('Making request to ElevenLabs API');
-      const response = await fetch(
-        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
-        {
-          headers: {
-            'xi-api-key': elevenLabsApiKey,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      console.log('ElevenLabs response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('ElevenLabs API error:', errorText);
-        throw new Error(`ElevenLabs API error: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      console.log('Successfully got signed URL');
-      return res.json({ signedUrl: data.signed_url });
-    } catch (error) {
-      console.error('Error getting signed URL:', error);
-      return res.status(500).json({
-        message: error instanceof Error ? error.message : 'Failed to get signed URL'
-      });
-    }
-  });
-
+  // Auth status check endpoint
   app.get('/api/auth/status', (req, res) => {
     if (req.session.adminId) {
       res.json({ authenticated: true });
@@ -129,6 +58,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Auth routes
   app.post('/api/auth/register', async (req, res) => {
     try {
       const { email, password } = insertAdminSchema.parse(req.body);
@@ -195,11 +125,42 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
+  app.get('/api/get-signed-url', async (req, res) => {
+    try {
+      const apiKey = process.env.ELEVENLABS_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: 'ElevenLabs API key not configured' });
+      }
 
+      const response = await fetch(
+        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
+        {
+          headers: {
+            'xi-api-key': apiKey
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to get signed URL from ElevenLabs');
+      }
+
+      const data = await response.json();
+      return res.json({ signedUrl: data.signed_url });
+    } catch (error) {
+      console.error('Error getting signed URL:', error);
+      return res.status(500).json({
+        message: error instanceof Error ? error.message : 'Failed to get signed URL'
+      });
+    }
+  });
+
+  // Analytics routes
   app.get('/api/analytics/metrics', async (req, res) => {
     try {
       const { startDate, endDate } = req.query;
 
+      // Get total conversations and metrics
       const [{
         count: totalConversations,
         avgDuration,
@@ -221,6 +182,7 @@ export function registerRoutes(app: Express): Server {
           )
         );
 
+      // Get sentiment trend
       const sentimentTrend = await db
         .select({
           timestamp: conversations.createdAt,
@@ -235,6 +197,7 @@ export function registerRoutes(app: Express): Server {
         )
         .orderBy(conversations.createdAt);
 
+      // Get emotional state distribution
       const emotionalStates = await db
         .select({
           mood: sql<string>`jsonb_array_elements(${conversations.emotionalStates})->>'mood'`,
@@ -264,6 +227,7 @@ export function registerRoutes(app: Express): Server {
 
   app.get('/api/analytics/feedback', async (req, res) => {
     try {
+      // Get sentiment distribution
       const sentimentDistribution = await db
         .select({
           name: conversationFeedback.sentiment,
@@ -272,6 +236,7 @@ export function registerRoutes(app: Express): Server {
         .from(conversationFeedback)
         .groupBy(conversationFeedback.sentiment);
 
+      // Get recent feedback
       const recentFeedback = await db
         .select()
         .from(conversationFeedback)
@@ -331,6 +296,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // WebSocket setup for chat
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ noServer: true });
 
@@ -343,27 +309,4 @@ export function registerRoutes(app: Express): Server {
   });
 
   return httpServer;
-}
-
-const rateLimits = new Map<string, { count: number; resetTime: number }>();
-
-function getRateLimit(clientIp: string, currentTime: number) {
-  const windowMs = 60 * 1000; 
-  const maxRequests = 60; 
-
-  const limit = rateLimits.get(clientIp) || { count: 0, resetTime: currentTime + windowMs };
-
-  if (currentTime > limit.resetTime) {
-    limit.count = 1;
-    limit.resetTime = currentTime + windowMs;
-  } else {
-    limit.count++;
-  }
-
-  rateLimits.set(clientIp, limit);
-
-  return {
-    exceeded: limit.count > maxRequests,
-    resetTime: limit.resetTime
-  };
 }
