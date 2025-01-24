@@ -115,30 +115,42 @@ class VoiceConvoWidget extends HTMLElement {
       const scriptTag = document.querySelector('script[src*="widget.js"]');
       const baseUrl = scriptTag ? new URL(scriptTag.src).origin : window.location.origin;
 
+      const apiKey = this.getAttribute('api-key');
+      if (!apiKey) {
+        throw new Error('API key is required. Add api-key attribute to the widget.');
+      }
+
       const response = await fetch(`${baseUrl}/api/get-signed-url`, {
         headers: {
-          'Authorization': `Bearer ${this.getAttribute('api-key')}`
+          'Authorization': `Bearer ${apiKey}`
         }
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get signed URL');
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to get signed URL');
       }
 
       const { signedUrl } = await response.json();
       const ws = new WebSocket(signedUrl);
 
       ws.onopen = () => {
+        console.log('Connected to ElevenLabs');
+        const agentId = this.getAttribute('agent-id');
         ws.send(JSON.stringify({
           type: 'init',
-          agentId: this.getAttribute('agent-id'),
-          signedUrl
+          agentId: agentId || 'default-agent'
         }));
       };
 
       ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        this.updateChatUI(chatWindow, data);
+        try {
+          const data = JSON.parse(event.data);
+          console.log('Message:', data);
+          this.updateChatUI(chatWindow, data);
+        } catch (error) {
+          console.error('Error processing message:', error);
+        }
       };
 
       ws.onerror = (error) => {
@@ -146,10 +158,15 @@ class VoiceConvoWidget extends HTMLElement {
         this.showError(chatWindow, 'Connection error occurred. Please try again.');
       };
 
+      ws.onclose = () => {
+        console.log('Disconnected from ElevenLabs');
+        // Optional: Implement reconnection logic here
+      };
+
       this.ws = ws;
     } catch (error) {
       console.error('Failed to initialize chat:', error);
-      this.showError(chatWindow, 'Failed to initialize chat. Please check your credentials.');
+      this.showError(chatWindow, error.message || 'Failed to initialize chat. Please check your credentials.');
     }
   }
 

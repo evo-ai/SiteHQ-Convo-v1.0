@@ -21,6 +21,8 @@ const MemoryStoreSession = MemoryStore(session);
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
 
+const DEFAULT_CLIENT_API_KEY = 'vc_live_8f4a9c2e7b6d5x3y1w9v8u4t2p0n7m5k3j1h';
+
 export function registerRoutes(app: Express): Server {
   // Session middleware with secure settings
   app.use(
@@ -127,22 +129,48 @@ export function registerRoutes(app: Express): Server {
 
   app.get('/api/get-signed-url', async (req, res) => {
     try {
-      const apiKey = process.env.ELEVENLABS_API_KEY;
-      if (!apiKey) {
+      // Validate API key from request
+      const clientApiKey = req.headers.authorization?.replace('Bearer ', '');
+      if (!clientApiKey) {
+        return res.status(401).json({ message: 'API key is required' });
+      }
+
+      // Use environment variable if available, otherwise use default key
+      const validApiKey = process.env.CLIENT_API_KEY || DEFAULT_CLIENT_API_KEY;
+      if (clientApiKey !== validApiKey) {
+        return res.status(401).json({ message: 'Invalid API key' });
+      }
+
+      const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
+      if (!elevenLabsApiKey) {
         return res.status(500).json({ message: 'ElevenLabs API key not configured' });
+      }
+
+      // Add basic rate limiting
+      // TODO: Implement proper rate limiting with Redis or similar
+      const clientIp = req.ip;
+      const currentTime = Date.now();
+      const rateLimit = getRateLimit(clientIp, currentTime);
+
+      if (rateLimit.exceeded) {
+        return res.status(429).json({ 
+          message: 'Rate limit exceeded. Please try again later.',
+          resetTime: rateLimit.resetTime 
+        });
       }
 
       const response = await fetch(
         'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
         {
           headers: {
-            'xi-api-key': apiKey
+            'xi-api-key': elevenLabsApiKey,
+            'Content-Type': 'application/json'
           }
         }
       );
 
       if (!response.ok) {
-        throw new Error('Failed to get signed URL from ElevenLabs');
+        throw new Error(`ElevenLabs API error: ${response.status}`);
       }
 
       const data = await response.json();
@@ -309,4 +337,28 @@ export function registerRoutes(app: Express): Server {
   });
 
   return httpServer;
+}
+
+// Simple in-memory rate limiting
+const rateLimits = new Map<string, { count: number; resetTime: number }>();
+
+function getRateLimit(clientIp: string, currentTime: number) {
+  const windowMs = 60 * 1000; // 1 minute window
+  const maxRequests = 60; // 60 requests per minute
+
+  const limit = rateLimits.get(clientIp) || { count: 0, resetTime: currentTime + windowMs };
+
+  if (currentTime > limit.resetTime) {
+    limit.count = 1;
+    limit.resetTime = currentTime + windowMs;
+  } else {
+    limit.count++;
+  }
+
+  rateLimits.set(clientIp, limit);
+
+  return {
+    exceeded: limit.count > maxRequests,
+    resetTime: limit.resetTime
+  };
 }
