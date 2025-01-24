@@ -9,6 +9,7 @@ import { eq, and, gte, lte, sql } from 'drizzle-orm';
 import { requireAuth, hashPassword, comparePasswords } from './auth';
 import session from 'express-session';
 import MemoryStore from 'memorystore';
+import path from 'path';
 
 const MemoryStoreSession = MemoryStore(session);
 
@@ -34,6 +35,14 @@ export function registerRoutes(app: Express): Server {
       name: 'analytics_session'
     })
   );
+
+  // Serve widget.js with CORS enabled
+  app.get('/widget.js', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.sendFile(path.resolve(__dirname, '../client/public/widget.js'));
+  });
 
   // Auth status check endpoint
   app.get('/api/auth/status', (req, res) => {
