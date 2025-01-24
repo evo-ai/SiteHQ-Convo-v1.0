@@ -36,17 +36,9 @@ export default function ChatBubble({
   const conversation = useConversation({
     onConnect: () => {
       console.log('Connected to ElevenLabs');
-      toast({
-        title: "Connected",
-        description: "Successfully connected to AI assistant"
-      });
     },
     onDisconnect: () => {
       console.log('Disconnected from ElevenLabs');
-      toast({
-        title: "Disconnected",
-        description: "The connection to the AI assistant was closed"
-      });
     },
     onError: (error: Error) => {
       console.error('Conversation error:', error);
