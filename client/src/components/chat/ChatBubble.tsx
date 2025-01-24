@@ -14,6 +14,7 @@ import { useConversation } from '@11labs/react';
 import { Mic, MicOff, Volume2 } from 'lucide-react';
 
 interface ChatBubbleProps {
+  apiKey?: string;
   agentId?: string;
   title?: string;
   theme?: {
@@ -24,8 +25,9 @@ interface ChatBubbleProps {
 }
 
 export default function ChatBubble({ 
-  agentId = "FnTVTPK2FfEkaktJIFFx",
-  title = "AI Assistant",
+  apiKey = process.env.ELEVENLABS_API_KEY, 
+  agentId = "FnTVTPK2FfEkaktJIFFx", 
+  title = "AI Assistant", 
   theme 
 }: ChatBubbleProps) {
   const [showTerms, setShowTerms] = useState(false);
@@ -56,9 +58,12 @@ export default function ChatBubble({
   const handleAcceptTerms = useCallback(async () => {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      // Get signed URL from our server endpoint
-      const response = await fetch(`/api/get-signed-url?agentId=${agentId}`);
+      const response = await fetch('/api/get-signed-url', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        }
+      });
 
       if (!response.ok) {
         throw new Error('Failed to get signed URL');
@@ -78,7 +83,7 @@ export default function ChatBubble({
         variant: "destructive"
       });
     }
-  }, [agentId, conversation, toast]);
+  }, [apiKey, conversation, toast]);
 
   return (
     <div className="fixed bottom-8 right-8 z-50">
