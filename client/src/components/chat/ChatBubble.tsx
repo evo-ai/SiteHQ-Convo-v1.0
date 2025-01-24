@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { createChatConnection } from '@/lib/chat';
 
 interface ChatBubbleProps {
   apiKey?: string;
@@ -25,16 +26,43 @@ export default function ChatBubble({ apiKey, agentId, title = "AI Assistant", th
   const [showTerms, setShowTerms] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [status, setStatus] = useState<'idle' | 'listening' | 'speaking'>('idle');
+  const [socket, setSocket] = useState<WebSocket | null>(null);
 
   const handleStartCall = () => {
     setShowTerms(true);
   };
 
-  const handleAcceptTerms = () => {
+  const handleAcceptTerms = useCallback(() => {
+    if (!apiKey || !agentId) return;
+
     setShowTerms(false);
     setIsActive(true);
-    // Initialize WebSocket connection here
-  };
+
+    const ws = createChatConnection(apiKey, agentId);
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'status') {
+        setStatus(data.status);
+      }
+    };
+
+    ws.onclose = () => {
+      setIsActive(false);
+      setStatus('idle');
+      setSocket(null);
+    };
+
+    setSocket(ws);
+  }, [apiKey, agentId]);
+
+  useEffect(() => {
+    return () => {
+      if (socket) {
+        socket.close();
+      }
+    };
+  }, [socket]);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
