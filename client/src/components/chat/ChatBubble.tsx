@@ -65,10 +65,7 @@ export default function ChatBubble({
 
   const handleAcceptTerms = useCallback(async () => {
     try {
-      // Request microphone permission
       await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      // Start the conversation using the signed URL approach
       const response = await fetch('/api/get-signed-url', {
         headers: {
           'Content-Type': 'application/json',
@@ -81,8 +78,6 @@ export default function ChatBubble({
       }
 
       const { signedUrl } = await response.json();
-
-      // Start the conversation with the signed URL
       await conversation.startSession({
         signedUrl
       });
@@ -99,7 +94,7 @@ export default function ChatBubble({
   }, [apiKey, conversation, toast]);
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="fixed bottom-8 right-8 z-50">
       <AnimatePresence>
         {conversation.status !== 'connected' ? (
           <motion.div
@@ -107,21 +102,24 @@ export default function ChatBubble({
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
           >
-            <div className="flex flex-col items-end gap-2">
-              <div className="bg-white rounded-lg shadow-lg p-2 mb-2">
-                <span className="text-sm font-medium">{title}</span>
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+              <div className="flex flex-col items-start gap-4">
+                <h3 className="text-xl font-semibold tracking-tight">
+                  Need help?
+                </h3>
+                <Button
+                  size="lg"
+                  className="rounded-full shadow-lg text-base py-6 px-8 gap-2"
+                  style={{ 
+                    backgroundColor: theme?.primary || 'hsl(var(--primary))',
+                    color: theme?.text || 'hsl(var(--primary-foreground))'
+                  }}
+                  onClick={handleStartCall}
+                >
+                  <Mic className="w-5 h-5" />
+                  Start a call
+                </Button>
               </div>
-              <Button
-                size="default"
-                className="rounded-full shadow-lg"
-                style={{ 
-                  backgroundColor: theme?.primary || 'hsl(var(--primary))',
-                  color: theme?.text || 'hsl(var(--primary-foreground))'
-                }}
-                onClick={handleStartCall}
-              >
-                Start a call
-              </Button>
             </div>
           </motion.div>
         ) : (
@@ -129,10 +127,10 @@ export default function ChatBubble({
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
-            className="bg-white rounded-lg shadow-lg p-4 min-w-[300px]"
+            className="bg-white rounded-lg shadow-lg p-6 min-w-[380px]"
           >
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
                 <motion.div
                   animate={{
                     scale: conversation.isSpeaking ? [1, 1.2, 1] : 1,
@@ -141,17 +139,17 @@ export default function ChatBubble({
                     repeat: conversation.isSpeaking ? Infinity : 0,
                     duration: 1.5,
                   }}
-                  className={`w-3 h-3 rounded-full ${
+                  className={`w-4 h-4 rounded-full ${
                     conversation.isSpeaking 
                       ? 'bg-blue-500' 
                       : 'bg-green-500'
                   }`}
                 />
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium">
+                  <span className="text-lg font-medium">
                     {conversation.isSpeaking ? (
-                      <div className="flex items-center gap-2">
-                        <Volume2 className="w-4 h-4" />
+                      <div className="flex items-center gap-3">
+                        <Volume2 className="w-5 h-5" />
                         <motion.span
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -161,8 +159,8 @@ export default function ChatBubble({
                         </motion.span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
-                        <Mic className="w-4 h-4" />
+                      <div className="flex items-center gap-3">
+                        <Mic className="w-5 h-5" />
                         <span className="text-green-600">Listening to you</span>
                       </div>
                     )}
@@ -170,12 +168,12 @@ export default function ChatBubble({
                 </div>
               </div>
               <Button
-                size="sm"
+                size="lg"
                 variant="outline"
-                className="gap-2"
+                className="gap-2 text-base"
                 onClick={() => conversation.endSession()}
               >
-                <MicOff className="w-4 h-4" />
+                <MicOff className="w-5 h-5" />
                 End Call
               </Button>
             </div>
@@ -184,10 +182,10 @@ export default function ChatBubble({
       </AnimatePresence>
 
       <Dialog open={showTerms} onOpenChange={setShowTerms}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Terms and conditions</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl">Terms and conditions</DialogTitle>
+            <DialogDescription className="text-base leading-relaxed">
               By clicking "Agree," and each time I interact with this AI agent, I consent to the recording, storage, and sharing of my communications with third-party service providers, and as described in the Privacy Policy. If you do not wish to have your conversations recorded, please refrain from using this service.
             </DialogDescription>
           </DialogHeader>
