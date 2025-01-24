@@ -22,6 +22,14 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
 
 export function registerRoutes(app: Express): Server {
+  // Enable CORS for all routes
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+  });
+
   // Session middleware with secure settings
   app.use(
     session({
@@ -41,11 +49,12 @@ export function registerRoutes(app: Express): Server {
     })
   );
 
-  // Serve widget.js with CORS enabled
+  // Serve widget.js and all static files with CORS enabled
   app.get('/widget.js', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Content-Type', 'application/javascript');
     res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
   });
 

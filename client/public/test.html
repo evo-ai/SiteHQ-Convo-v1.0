@@ -42,8 +42,8 @@
         </code></pre>
     </div>
 
-    <h2>Live Demo</h2>
-    <p>Below is a working example of the widget:</p>
+    <h2>Live Demo (Global Script Method)</h2>
+    <p>Below is a working example of the widget using the global script method:</p>
 
     <!-- Example Implementation -->
     <script>
@@ -55,7 +55,23 @@
     </script>
     <script src="https://voice-convo-widget-futur-intel.replit.app/widget.js" async></script>
 
+    <h2>Live Demo (Custom Element Method)</h2>
+    <p>Below is a working example of the widget using the custom element method:</p>
+
+    <voice-convo-widget 
+        api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
+        agent-id="FnTVTPK2FfEkaktJIFFx"
+        theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
+    ></voice-convo-widget>
+
     <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
         .instructions {
             max-width: 800px;
             margin: 20px auto;
