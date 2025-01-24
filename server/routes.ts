@@ -4,8 +4,8 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { setupChatWebSocket } from './chat';
 import { insertAdminSchema } from '@db/schema';
 import { db } from '@db';
-import { admins } from '@db/schema';
-import { eq } from 'drizzle-orm';
+import { admins, conversations, conversationMetrics, conversationFeedback } from '@db/schema';
+import { eq, and, gte, lte } from 'drizzle-orm';
 import { requireAuth, hashPassword, comparePasswords } from './auth';
 import session from 'express-session';
 import MemoryStore from 'memorystore';
@@ -114,6 +114,133 @@ export function registerRoutes(app: Express): Server {
       return res.status(500).json({ 
         message: error instanceof Error ? error.message : 'Failed to get signed URL' 
       });
+    }
+  });
+
+  // Analytics routes
+  app.get('/api/analytics/metrics', requireAuth, async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+
+      // Get total conversations
+      const [{ count: totalConversations }] = await db
+        .select({ count: conversations.id })
+        .from(conversations)
+        .where(
+          and(
+            startDate ? gte(conversations.createdAt, new Date(startDate as string)) : undefined,
+            endDate ? lte(conversations.createdAt, new Date(endDate as string)) : undefined
+          )
+        );
+
+      // Get average duration
+      const [{ avgDuration }] = await db
+        .select({
+          avgDuration: conversations.duration
+        })
+        .from(conversations)
+        .where(
+          and(
+            startDate ? gte(conversations.createdAt, new Date(startDate as string)) : undefined,
+            endDate ? lte(conversations.createdAt, new Date(endDate as string)) : undefined
+          )
+        );
+
+      // Get average engagement score
+      const [{ avgEngagement }] = await db
+        .select({
+          avgEngagement: conversationMetrics.userEngagementScore
+        })
+        .from(conversationMetrics)
+        .where(
+          and(
+            startDate ? gte(conversationMetrics.createdAt, new Date(startDate as string)) : undefined,
+            endDate ? lte(conversationMetrics.createdAt, new Date(endDate as string)) : undefined
+          )
+        );
+
+      // Get satisfaction rate (average rating)
+      const [{ satisfactionRate }] = await db
+        .select({
+          satisfactionRate: conversationFeedback.rating
+        })
+        .from(conversationFeedback)
+        .where(
+          and(
+            startDate ? gte(conversationFeedback.createdAt, new Date(startDate as string)) : undefined,
+            endDate ? lte(conversationFeedback.createdAt, new Date(endDate as string)) : undefined
+          )
+        );
+
+      // Get time series data
+      const timeSeriesData = await db
+        .select({
+          date: conversations.createdAt,
+          conversations: conversations.id
+        })
+        .from(conversations)
+        .where(
+          and(
+            startDate ? gte(conversations.createdAt, new Date(startDate as string)) : undefined,
+            endDate ? lte(conversations.createdAt, new Date(endDate as string)) : undefined
+          )
+        )
+        .orderBy(conversations.createdAt);
+
+      // Get engagement distribution
+      const engagementDistribution = await db
+        .select({
+          range: conversationMetrics.userEngagementScore,
+          count: conversationMetrics.id
+        })
+        .from(conversationMetrics)
+        .where(
+          and(
+            startDate ? gte(conversationMetrics.createdAt, new Date(startDate as string)) : undefined,
+            endDate ? lte(conversationMetrics.createdAt, new Date(endDate as string)) : undefined
+          )
+        )
+        .groupBy(conversationMetrics.userEngagementScore);
+
+      res.json({
+        totalConversations,
+        avgDuration,
+        avgEngagement,
+        satisfactionRate,
+        timeSeriesData,
+        engagementDistribution
+      });
+    } catch (error) {
+      console.error('Error fetching analytics metrics:', error);
+      res.status(500).json({ message: 'Failed to fetch analytics metrics' });
+    }
+  });
+
+  app.get('/api/analytics/feedback', requireAuth, async (req, res) => {
+    try {
+      // Get sentiment distribution
+      const sentimentDistribution = await db
+        .select({
+          name: conversationFeedback.sentiment,
+          value: conversationFeedback.id
+        })
+        .from(conversationFeedback)
+        .groupBy(conversationFeedback.sentiment);
+
+      // Get recent feedback
+      const recentFeedback = await db
+        .select()
+        .from(conversationFeedback)
+        .orderBy(conversationFeedback.createdAt)
+        .limit(5);
+
+      res.json({
+        sentimentDistribution,
+        recentFeedback
+      });
+    } catch (error) {
+      console.error('Error fetching feedback data:', error);
+      res.status(500).json({ message: 'Failed to fetch feedback data' });
     }
   });
 

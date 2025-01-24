@@ -30,16 +30,43 @@ export const conversations = pgTable("conversations", {
   configId: integer("config_id").references(() => widgetConfigs.id).notNull(),
   agentId: text("agent_id").notNull(),
   messages: jsonb("messages").notNull().default([]),
+  startedAt: timestamp("started_at").defaultNow(),
+  endedAt: timestamp("ended_at"),
+  duration: integer("duration"), // in seconds
+  totalTurns: integer("total_turns").default(0),
+  interruptions: integer("interruptions").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const conversationMetrics = pgTable("conversation_metrics", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").references(() => conversations.id).notNull(),
+  avgResponseTime: integer("avg_response_time"), // in milliseconds
+  userEngagementScore: integer("user_engagement_score"), // 1-100
+  completionRate: integer("completion_rate"), // percentage
+  successfulInterruptions: integer("successful_interruptions").default(0),
+  failedInterruptions: integer("failed_interruptions").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const conversationFeedback = pgTable("conversation_feedback", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").references(() => conversations.id).notNull(),
+  rating: integer("rating"), // 1-5 stars
+  feedback: text("feedback"),
+  sentiment: text("sentiment"), // positive, negative, neutral
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
-export const conversationsRelations = relations(conversations, ({ one }) => ({
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
   config: one(widgetConfigs, {
     fields: [conversations.configId],
     references: [widgetConfigs.id],
   }),
+  metrics: many(conversationMetrics),
+  feedback: many(conversationFeedback),
 }));
 
 export const widgetConfigsRelations = relations(widgetConfigs, ({ one, many }) => ({
@@ -65,3 +92,13 @@ export const insertConversationSchema = createInsertSchema(conversations);
 export const selectConversationSchema = createSelectSchema(conversations);
 export type InsertConversation = typeof conversations.$inferInsert;
 export type SelectConversation = typeof conversations.$inferSelect;
+
+export const insertConversationMetricsSchema = createInsertSchema(conversationMetrics);
+export const selectConversationMetricsSchema = createSelectSchema(conversationMetrics);
+export type InsertConversationMetrics = typeof conversationMetrics.$inferInsert;
+export type SelectConversationMetrics = typeof conversationMetrics.$inferSelect;
+
+export const insertConversationFeedbackSchema = createInsertSchema(conversationFeedback);
+export const selectConversationFeedbackSchema = createSelectSchema(conversationFeedback);
+export type InsertConversationFeedback = typeof conversationFeedback.$inferInsert;
+export type SelectConversationFeedback = typeof conversationFeedback.$inferSelect;
