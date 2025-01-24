@@ -198,7 +198,7 @@ export default function AnalyticsDashboard() {
                   <div className="flex items-center gap-2 mb-2">
                     <div className="flex-1">
                       <div className="text-sm font-medium">
-                        {format(new Date(feedback.created_at), 'PPp')}
+                        {feedback.created_at ? format(new Date(feedback.created_at), 'PPp') : 'Date not available'}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Rating: {feedback.rating}/5
