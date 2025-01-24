@@ -2,7 +2,7 @@ class VoiceConvoWidget extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.initialized = false;
+    this.initialized = false; // Flag to track if chat is initialized
   }
 
   async connectedCallback() {
@@ -71,12 +71,6 @@ class VoiceConvoWidget extends HTMLElement {
         color: #333;
         margin-right: auto;
       }
-
-      .error {
-        color: #dc2626;
-        padding: 10px;
-        text-align: center;
-      }
     `;
 
     this.shadowRoot.appendChild(styles);
@@ -108,6 +102,7 @@ class VoiceConvoWidget extends HTMLElement {
       container.appendChild(chatWindow);
       this.shadowRoot.appendChild(container);
 
+      // Apply custom theme if provided
       this.applyTheme();
     } catch (error) {
       console.error('Failed to initialize widget:', error);
@@ -120,13 +115,24 @@ class VoiceConvoWidget extends HTMLElement {
       const scriptTag = document.querySelector('script[src*="widget.js"]');
       const baseUrl = scriptTag ? new URL(scriptTag.src).origin : window.location.origin;
 
-      // Connect to our middleware server
-      const ws = new WebSocket(`${baseUrl.replace('http', 'ws')}/api/chat`);
+      const response = await fetch(`${baseUrl}/api/get-signed-url`, {
+        headers: {
+          'Authorization': `Bearer ${this.getAttribute('api-key')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get signed URL');
+      }
+
+      const { signedUrl } = await response.json();
+      const ws = new WebSocket(signedUrl);
 
       ws.onopen = () => {
         ws.send(JSON.stringify({
           type: 'init',
-          apiKey: this.getAttribute('api-key')
+          agentId: this.getAttribute('agent-id'),
+          signedUrl
         }));
       };
 

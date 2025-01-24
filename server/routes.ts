@@ -4,7 +4,7 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { setupChatWebSocket } from './chat';
 import { insertAdminSchema } from '@db/schema';
 import { db } from '@db';
-import { admins, conversations, conversationMetrics, conversationFeedback, widgetConfigs } from '@db/schema';
+import { admins, conversations, conversationMetrics, conversationFeedback } from '@db/schema';
 import { eq, and, gte, lte, sql } from 'drizzle-orm';
 import { requireAuth, hashPassword, comparePasswords } from './auth';
 import session from 'express-session';
@@ -125,32 +125,15 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
-  // Update the signed URL endpoint to use widget config
   app.get('/api/get-signed-url', async (req, res) => {
     try {
-      // Get API key from Authorization header
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Missing or invalid API key' });
-      }
-
-      const apiKey = authHeader.split(' ')[1];
-
-      // Validate API key against widget configs
-      const widgetConfig = await db.query.widgetConfigs.findFirst({
-        where: eq(widgetConfigs.elevenlabsApiKey, apiKey),
-        columns: {
-          agentId: true,
-          active: true
-        }
-      });
-
-      if (!widgetConfig || !widgetConfig.active) {
-        return res.status(401).json({ message: 'Invalid or inactive widget configuration' });
+      const apiKey = process.env.ELEVENLABS_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: 'ElevenLabs API key not configured' });
       }
 
       const response = await fetch(
-        `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${widgetConfig.agentId}`,
+        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
         {
           headers: {
             'xi-api-key': apiKey
