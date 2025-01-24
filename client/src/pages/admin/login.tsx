@@ -37,13 +37,14 @@ export default function AdminLogin() {
       });
 
       if (!res.ok) {
-        throw new Error(await res.text());
+        const error = await res.json();
+        throw new Error(error.message || 'Login failed');
       }
 
       return res.json();
     },
     onSuccess: () => {
-      navigate("/admin/dashboard");
+      navigate("/admin/analytics"); // Changed from /admin/dashboard to /admin/analytics
     },
     onError: (error) => {
       toast({

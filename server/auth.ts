@@ -15,21 +15,29 @@ export async function requireAuth(
   res: Response,
   next: NextFunction,
 ) {
-  if (!req.session.adminId) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-
   try {
+    if (!req.session.adminId) {
+      console.log('No session found, redirecting to login');
+      return res.status(401).json({ message: 'Unauthorized', redirect: '/admin/login' });
+    }
+
     const admin = await db.query.admins.findFirst({
       where: eq(admins.id, req.session.adminId),
     });
 
     if (!admin) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      // Clear invalid session
+      req.session.destroy((err) => {
+        if (err) console.error('Error destroying invalid session:', err);
+      });
+      return res.status(401).json({ message: 'Unauthorized', redirect: '/admin/login' });
     }
 
+    // Attach admin to request for use in protected routes
+    (req as any).admin = { id: admin.id, email: admin.email };
     next();
   } catch (error) {
+    console.error('Auth middleware error:', error);
     next(error);
   }
 }

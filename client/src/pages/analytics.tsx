@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import { useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -21,16 +23,33 @@ import { format } from "date-fns";
 import ConversationFlow from "@/components/conversation/ConversationFlow";
 
 export default function AnalyticsDashboard() {
+  const [, navigate] = useLocation();
+
+  // Check authentication status
+  const { data: authData, isError: isAuthError } = useQuery({
+    queryKey: ["/api/auth/status"],
+    retry: false
+  });
+
+  useEffect(() => {
+    if (isAuthError || (authData && !authData.authenticated)) {
+      navigate("/admin/login");
+    }
+  }, [authData, isAuthError, navigate]);
+
   const { data: metricsData, isLoading: isLoadingMetrics } = useQuery({
     queryKey: ["/api/analytics/metrics"],
+    enabled: !!authData?.authenticated
   });
 
   const { data: feedbackData, isLoading: isLoadingFeedback } = useQuery({
     queryKey: ["/api/analytics/feedback"],
+    enabled: !!authData?.authenticated
   });
 
   const { data: conversationData, isLoading: isLoadingConversation } = useQuery({
     queryKey: ["/api/analytics/conversation"],
+    enabled: !!authData?.authenticated
   });
 
   if (isLoadingMetrics || isLoadingFeedback || isLoadingConversation) {

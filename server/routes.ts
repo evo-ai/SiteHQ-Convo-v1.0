@@ -12,19 +12,37 @@ import MemoryStore from 'memorystore';
 
 const MemoryStoreSession = MemoryStore(session);
 
+const ONE_DAY = 1000 * 60 * 60 * 24;
+const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
+
 export function registerRoutes(app: Express): Server {
-  // Session middleware
+  // Session middleware with secure settings
   app.use(
     session({
-      cookie: { maxAge: 86400000 },
+      cookie: {
+        maxAge: ONE_DAY,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        httpOnly: true
+      },
       store: new MemoryStoreSession({
-        checkPeriod: 86400000, // prune expired entries every 24h
+        checkPeriod: ONE_DAY
       }),
       resave: false,
-      secret: 'your-secret-key',
+      secret: COOKIE_SECRET,
       saveUninitialized: false,
+      name: 'analytics_session'
     })
   );
+
+  // Auth status check endpoint
+  app.get('/api/auth/status', (req, res) => {
+    if (req.session.adminId) {
+      res.json({ authenticated: true });
+    } else {
+      res.json({ authenticated: false });
+    }
+  });
 
   // Auth routes
   app.post('/api/auth/register', async (req, res) => {
@@ -70,8 +88,15 @@ export function registerRoutes(app: Express): Server {
       }
 
       req.session.adminId = admin.id;
-      res.json({ admin: { id: admin.id, email: admin.email } });
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: 'Error saving session' });
+        }
+        res.json({ admin: { id: admin.id, email: admin.email } });
+      });
     } catch (error) {
+      console.error('Login error:', error);
       res.status(400).json({ message: String(error) });
     }
   });
@@ -81,6 +106,7 @@ export function registerRoutes(app: Express): Server {
       if (err) {
         return res.status(500).json({ message: 'Failed to logout' });
       }
+      res.clearCookie('analytics_session');
       res.json({ message: 'Logged out successfully' });
     });
   });
@@ -128,7 +154,7 @@ export function registerRoutes(app: Express): Server {
         overallSentiment 
       }] = await db
         .select({
-          count: conversations.id,
+          count: sql<number>`count(${conversations.id})`,
           avgDuration: sql<number>`avg(${conversations.duration})`,
           avgEngagement: sql<number>`avg(${conversationMetrics.userEngagementScore})`,
           overallSentiment: sql<number>`avg(${conversations.overallSentiment})`

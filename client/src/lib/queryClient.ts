@@ -9,11 +9,17 @@ export const queryClient = new QueryClient({
         });
 
         if (!res.ok) {
+          if (res.status === 401) {
+            // Handle unauthorized access by redirecting to login
+            window.location.href = "/admin/login";
+            throw new Error("Please login to access this resource");
+          }
           if (res.status >= 500) {
             throw new Error(`${res.status}: ${res.statusText}`);
           }
 
-          throw new Error(`${res.status}: ${await res.text()}`);
+          const errorData = await res.json().catch(() => ({ message: res.statusText }));
+          throw new Error(errorData.message || `${res.status}: ${res.statusText}`);
         }
 
         return res.json();
@@ -21,7 +27,11 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
-      retry: false,
+      retry: (failureCount, error) => {
+        // Don't retry on 401 unauthorized
+        if (error.message.includes("Please login")) return false;
+        return failureCount < 3;
+      },
     },
     mutations: {
       retry: false,
