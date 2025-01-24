@@ -25,16 +25,22 @@ if (!process.env.ELEVENLABS_API_KEY) {
 
 export async function getSignedUrl(agentId: string) {
   try {
+    const headers = new Headers();
+    headers.append('xi-api-key', process.env.ELEVENLABS_API_KEY);
+
     const response = await fetch(
       `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${agentId}`,
       {
-        headers: {
-          'xi-api-key': process.env.ELEVENLABS_API_KEY
-        }
+        method: 'GET',
+        headers
       }
     );
 
     if (!response.ok) {
+      console.error('ElevenLabs API Error:', {
+        status: response.status,
+        statusText: response.statusText
+      });
       throw new Error(`Failed to get signed URL: ${response.status}`);
     }
 
@@ -117,12 +123,12 @@ export function setupChatWebSocket(ws: WebSocket) {
                   };
 
                   // Update conversation with new message
-                  const currentMessages = Array.isArray(currentConversation.messages) 
-                    ? currentConversation.messages 
+                  const currentMessages = Array.isArray(currentConversation.messages)
+                    ? currentConversation.messages
                     : [];
 
                   const updatedMessages = [...currentMessages, messageWithSentiment];
-                  const overallSentiment = updatedMessages.reduce((acc, msg: any) => 
+                  const overallSentiment = updatedMessages.reduce((acc, msg: any) =>
                     acc + (msg.sentiment?.score || 0), 0) / updatedMessages.length;
 
                   await db.update(conversations)
@@ -186,12 +192,12 @@ export function setupChatWebSocket(ws: WebSocket) {
               }
             };
 
-            const currentMessages = Array.isArray(currentConversation.messages) 
-              ? currentConversation.messages 
+            const currentMessages = Array.isArray(currentConversation.messages)
+              ? currentConversation.messages
               : [];
 
             const updatedMessages = [...currentMessages, messageWithSentiment];
-            const overallSentiment = updatedMessages.reduce((acc, msg: any) => 
+            const overallSentiment = updatedMessages.reduce((acc, msg: any) =>
               acc + (msg.sentiment?.score || 0), 0) / updatedMessages.length;
 
             await db.update(conversations)
