@@ -10,6 +10,11 @@ import { requireAuth, hashPassword, comparePasswords } from './auth';
 import session from 'express-session';
 import MemoryStore from 'memorystore';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const MemoryStoreSession = MemoryStore(session);
 
@@ -40,8 +45,8 @@ export function registerRoutes(app: Express): Server {
   app.get('/widget.js', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.sendFile(path.resolve(__dirname, '../client/public/widget.js'));
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
   });
 
   // Auth status check endpoint
@@ -156,11 +161,11 @@ export function registerRoutes(app: Express): Server {
       const { startDate, endDate } = req.query;
 
       // Get total conversations and metrics
-      const [{ 
+      const [{
         count: totalConversations,
         avgDuration,
         avgEngagement,
-        overallSentiment 
+        overallSentiment
       }] = await db
         .select({
           count: sql<number>`count(${conversations.id})`,
