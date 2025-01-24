@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, jsonb, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, jsonb, boolean, integer, real } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from 'drizzle-orm';
 
@@ -35,6 +35,8 @@ export const conversations = pgTable("conversations", {
   duration: integer("duration"), // in seconds
   totalTurns: integer("total_turns").default(0),
   interruptions: integer("interruptions").default(0),
+  overallSentiment: real("overall_sentiment").default(0), // Average sentiment score
+  emotionalStates: jsonb("emotional_states").default([]), // Array of emotional states over time
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
