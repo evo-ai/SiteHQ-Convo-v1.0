@@ -2,7 +2,7 @@ class VoiceConvoWidget extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.initialized = false; // Flag to track if chat is initialized
+    this.initialized = false;
   }
 
   async connectedCallback() {
@@ -71,6 +71,15 @@ class VoiceConvoWidget extends HTMLElement {
         color: #333;
         margin-right: auto;
       }
+
+      .error {
+        background-color: #ff4444;
+        color: white;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+      }
     `;
 
     this.shadowRoot.appendChild(styles);
@@ -102,7 +111,6 @@ class VoiceConvoWidget extends HTMLElement {
       container.appendChild(chatWindow);
       this.shadowRoot.appendChild(container);
 
-      // Apply custom theme if provided
       this.applyTheme();
     } catch (error) {
       console.error('Failed to initialize widget:', error);
@@ -111,31 +119,38 @@ class VoiceConvoWidget extends HTMLElement {
 
   async initializeChat(chatWindow) {
     try {
-      // Get the base URL from the script tag
+      console.log('Initializing chat...');
       const scriptTag = document.querySelector('script[src*="widget.js"]');
       const baseUrl = scriptTag ? new URL(scriptTag.src).origin : window.location.origin;
+      console.log('Base URL:', baseUrl);
 
       const apiKey = this.getAttribute('api-key');
       if (!apiKey) {
         throw new Error('API key is required. Add api-key attribute to the widget.');
       }
+      console.log('API Key present:', !!apiKey);
 
+      console.log('Fetching signed URL...');
       const response = await fetch(`${baseUrl}/api/get-signed-url`, {
         headers: {
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
         }
       });
 
+      console.log('Signed URL response status:', response.status);
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || 'Failed to get signed URL');
       }
 
       const { signedUrl } = await response.json();
+      console.log('Got signed URL, connecting to WebSocket...');
+
       const ws = new WebSocket(signedUrl);
 
       ws.onopen = () => {
-        console.log('Connected to ElevenLabs');
+        console.log('WebSocket connected');
         const agentId = this.getAttribute('agent-id');
         ws.send(JSON.stringify({
           type: 'init',
@@ -146,7 +161,7 @@ class VoiceConvoWidget extends HTMLElement {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log('Message:', data);
+          console.log('Received message:', data);
           this.updateChatUI(chatWindow, data);
         } catch (error) {
           console.error('Error processing message:', error);
@@ -159,8 +174,7 @@ class VoiceConvoWidget extends HTMLElement {
       };
 
       ws.onclose = () => {
-        console.log('Disconnected from ElevenLabs');
-        // Optional: Implement reconnection logic here
+        console.log('WebSocket connection closed');
       };
 
       this.ws = ws;
@@ -180,7 +194,7 @@ class VoiceConvoWidget extends HTMLElement {
 
   showError(chatWindow, message) {
     const errorElement = document.createElement('div');
-    errorElement.className = 'message error';
+    errorElement.className = 'error';
     errorElement.textContent = message;
     chatWindow.appendChild(errorElement);
   }
@@ -211,5 +225,4 @@ class VoiceConvoWidget extends HTMLElement {
   }
 }
 
-// Register the custom element
 customElements.define('voice-convo-widget', VoiceConvoWidget);

@@ -21,9 +21,21 @@ const MemoryStoreSession = MemoryStore(session);
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
 
+// Default API key for testing
 const DEFAULT_CLIENT_API_KEY = 'vc_live_8f4a9c2e7b6d5x3y1w9v8u4t2p0n7m5k3j1h';
 
 export function registerRoutes(app: Express): Server {
+  // Enable CORS for all routes
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+    next();
+  });
+
   app.use(
     session({
       cookie: {
@@ -42,11 +54,71 @@ export function registerRoutes(app: Express): Server {
     })
   );
 
+  // Serve widget.js with CORS enabled
   app.get('/widget.js', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
+  });
+
+  // Signed URL endpoint with detailed logging
+  app.get('/api/get-signed-url', async (req, res) => {
+    try {
+      console.log('Received signed URL request');
+      console.log('Headers:', req.headers);
+
+      const authHeader = req.headers.authorization;
+      console.log('Auth header:', authHeader);
+
+      const clientApiKey = authHeader?.replace('Bearer ', '');
+      console.log('Extracted client API key:', clientApiKey);
+
+      if (!clientApiKey) {
+        console.log('No API key provided');
+        return res.status(401).json({ message: 'API key is required' });
+      }
+
+      const validApiKey = process.env.CLIENT_API_KEY || DEFAULT_CLIENT_API_KEY;
+      console.log('Using API key:', validApiKey);
+      console.log('Keys match:', clientApiKey === validApiKey);
+
+      if (clientApiKey !== validApiKey) {
+        console.log('Invalid API key provided');
+        return res.status(401).json({ message: 'Invalid API key' });
+      }
+
+      const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
+      if (!elevenLabsApiKey) {
+        console.log('No ElevenLabs API key configured');
+        return res.status(500).json({ message: 'ElevenLabs API key not configured' });
+      }
+
+      console.log('Making request to ElevenLabs API');
+      const response = await fetch(
+        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
+        {
+          headers: {
+            'xi-api-key': elevenLabsApiKey,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('ElevenLabs response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('ElevenLabs API error:', errorText);
+        throw new Error(`ElevenLabs API error: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Successfully got signed URL');
+      return res.json({ signedUrl: data.signed_url });
+    } catch (error) {
+      console.error('Error getting signed URL:', error);
+      return res.status(500).json({
+        message: error instanceof Error ? error.message : 'Failed to get signed URL'
+      });
+    }
   });
 
   app.get('/api/auth/status', (req, res) => {
@@ -123,61 +195,6 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
-  app.get('/api/get-signed-url', async (req, res) => {
-    try {
-      console.log('Received signed URL request');
-      const clientApiKey = req.headers.authorization?.replace('Bearer ', '');
-      if (!clientApiKey) {
-        console.log('No API key provided');
-        return res.status(401).json({ message: 'API key is required' });
-      }
-
-      const validApiKey = process.env.CLIENT_API_KEY || DEFAULT_CLIENT_API_KEY;
-      console.log('Validating API key:', clientApiKey === validApiKey);
-
-      if (clientApiKey !== validApiKey) {
-        return res.status(401).json({ message: 'Invalid API key' });
-      }
-
-      const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
-      if (!elevenLabsApiKey) {
-        return res.status(500).json({ message: 'ElevenLabs API key not configured' });
-      }
-
-      const clientIp = req.ip;
-      const currentTime = Date.now();
-      const rateLimit = getRateLimit(clientIp, currentTime);
-
-      if (rateLimit.exceeded) {
-        return res.status(429).json({ 
-          message: 'Rate limit exceeded. Please try again later.',
-          resetTime: rateLimit.resetTime 
-        });
-      }
-
-      const response = await fetch(
-        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
-        {
-          headers: {
-            'xi-api-key': elevenLabsApiKey,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`ElevenLabs API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return res.json({ signedUrl: data.signed_url });
-    } catch (error) {
-      console.error('Error getting signed URL:', error);
-      return res.status(500).json({
-        message: error instanceof Error ? error.message : 'Failed to get signed URL'
-      });
-    }
-  });
 
   app.get('/api/analytics/metrics', async (req, res) => {
     try {
