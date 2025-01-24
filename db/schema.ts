@@ -36,6 +36,7 @@ export const conversations = pgTable("conversations", {
   totalTurns: integer("total_turns").default(0),
   interruptions: integer("interruptions").default(0),
   overallSentiment: real("overall_sentiment").default(0), // Average sentiment score
+  sentimentTrend: jsonb("sentiment_trend").default([]), // Array of sentiment scores over time
   emotionalStates: jsonb("emotional_states").default([]), // Array of emotional states over time
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
