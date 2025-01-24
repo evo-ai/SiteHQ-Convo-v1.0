@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/ui/date-range-picker";
 import { Activity, MessageCircle, ThumbsUp, Timer } from "lucide-react";
 import { format } from "date-fns";
+import ConversationFlow from "@/components/conversation/ConversationFlow";
 
 export default function AnalyticsDashboard() {
   const { data: metricsData, isLoading: isLoadingMetrics } = useQuery({
@@ -28,7 +29,12 @@ export default function AnalyticsDashboard() {
     queryKey: ["/api/analytics/feedback"],
   });
 
-  if (isLoadingMetrics || isLoadingFeedback) {
+  // New query for conversation flow data
+  const { data: conversationData, isLoading: isLoadingConversation } = useQuery({
+    queryKey: ["/api/analytics/conversation"],
+  });
+
+  if (isLoadingMetrics || isLoadingFeedback || isLoadingConversation) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
@@ -74,6 +80,18 @@ export default function AnalyticsDashboard() {
           trend={+12}
         />
       </div>
+
+      {/* Conversation Flow Visualization */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Conversation Flow Analysis</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {conversationData?.conversation && (
+            <ConversationFlow conversation={conversationData.conversation} />
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2 mb-8">
         <Card>

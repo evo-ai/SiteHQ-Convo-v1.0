@@ -111,8 +111,8 @@ export function registerRoutes(app: Express): Server {
       return res.json({ signedUrl: data.signed_url });
     } catch (error) {
       console.error('Error getting signed URL:', error);
-      return res.status(500).json({ 
-        message: error instanceof Error ? error.message : 'Failed to get signed URL' 
+      return res.status(500).json({
+        message: error instanceof Error ? error.message : 'Failed to get signed URL'
       });
     }
   });
@@ -243,6 +243,51 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ message: 'Failed to fetch feedback data' });
     }
   });
+
+  // Add new conversation flow endpoint
+  app.get('/api/analytics/conversation', requireAuth, async (req, res) => {
+    try {
+      const { conversationId } = req.query;
+
+      // Get conversation with messages
+      const conversation = await db
+        .select({
+          id: conversations.id,
+          messages: conversations.messages,
+          startedAt: conversations.startedAt,
+          endedAt: conversations.endedAt,
+          duration: conversations.duration,
+          totalTurns: conversations.totalTurns,
+          interruptions: conversations.interruptions
+        })
+        .from(conversations)
+        .where(conversationId ? eq(conversations.id, Number(conversationId)) : undefined)
+        .orderBy(conversations.createdAt)
+        .limit(1);
+
+      if (!conversation.length) {
+        return res.status(404).json({ message: 'Conversation not found' });
+      }
+
+      // Transform the messages for the flow visualization
+      const transformedMessages = conversation[0].messages.map((msg: any, index: number) => ({
+        id: `msg-${index}`,
+        ...msg,
+        timestamp: new Date(msg.timestamp).toISOString()
+      }));
+
+      res.json({
+        conversation: {
+          ...conversation[0],
+          messages: transformedMessages
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching conversation flow data:', error);
+      res.status(500).json({ message: 'Failed to fetch conversation flow data' });
+    }
+  });
+
 
   // WebSocket setup for chat
   const httpServer = createServer(app);
