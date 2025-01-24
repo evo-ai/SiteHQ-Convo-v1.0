@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocket, WebSocketServer } from 'ws';
-import { setupChatWebSocket, getSignedUrl } from './chat';
+import { setupChatWebSocket } from './chat';
 import { insertAdminSchema } from '@db/schema';
 import { db } from '@db';
 import { admins, conversations, conversationMetrics, conversationFeedback } from '@db/schema';
@@ -22,14 +22,6 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
 
 export function registerRoutes(app: Express): Server {
-  // Enable CORS for all routes
-  app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-  });
-
   // Session middleware with secure settings
   app.use(
     session({
@@ -49,31 +41,12 @@ export function registerRoutes(app: Express): Server {
     })
   );
 
-  // Serve widget.js with proper CORS and content type
+  // Serve widget.js with CORS enabled
   app.get('/widget.js', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
-  });
-
-  // Get signed URL endpoint - no API key required from client
-  app.get('/api/get-signed-url', async (req, res) => {
-    try {
-      const { agentId } = req.query;
-
-      if (!agentId) {
-        return res.status(400).json({ error: 'Agent ID is required' });
-      }
-
-      const signedUrl = await getSignedUrl(agentId as string);
-      return res.json({ signedUrl });
-    } catch (error) {
-      console.error('Error getting signed URL:', error);
-      return res.status(500).json({
-        error: 'Failed to get signed URL'
-      });
-    }
   });
 
   // Auth status check endpoint
@@ -152,6 +125,35 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
+  app.get('/api/get-signed-url', async (req, res) => {
+    try {
+      const apiKey = process.env.ELEVENLABS_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: 'ElevenLabs API key not configured' });
+      }
+
+      const response = await fetch(
+        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
+        {
+          headers: {
+            'xi-api-key': apiKey
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to get signed URL from ElevenLabs');
+      }
+
+      const data = await response.json();
+      return res.json({ signedUrl: data.signed_url });
+    } catch (error) {
+      console.error('Error getting signed URL:', error);
+      return res.status(500).json({
+        message: error instanceof Error ? error.message : 'Failed to get signed URL'
+      });
+    }
+  });
 
   // Analytics routes
   app.get('/api/analytics/metrics', async (req, res) => {

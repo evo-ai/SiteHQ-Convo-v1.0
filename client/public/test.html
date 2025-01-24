@@ -15,17 +15,19 @@
 <!-- Widget Configuration -->
 &lt;script&gt;
     window.CONVAI_SETTINGS = {
-        agentId: "FnTVTPK2FfEkaktJIFFx",
-        title: "LifePod Agent"
+        apiKey: "your-api-key",
+        agentId: "your-agent-id",
+        title: "Your Assistant Name"
     };
 &lt;/script&gt;
 
 <!-- Widget Script -->
-&lt;script src="https://voice-convo-widget-futur-intel.replit.app/widget.js" async&gt;&lt;/script&gt;
+&lt;script src="https://{your-replit-url}/widget.js" async&gt;&lt;/script&gt;
         </code></pre>
 
         <h3>Required Parameters:</h3>
         <ul>
+            <li><strong>apiKey</strong>: Your ElevenLabs API key</li>
             <li><strong>agentId</strong>: Your ConvAI agent ID</li>
             <li><strong>title</strong> (optional): Custom title for the chat window</li>
         </ul>
@@ -33,40 +35,25 @@
         <h3>Or use as a Custom Element:</h3>
         <pre><code>
 &lt;voice-convo-widget 
-    agent-id="FnTVTPK2FfEkaktJIFFx"
+    api-key="your-api-key"
+    agent-id="your-agent-id"
     theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
 &gt;&lt;/voice-convo-widget&gt;
         </code></pre>
     </div>
 
-    <h2>Live Demo (Global Script Method)</h2>
-    <p>Below is a working example of the widget using the global script method:</p>
+    <h2>Live Demo</h2>
+    <p>Below is a working example of the widget:</p>
 
     <!-- Example Implementation -->
-    <script>
-        window.CONVAI_SETTINGS = {
-            agentId: "FnTVTPK2FfEkaktJIFFx",
-            title: "LifePod Agent"
-        };
-    </script>
-    <script src="https://voice-convo-widget-futur-intel.replit.app/widget.js" async></script>
-
-    <h2>Live Demo (Custom Element Method)</h2>
-    <p>Below is a working example of the widget using the custom element method:</p>
-
     <voice-convo-widget 
         agent-id="FnTVTPK2FfEkaktJIFFx"
+        api-key="your-api-key"
         theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
     ></voice-convo-widget>
+    <script src="/widget.js" async type="text/javascript"></script>
 
     <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            line-height: 1.5;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
         .instructions {
             max-width: 800px;
             margin: 20px auto;
