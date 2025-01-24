@@ -15,7 +15,6 @@
 <!-- Widget Configuration -->
 &lt;script&gt;
     window.CONVAI_SETTINGS = {
-        apiKey: "sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500",
         agentId: "FnTVTPK2FfEkaktJIFFx",
         title: "LifePod Agent"
     };
@@ -27,7 +26,6 @@
 
         <h3>Required Parameters:</h3>
         <ul>
-            <li><strong>apiKey</strong>: Your ElevenLabs API key</li>
             <li><strong>agentId</strong>: Your ConvAI agent ID</li>
             <li><strong>title</strong> (optional): Custom title for the chat window</li>
         </ul>
@@ -35,7 +33,6 @@
         <h3>Or use as a Custom Element:</h3>
         <pre><code>
 &lt;voice-convo-widget 
-    api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
     agent-id="FnTVTPK2FfEkaktJIFFx"
     theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
 &gt;&lt;/voice-convo-widget&gt;
@@ -48,7 +45,6 @@
     <!-- Example Implementation -->
     <script>
         window.CONVAI_SETTINGS = {
-            apiKey: "sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500",
             agentId: "FnTVTPK2FfEkaktJIFFx",
             title: "LifePod Agent"
         };
@@ -59,7 +55,6 @@
     <p>Below is a working example of the widget using the custom element method:</p>
 
     <voice-convo-widget 
-        api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
         agent-id="FnTVTPK2FfEkaktJIFFx"
         theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
     ></voice-convo-widget>
