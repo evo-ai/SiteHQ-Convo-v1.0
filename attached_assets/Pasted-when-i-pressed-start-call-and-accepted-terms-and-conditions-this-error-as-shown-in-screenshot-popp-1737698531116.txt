@@ -1,0 +1,205 @@
+when i pressed 'start call' and accepted terms and conditions this error as shown in screenshot popped up 
+moreover would below be the correct api 
+const websocketUrl = "wss://api.elevenlabs.io/v1/convai/conversation?agent_id=FnTVTPK2FfEkaktJIFFx";
+
+for you to have context i will share the widget of my elevenlabs bot and the docuemntation for api from elevenlabs so that you can determine how to extract correct API. Please find details as below 
+
+Embed code
+Add the following snippet to the pages where you want the conversation widget to be.
+<elevenlabs-convai agent-id="FnTVTPK2FfEkaktJIFFx"></elevenlabs-convai><script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+
+
+API Reference
+WebSocket
+Create real-time, interactive voice conversations with AI agents
+This documentation is for developers integrating directly with the ElevenLabs WebSocket API. For convenience, consider using the official SDKs provided by ElevenLabs.
+
+The ElevenLabs Conversational AI WebSocket API enables real-time, interactive voice conversations with AI agents. By establishing a WebSocket connection, you can send audio input and receive audio responses in real-time, creating life-like conversational experiences.
+
+Endpoint: wss://api.elevenlabs.io/v1/convai/conversation?agent_id={agent_id}
+
+Authentication
+
+Using Agent ID
+
+For public agents, you can directly use the agent_id in the WebSocket URL without additional authentication:
+
+wss://api.elevenlabs.io/v1/convai/conversation?agent_id=<your-agent-id>
+
+Using a Signed URL
+
+For private agents or conversations requiring authorization, obtain a signed URL from your server, which securely communicates with the ElevenLabs API using your API key.
+
+Example using cURL
+
+Request:
+
+curl -X GET "https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=<your-agent-id>" \
+     -H "xi-api-key: <your-api-key>"
+
+Response:
+
+{
+  "signed_url": "wss://api.elevenlabs.io/v1/convai/conversation?agent_id=<your-agent-id>&token=<token>"
+}
+
+Never expose your ElevenLabs API key on the client side.
+Communication
+
+Client-to-Server Messages
+
+User Audio Chunk
+
+Send audio data from the user to the server.
+
+Format:
+
+{
+  "user_audio_chunk": "<base64-encoded-audio-data>"
+}
+
+Notes:
+
+Audio Format Requirements:
+
+PCM 16-bit mono format
+Base64 encoded
+Sample rate of 16,000 Hz
+Recommended Chunk Duration:
+
+Send audio chunks approximately every 250 milliseconds (0.25 seconds)
+This equates to chunks of about 4,000 samples at a 16,000 Hz sample rate
+Optimizing Latency and Efficiency:
+
+Balance Latency and Efficiency: Sending audio chunks every 250 milliseconds offers a good trade-off between responsiveness and network overhead.
+Adjust Based on Needs:
+Lower Latency Requirements: Decrease the chunk duration to send smaller chunks more frequently.
+Higher Efficiency Requirements: Increase the chunk duration to send larger chunks less frequently.
+Network Conditions: Adapt the chunk size if you experience network constraints or variability.
+Pong Message
+
+Respond to server ping messages by sending a pong message, ensuring the event_id matches the one received in the ping message.
+
+Format:
+
+{
+  "type": "pong",
+  "event_id": 12345
+}
+
+Server-to-Client Messages
+
+conversation_initiation_metadata
+
+Provides initial metadata about the conversation.
+
+Format:
+
+{
+  "type": "conversation_initiation_metadata",
+  "conversation_initiation_metadata_event": {
+    "conversation_id": "conv_123456789",
+    "agent_output_audio_format": "pcm_16000"
+  }
+}
+
+Other Server-to-Client Messages
+
+Type	Purpose
+user_transcript	Transcriptions of the user’s speech
+agent_response	Agent’s textual response
+audio	Chunks of the agent’s audio response
+interruption	Indicates that the agent’s response was interrupted
+ping	Server pings to measure latency
+client-tool-call	Initiate client tool call
+client-tool-result	Response for the client tool call
+Message Formats
+user_transcript:
+
+{
+  "type": "user_transcript",
+  "user_transcription_event": {
+    "user_transcript": "Hello, how are you today?"
+  }
+}
+
+agent_response:
+
+{
+  "type": "agent_response",
+  "agent_response_event": {
+    "agent_response": "Hello! I'm doing well, thank you for asking. How can I assist you today?"
+  }
+}
+
+audio:
+
+{
+  "type": "audio",
+  "audio_event": {
+    "audio_base_64": "SGVsbG8sIHRoaXMgaXMgYSBzYW1wbGUgYXVkaW8gY2h1bms=",
+    "event_id": 67890
+  }
+}
+
+interruption:
+
+{
+  "type": "interruption",
+  "interruption_event": {
+    "event_id": 54321
+  }
+}
+
+internal_tentative_agent_response:
+
+{
+  "type": "internal_tentative_agent_response",
+  "tentative_agent_response_internal_event": {
+    "tentative_agent_response": "I'm thinking about how to respond..."
+  }
+}
+
+ping:
+
+{
+  "type": "ping",
+  "ping_event": {
+    "event_id": 13579,
+    "ping_ms": 50
+  }
+}
+
+client_tool_call:
+
+{
+  "type": "client_tool_call",
+  "client_tool_call": {
+    "tool_name": string,
+    "tool_call_id": string,
+    "parameters": dict,
+  }
+}
+
+client_tool_result:
+
+{
+  "type": "client_tool_result",
+  "tool_call_id": str,
+  "result": str,
+  "is_error": bool,
+}
+
+Latency Management
+
+To ensure smooth conversations, implement these strategies:
+
+Adaptive Buffering: Adjust audio buffering based on network conditions.
+Jitter Buffer: Implement a jitter buffer to smooth out variations in packet arrival times.
+Ping-Pong Monitoring: Use ping and pong events to measure round-trip time and adjust accordingly.
+Security Best Practices
+
+Rotate API keys regularly and use environment variables to store them.
+Implement rate limiting to prevent abuse.
+Clearly explain the intention when prompting users for microphone access.
+Optimized Chunking: Tweak the audio chunk duration to balance latency and efficiency.
