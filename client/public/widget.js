@@ -111,7 +111,11 @@ class VoiceConvoWidget extends HTMLElement {
 
   async initializeChat(chatWindow) {
     try {
-      const response = await fetch('/api/get-signed-url', {
+      // Get the base URL from the script tag
+      const scriptTag = document.querySelector('script[src*="widget.js"]');
+      const baseUrl = scriptTag ? new URL(scriptTag.src).origin : window.location.origin;
+
+      const response = await fetch(`${baseUrl}/api/get-signed-url`, {
         headers: {
           'Authorization': `Bearer ${this.getAttribute('api-key')}`
         }
