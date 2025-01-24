@@ -2,7 +2,7 @@ class VoiceConvoWidget extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.initialized = false; // Flag to track if chat is initialized
+    this.initialized = false;
   }
 
   async connectedCallback() {
@@ -53,28 +53,44 @@ class VoiceConvoWidget extends HTMLElement {
         transition: opacity 0.3s ease;
       }
 
-      .message {
-        padding: 10px 15px;
-        margin: 5px;
+      .error-message {
+        color: #ff4444;
+        padding: 15px;
+        text-align: center;
+        background: #fff;
         border-radius: 8px;
-        max-width: 80%;
-      }
-
-      .message.user {
-        background-color: var(--primary-color, #0066cc);
-        color: var(--text-color, white);
-        margin-left: auto;
-      }
-
-      .message.ai {
-        background-color: #f0f0f0;
-        color: #333;
-        margin-right: auto;
+        margin: 10px;
+        font-size: 14px;
       }
     `;
 
     this.shadowRoot.appendChild(styles);
     await this.initializeWidget();
+  }
+
+  getCredentials() {
+    // Check for global settings first
+    if (window.CONVAI_SETTINGS?.apiKey && window.CONVAI_SETTINGS?.agentId) {
+      return {
+        apiKey: window.CONVAI_SETTINGS.apiKey,
+        agentId: window.CONVAI_SETTINGS.agentId,
+        title: window.CONVAI_SETTINGS.title
+      };
+    }
+
+    // Fallback to attributes
+    const apiKey = this.getAttribute('api-key');
+    const agentId = this.getAttribute('agent-id');
+
+    if (!apiKey || !agentId) {
+      throw new Error('Missing required credentials. Please provide apiKey and agentId either through CONVAI_SETTINGS or element attributes.');
+    }
+
+    return {
+      apiKey,
+      agentId,
+      title: this.getAttribute('title')
+    };
   }
 
   async initializeWidget() {
@@ -89,12 +105,21 @@ class VoiceConvoWidget extends HTMLElement {
       const chatWindow = document.createElement('div');
       chatWindow.className = 'chat-window';
 
-      button.addEventListener('click', () => {
+      // Get credentials before showing the widget
+      const credentials = this.getCredentials();
+
+      button.addEventListener('click', async () => {
         const isVisible = chatWindow.style.display === 'block';
         chatWindow.style.display = isVisible ? 'none' : 'block';
+
         if (!isVisible && !this.initialized) {
-          this.initializeChat(chatWindow);
-          this.initialized = true;
+          try {
+            await this.initializeChat(chatWindow, credentials);
+            this.initialized = true;
+          } catch (error) {
+            console.error('Chat initialization error:', error);
+            this.showError(chatWindow, error.message);
+          }
         }
       });
 
@@ -105,33 +130,33 @@ class VoiceConvoWidget extends HTMLElement {
       // Apply custom theme if provided
       this.applyTheme();
     } catch (error) {
-      console.error('Failed to initialize widget:', error);
+      console.error('Widget initialization error:', error);
+      // Still show the widget even if initialization fails
+      this.showError(null, error.message);
     }
   }
 
-  async initializeChat(chatWindow) {
+  async initializeChat(chatWindow, credentials) {
     try {
-      // Get the base URL from the script tag
-      const scriptTag = document.querySelector('script[src*="widget.js"]');
-      const baseUrl = scriptTag ? new URL(scriptTag.src).origin : window.location.origin;
-
-      const response = await fetch(`${baseUrl}/api/get-signed-url`, {
+      const response = await fetch('https://voice-convo-widget-futur-intel.replit.app/api/get-signed-url', {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.getAttribute('api-key')}`
+          'Authorization': `Bearer ${credentials.apiKey}`
         }
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get signed URL');
+        throw new Error(`Failed to get signed URL: ${response.status}`);
       }
 
       const { signedUrl } = await response.json();
       const ws = new WebSocket(signedUrl);
 
       ws.onopen = () => {
+        console.log('WebSocket connected');
         ws.send(JSON.stringify({
           type: 'init',
-          agentId: this.getAttribute('agent-id'),
+          agentId: credentials.agentId,
           signedUrl
         }));
       };
@@ -149,7 +174,7 @@ class VoiceConvoWidget extends HTMLElement {
       this.ws = ws;
     } catch (error) {
       console.error('Failed to initialize chat:', error);
-      this.showError(chatWindow, 'Failed to initialize chat. Please check your credentials.');
+      throw new Error('Failed to initialize chat. Please check your credentials.');
     }
   }
 
@@ -163,9 +188,17 @@ class VoiceConvoWidget extends HTMLElement {
 
   showError(chatWindow, message) {
     const errorElement = document.createElement('div');
-    errorElement.className = 'message error';
+    errorElement.className = 'error-message';
     errorElement.textContent = message;
-    chatWindow.appendChild(errorElement);
+
+    if (chatWindow) {
+      chatWindow.appendChild(errorElement);
+    } else if (this.shadowRoot) {
+      const container = this.shadowRoot.querySelector('#voice-convo-widget');
+      if (container) {
+        container.appendChild(errorElement);
+      }
+    }
   }
 
   applyTheme() {
