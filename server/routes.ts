@@ -142,7 +142,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Analytics routes
-  app.get('/api/analytics/metrics', requireAuth, async (req, res) => {
+  app.get('/api/analytics/metrics', async (req, res) => {
     try {
       const { startDate, endDate } = req.query;
 
@@ -211,7 +211,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get('/api/analytics/feedback', requireAuth, async (req, res) => {
+  app.get('/api/analytics/feedback', async (req, res) => {
     try {
       // Get sentiment distribution
       const sentimentDistribution = await db
@@ -239,7 +239,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get('/api/analytics/conversation', requireAuth, async (req, res) => {
+  app.get('/api/analytics/conversation', async (req, res) => {
     try {
       const { conversationId } = req.query;
 
