@@ -23,14 +23,17 @@ import ConversationFlow from "@/components/conversation/ConversationFlow";
 export default function AnalyticsDashboard() {
   const { data: metricsData, isLoading: isLoadingMetrics } = useQuery({
     queryKey: ["/api/analytics/metrics"],
+    refetchInterval: 5000 // Refetch every 5 seconds for real-time updates
   });
 
   const { data: feedbackData, isLoading: isLoadingFeedback } = useQuery({
     queryKey: ["/api/analytics/feedback"],
+    refetchInterval: 5000
   });
 
   const { data: conversationData, isLoading: isLoadingConversation } = useQuery({
     queryKey: ["/api/analytics/conversation"],
+    refetchInterval: 5000
   });
 
   if (isLoadingMetrics || isLoadingFeedback || isLoadingConversation) {
