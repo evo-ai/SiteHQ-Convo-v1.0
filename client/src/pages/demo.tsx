@@ -8,7 +8,7 @@ export default function Demo() {
       <div className="prose">
         <h2>Embedding Instructions</h2>
         <p>To add the widget to your website, include the following code:</p>
-        <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto">
+        <pre className="bg-slate-900 p-4 rounded-lg overflow-x-auto text-white">
           {`<script>
   window.CONVAI_SETTINGS = {
     apiKey: "your-api-key",

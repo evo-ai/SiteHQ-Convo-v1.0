@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { createChatConnection } from '@/lib/chat';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChatBubbleProps {
   apiKey?: string;
@@ -27,13 +28,21 @@ export default function ChatBubble({ apiKey, agentId, title = "AI Assistant", th
   const [isActive, setIsActive] = useState(false);
   const [status, setStatus] = useState<'idle' | 'listening' | 'speaking'>('idle');
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  const { toast } = useToast();
 
   const handleStartCall = () => {
     setShowTerms(true);
   };
 
   const handleAcceptTerms = useCallback(() => {
-    if (!apiKey || !agentId) return;
+    if (!apiKey || !agentId) {
+      toast({
+        title: "Error",
+        description: "API key and Agent ID are required",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setShowTerms(false);
     setIsActive(true);
@@ -41,20 +50,39 @@ export default function ChatBubble({ apiKey, agentId, title = "AI Assistant", th
     const ws = createChatConnection(apiKey, agentId);
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'status') {
-        setStatus(data.status);
+      try {
+        const data = JSON.parse(event.data);
+        console.log('Received message:', data);
+        if (data.type === 'status') {
+          setStatus(data.status);
+        }
+      } catch (error) {
+        console.error('Error parsing message:', error);
       }
     };
 
     ws.onclose = () => {
+      console.log('WebSocket closed');
       setIsActive(false);
       setStatus('idle');
       setSocket(null);
+      toast({
+        title: "Connection closed",
+        description: "The connection to the AI assistant was closed",
+      });
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      toast({
+        title: "Connection error",
+        description: "Failed to connect to the AI assistant",
+        variant: "destructive",
+      });
     };
 
     setSocket(ws);
-  }, [apiKey, agentId]);
+  }, [apiKey, agentId, toast]);
 
   useEffect(() => {
     return () => {
