@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Convo Widget Test</title>
+    <title>Conversational AI Widget Demo</title>
 </head>
 <body>
     <h1>Widget Implementation Guide</h1>
@@ -27,7 +27,7 @@
 
         <h3>Required Parameters:</h3>
         <ul>
-            <li><strong>apiKey</strong>: Your ElevenLabs API key</li>
+            <li><strong>apiKey</strong>: Your middleware API key (get this from your dashboard)</li>
             <li><strong>agentId</strong>: Your ConvAI agent ID</li>
             <li><strong>title</strong> (optional): Custom title for the chat window</li>
         </ul>
@@ -48,19 +48,29 @@
     <!-- Example Implementation -->
     <voice-convo-widget 
         agent-id="FnTVTPK2FfEkaktJIFFx"
-        api-key="your-api-key"
+        api-key="vc_live_8f4a9c2e7b6d5x3y1w9v8u4t2p0n7m5k3j1h"
         theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
     ></voice-convo-widget>
     <script src="/widget.js" async type="text/javascript"></script>
 
     <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
         .instructions {
             max-width: 800px;
             margin: 20px auto;
             padding: 20px;
             background: #f5f5f5;
             border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         pre {
             background: #1e1e1e;
             color: #fff;
@@ -68,11 +78,24 @@
             border-radius: 4px;
             overflow-x: auto;
         }
+
         code {
             font-family: monospace;
         }
+
         ul {
             margin: 20px 0;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        .demo-section {
+            margin-top: 40px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
         }
     </style>
 </body>

@@ -24,7 +24,6 @@ const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-pr
 const DEFAULT_CLIENT_API_KEY = 'vc_live_8f4a9c2e7b6d5x3y1w9v8u4t2p0n7m5k3j1h';
 
 export function registerRoutes(app: Express): Server {
-  // Session middleware with secure settings
   app.use(
     session({
       cookie: {
@@ -43,7 +42,6 @@ export function registerRoutes(app: Express): Server {
     })
   );
 
-  // Serve widget.js with CORS enabled
   app.get('/widget.js', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
@@ -51,7 +49,6 @@ export function registerRoutes(app: Express): Server {
     res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
   });
 
-  // Auth status check endpoint
   app.get('/api/auth/status', (req, res) => {
     if (req.session.adminId) {
       res.json({ authenticated: true });
@@ -60,7 +57,6 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Auth routes
   app.post('/api/auth/register', async (req, res) => {
     try {
       const { email, password } = insertAdminSchema.parse(req.body);
@@ -129,14 +125,16 @@ export function registerRoutes(app: Express): Server {
 
   app.get('/api/get-signed-url', async (req, res) => {
     try {
-      // Validate API key from request
+      console.log('Received signed URL request');
       const clientApiKey = req.headers.authorization?.replace('Bearer ', '');
       if (!clientApiKey) {
+        console.log('No API key provided');
         return res.status(401).json({ message: 'API key is required' });
       }
 
-      // Use environment variable if available, otherwise use default key
       const validApiKey = process.env.CLIENT_API_KEY || DEFAULT_CLIENT_API_KEY;
+      console.log('Validating API key:', clientApiKey === validApiKey);
+
       if (clientApiKey !== validApiKey) {
         return res.status(401).json({ message: 'Invalid API key' });
       }
@@ -146,8 +144,6 @@ export function registerRoutes(app: Express): Server {
         return res.status(500).json({ message: 'ElevenLabs API key not configured' });
       }
 
-      // Add basic rate limiting
-      // TODO: Implement proper rate limiting with Redis or similar
       const clientIp = req.ip;
       const currentTime = Date.now();
       const rateLimit = getRateLimit(clientIp, currentTime);
@@ -183,12 +179,10 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Analytics routes
   app.get('/api/analytics/metrics', async (req, res) => {
     try {
       const { startDate, endDate } = req.query;
 
-      // Get total conversations and metrics
       const [{
         count: totalConversations,
         avgDuration,
@@ -210,7 +204,6 @@ export function registerRoutes(app: Express): Server {
           )
         );
 
-      // Get sentiment trend
       const sentimentTrend = await db
         .select({
           timestamp: conversations.createdAt,
@@ -225,7 +218,6 @@ export function registerRoutes(app: Express): Server {
         )
         .orderBy(conversations.createdAt);
 
-      // Get emotional state distribution
       const emotionalStates = await db
         .select({
           mood: sql<string>`jsonb_array_elements(${conversations.emotionalStates})->>'mood'`,
@@ -255,7 +247,6 @@ export function registerRoutes(app: Express): Server {
 
   app.get('/api/analytics/feedback', async (req, res) => {
     try {
-      // Get sentiment distribution
       const sentimentDistribution = await db
         .select({
           name: conversationFeedback.sentiment,
@@ -264,7 +255,6 @@ export function registerRoutes(app: Express): Server {
         .from(conversationFeedback)
         .groupBy(conversationFeedback.sentiment);
 
-      // Get recent feedback
       const recentFeedback = await db
         .select()
         .from(conversationFeedback)
@@ -324,7 +314,6 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // WebSocket setup for chat
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ noServer: true });
 
@@ -339,12 +328,11 @@ export function registerRoutes(app: Express): Server {
   return httpServer;
 }
 
-// Simple in-memory rate limiting
 const rateLimits = new Map<string, { count: number; resetTime: number }>();
 
 function getRateLimit(clientIp: string, currentTime: number) {
-  const windowMs = 60 * 1000; // 1 minute window
-  const maxRequests = 60; // 60 requests per minute
+  const windowMs = 60 * 1000; 
+  const maxRequests = 60; 
 
   const limit = rateLimits.get(clientIp) || { count: 0, resetTime: currentTime + windowMs };
 
