@@ -1,7 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { WebSocket, WebSocketServer } from 'ws';
-import { setupChatWebSocket } from './chat';
+import { WebSocketServer } from 'ws';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -44,23 +43,13 @@ export function registerRoutes(app: Express): Server {
       return res.json({ signedUrl: data.signed_url });
     } catch (error) {
       console.error('Error getting signed URL:', error);
-      return res.status(500).json({
-        message: 'Failed to get signed URL'
-      });
+      return res.status(500).json({ message: 'Failed to get signed URL' });
     }
   });
 
-  // WebSocket setup for chat
+  // WebSocket setup
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ noServer: true });
-
-  httpServer.on('upgrade', (request, socket, head) => {
-    if (request.url === '/api/chat') {
-      wss.handleUpgrade(request, socket, head, (ws) => {
-        setupChatWebSocket(ws);
-      });
-    }
-  });
 
   return httpServer;
 }
