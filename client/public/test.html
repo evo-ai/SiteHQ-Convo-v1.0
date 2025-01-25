@@ -31,11 +31,11 @@
     </style>
 </head>
 <body>
-    <h1>Chat Widget Implementation Guide</h1>
+    <h1>Conversational AI Widget Demo</h1>
 
     <div class="instructions">
-        <h2>How to Embed the Widget</h2>
-        <p>Replace the values with your API key and agent ID:</p>
+        <h2>Embedding Instructions</h2>
+        <p>Add this code to your website:</p>
         <pre><code>&lt;iframe
     src="https://voice-convo-widget-futur-intel.replit.app/embed?apiKey=YOUR_API_KEY&amp;agentId=YOUR_AGENT_ID&amp;theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
     style="
@@ -52,15 +52,23 @@
     allow="microphone"
 &gt;&lt;/iframe&gt;</code></pre>
 
-        <h3>Parameters:</h3>
+        <h3>Features</h3>
+        <ul>
+            <li>Voice-based conversational AI using ElevenLabs API</li>
+            <li>Customizable appearance</li>
+            <li>Terms and conditions compliance</li>
+            <li>Real-time conversation status indicators</li>
+        </ul>
+
+        <h3>Configuration Parameters</h3>
         <ul>
             <li><strong>apiKey</strong>: Your ElevenLabs API key</li>
             <li><strong>agentId</strong>: Your ConvAI agent ID</li>
-            <li><strong>theme</strong>: Custom theme configuration (encoded JSON)</li>
+            <li><strong>theme</strong>: Customize the appearance (optional)</li>
         </ul>
 
         <h3>Theme Configuration</h3>
-        <p>Default theme values (before URL encoding):</p>
+        <p>Default theme values:</p>
         <pre><code>{
   "primary": "#0066cc",
   "background": "#ffffff",
@@ -71,6 +79,7 @@
     <h2>Live Demo</h2>
     <p>Below is a working example of the widget:</p>
 
+    <!-- Test widget with demo credentials -->
     <iframe
         src="/embed?apiKey=demo-key&amp;agentId=FnTVTPK2FfEkaktJIFFx&amp;theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
         style="
