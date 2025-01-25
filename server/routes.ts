@@ -12,6 +12,7 @@ import MemoryStore from 'memorystore';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import cors from 'cors';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,6 +23,14 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
 
 export function registerRoutes(app: Express): Server {
+  // Global CORS middleware - Must come BEFORE any routes
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }));
+
   // Session middleware with secure settings
   app.use(
     session({
@@ -41,11 +50,8 @@ export function registerRoutes(app: Express): Server {
     })
   );
 
-  // Serve widget.js with CORS enabled
+  // Serve widget.js (CORS now handled by global middleware)
   app.get('/widget.js', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
   });
 
@@ -125,19 +131,7 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
-  // CORS middleware for the widget endpoints
-  app.use('/api/get-signed-url', (req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
-    next();
-  });
-
-  // Get signed URL endpoint
+  // Get signed URL endpoint (CORS now handled by global middleware)
   app.get('/api/get-signed-url', async (req, res) => {
     try {
       const authHeader = req.headers.authorization;
@@ -174,6 +168,7 @@ export function registerRoutes(app: Express): Server {
       });
     }
   });
+
 
   // Analytics routes
   app.get('/api/analytics/metrics', async (req, res) => {
