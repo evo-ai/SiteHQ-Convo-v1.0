@@ -2,6 +2,7 @@ class VoiceConvoWidget extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    this.initialized = false; // Flag to track if chat is initialized
   }
 
   async connectedCallback() {
@@ -91,8 +92,9 @@ class VoiceConvoWidget extends HTMLElement {
       button.addEventListener('click', () => {
         const isVisible = chatWindow.style.display === 'block';
         chatWindow.style.display = isVisible ? 'none' : 'block';
-        if (!isVisible) {
+        if (!isVisible && !this.initialized) {
           this.initializeChat(chatWindow);
+          this.initialized = true;
         }
       });
 
@@ -100,6 +102,7 @@ class VoiceConvoWidget extends HTMLElement {
       container.appendChild(chatWindow);
       this.shadowRoot.appendChild(container);
 
+      // Apply custom theme if provided
       this.applyTheme();
     } catch (error) {
       console.error('Failed to initialize widget:', error);
@@ -108,18 +111,13 @@ class VoiceConvoWidget extends HTMLElement {
 
   async initializeChat(chatWindow) {
     try {
-      const apiKey = this.getAttribute('api-key');
-      if (!apiKey) {
-        throw new Error('API key is required');
-      }
-
-      // Get the script URL
+      // Get the base URL from the script tag
       const scriptTag = document.querySelector('script[src*="widget.js"]');
       const baseUrl = scriptTag ? new URL(scriptTag.src).origin : window.location.origin;
 
       const response = await fetch(`${baseUrl}/api/get-signed-url`, {
         headers: {
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${this.getAttribute('api-key')}`
         }
       });
 
@@ -196,4 +194,5 @@ class VoiceConvoWidget extends HTMLElement {
   }
 }
 
+// Register the custom element
 customElements.define('voice-convo-widget', VoiceConvoWidget);
