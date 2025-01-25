@@ -3,63 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Convo Widget Test</title>
-</head>
-<body>
-    <h1>Widget Implementation Guide</h1>
-
-    <div class="instructions">
-        <h2>How to Embed the Widget</h2>
-        <p>Add the following code to your website:</p>
-        <pre><code>
-<!-- Widget Configuration -->
-&lt;script&gt;
-    window.CONVAI_SETTINGS = {
-        apiKey: "your-api-key",
-        agentId: "your-agent-id",
-        title: "Your Assistant Name"
-    };
-&lt;/script&gt;
-
-<!-- Widget Script -->
-&lt;script src="https://{your-replit-url}/widget.js" async&gt;&lt;/script&gt;
-        </code></pre>
-
-        <h3>Required Parameters:</h3>
-        <ul>
-            <li><strong>apiKey</strong>: Your ElevenLabs API key</li>
-            <li><strong>agentId</strong>: Your ConvAI agent ID</li>
-            <li><strong>title</strong> (optional): Custom title for the chat window</li>
-        </ul>
-
-        <h3>Or use as a Custom Element:</h3>
-        <pre><code>
-&lt;voice-convo-widget 
-    api-key="your-api-key"
-    agent-id="your-agent-id"
-    theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
-&gt;&lt;/voice-convo-widget&gt;
-        </code></pre>
-    </div>
-
-    <h2>Live Demo</h2>
-    <p>Below is a working example of the widget:</p>
-
-    <!-- Example Implementation -->
-    <voice-convo-widget 
-        agent-id="FnTVTPK2FfEkaktJIFFx"
-        api-key="your-api-key"
-        theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
-    ></voice-convo-widget>
-    <script src="/widget.js" async type="text/javascript"></script>
-
+    <title>Chat Widget Implementation Guide</title>
     <style>
-        .instructions {
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
             max-width: 800px;
             margin: 20px auto;
-            padding: 20px;
+            padding: 0 20px;
+        }
+        .instructions {
             background: #f5f5f5;
+            padding: 20px;
             border-radius: 8px;
+            margin: 20px 0;
         }
         pre {
             background: #1e1e1e;
@@ -71,9 +28,67 @@
         code {
             font-family: monospace;
         }
-        ul {
-            margin: 20px 0;
-        }
     </style>
+</head>
+<body>
+    <h1>Chat Widget Implementation Guide</h1>
+
+    <div class="instructions">
+        <h2>How to Embed the Widget</h2>
+        <p>Add the following code to your website:</p>
+        <pre><code>
+&lt;iframe
+    src="https://voice-convo-widget-futur-intel.replit.app/embed?apiKey=your-api-key&agentId=your-agent-id&theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
+    style="
+        width: 400px;
+        height: 600px;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        z-index: 9999;
+    "
+    allow="microphone"
+&gt;&lt;/iframe&gt;
+        </code></pre>
+
+        <h3>Required Parameters:</h3>
+        <ul>
+            <li><strong>apiKey</strong>: Your ElevenLabs API key</li>
+            <li><strong>agentId</strong>: Your ConvAI agent ID</li>
+            <li><strong>theme</strong> (optional): Custom theme configuration in URL-encoded JSON format</li>
+        </ul>
+
+        <h3>Example Theme Configuration</h3>
+        <p>The default theme values are:</p>
+        <pre><code>
+{
+  "primary": "#0066cc",
+  "background": "#ffffff",
+  "text": "#ffffff"
+}
+        </code></pre>
+    </div>
+
+    <h2>Live Demo</h2>
+    <p>Below is a working example of the widget:</p>
+
+    <iframe
+        src="/embed?apiKey=demo-key&agentId=FnTVTPK2FfEkaktJIFFx&theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
+        style="
+            width: 400px;
+            height: 600px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 9999;
+        "
+        allow="microphone"
+    ></iframe>
 </body>
 </html>

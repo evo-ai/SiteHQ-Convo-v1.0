@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Demo from "@/pages/demo";
 import AdminLogin from "@/pages/admin/login";
 import AnalyticsDashboard from "@/pages/analytics";
+import EmbedPage from "@/pages/embed";
 
 function Router() {
   return (
@@ -13,6 +14,7 @@ function Router() {
       <Route path="/" component={Demo} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/analytics" component={AnalyticsDashboard} />
+      <Route path="/embed" component={EmbedPage} />
       <Route component={NotFound} />
     </Switch>
   );
