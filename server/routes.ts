@@ -125,15 +125,22 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
-  app.get('/api/get-signed-url', async (req, res) => {
+  app.post('/api/get-signed-url', async (req, res) => {
     try {
-      const apiKey = process.env.ELEVENLABS_API_KEY;
-      if (!apiKey) {
-        return res.status(500).json({ message: 'ElevenLabs API key not configured' });
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Missing or invalid API key' });
+      }
+
+      const apiKey = authHeader.split(' ')[1];
+      const { agentId } = req.body;
+
+      if (!agentId) {
+        return res.status(400).json({ message: 'Missing agentId in request body' });
       }
 
       const response = await fetch(
-        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
+        `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${agentId}`,
         {
           headers: {
             'xi-api-key': apiKey
@@ -142,7 +149,11 @@ export function registerRoutes(app: Express): Server {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to get signed URL from ElevenLabs');
+        const error = await response.text();
+        console.error('ElevenLabs API error:', error);
+        return res.status(response.status).json({
+          message: `ElevenLabs API error: ${response.status} - ${error}`
+        });
       }
 
       const data = await response.json();
