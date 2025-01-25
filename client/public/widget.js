@@ -2,7 +2,7 @@ class VoiceConvoWidget extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.initialized = false; // Flag to track if chat is initialized
+    this.initialized = false;
   }
 
   async connectedCallback() {
@@ -49,8 +49,21 @@ class VoiceConvoWidget extends HTMLElement {
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         display: none;
+        flex-direction: column;
         overflow: hidden;
-        transition: opacity 0.3s ease;
+      }
+
+      .chat-header {
+        padding: 15px;
+        background: var(--primary-color, #0066cc);
+        color: var(--text-color, white);
+        font-weight: bold;
+      }
+
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
       }
 
       .message {
@@ -71,6 +84,15 @@ class VoiceConvoWidget extends HTMLElement {
         color: #333;
         margin-right: auto;
       }
+
+      .error {
+        color: #dc2626;
+        padding: 10px;
+        text-align: center;
+        background: #fee2e2;
+        border-radius: 4px;
+        margin: 10px;
+      }
     `;
 
     this.shadowRoot.appendChild(styles);
@@ -89,9 +111,19 @@ class VoiceConvoWidget extends HTMLElement {
       const chatWindow = document.createElement('div');
       chatWindow.className = 'chat-window';
 
+      const chatHeader = document.createElement('div');
+      chatHeader.className = 'chat-header';
+      chatHeader.textContent = 'Chat Assistant';
+
+      const chatMessages = document.createElement('div');
+      chatMessages.className = 'chat-messages';
+
+      chatWindow.appendChild(chatHeader);
+      chatWindow.appendChild(chatMessages);
+
       button.addEventListener('click', () => {
-        const isVisible = chatWindow.style.display === 'block';
-        chatWindow.style.display = isVisible ? 'none' : 'block';
+        const isVisible = chatWindow.style.display === 'flex';
+        chatWindow.style.display = isVisible ? 'none' : 'flex';
         if (!isVisible && !this.initialized) {
           this.initializeChat(chatWindow);
           this.initialized = true;
@@ -111,9 +143,13 @@ class VoiceConvoWidget extends HTMLElement {
 
   async initializeChat(chatWindow) {
     try {
-      // Get the base URL from the script tag
-      const scriptTag = document.querySelector('script[src*="widget.js"]');
-      const baseUrl = scriptTag ? new URL(scriptTag.src).origin : window.location.origin;
+      const messagesContainer = chatWindow.querySelector('.chat-messages');
+
+      // Get the script URL to determine the base URL
+      const scriptUrl = document.querySelector('script[src*="widget.js"]')?.src;
+      const baseUrl = scriptUrl ? new URL(scriptUrl).origin : window.location.origin;
+
+      console.log('Initializing chat with base URL:', baseUrl);
 
       const response = await fetch(`${baseUrl}/api/get-signed-url`, {
         headers: {
@@ -126,46 +162,56 @@ class VoiceConvoWidget extends HTMLElement {
       }
 
       const { signedUrl } = await response.json();
+      console.log('Received signed URL:', signedUrl);
+
       const ws = new WebSocket(signedUrl);
 
       ws.onopen = () => {
+        console.log('WebSocket connected');
         ws.send(JSON.stringify({
           type: 'init',
           agentId: this.getAttribute('agent-id'),
           signedUrl
         }));
+
+        // Show initial message
+        this.addMessage(messagesContainer, {
+          role: 'ai',
+          content: 'Hello! How can I assist you today?'
+        });
       };
 
       ws.onmessage = (event) => {
+        console.log('Received message:', event.data);
         const data = JSON.parse(event.data);
-        this.updateChatUI(chatWindow, data);
+        this.addMessage(messagesContainer, data);
       };
 
       ws.onerror = (error) => {
         console.error('WebSocket error:', error);
-        this.showError(chatWindow, 'Connection error occurred. Please try again.');
+        this.showError(messagesContainer, 'Connection error occurred. Please try again.');
       };
 
       this.ws = ws;
     } catch (error) {
       console.error('Failed to initialize chat:', error);
-      this.showError(chatWindow, 'Failed to initialize chat. Please check your credentials.');
+      this.showError(chatWindow.querySelector('.chat-messages'), 'Failed to initialize chat. Please check your credentials.');
     }
   }
 
-  updateChatUI(chatWindow, message) {
+  addMessage(container, message) {
     const messageElement = document.createElement('div');
     messageElement.className = `message ${message.role || 'ai'}`;
     messageElement.textContent = message.content || message.text;
-    chatWindow.appendChild(messageElement);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+    container.appendChild(messageElement);
+    container.scrollTop = container.scrollHeight;
   }
 
-  showError(chatWindow, message) {
+  showError(container, message) {
     const errorElement = document.createElement('div');
-    errorElement.className = 'message error';
+    errorElement.className = 'error';
     errorElement.textContent = message;
-    chatWindow.appendChild(errorElement);
+    container.appendChild(errorElement);
   }
 
   applyTheme() {
