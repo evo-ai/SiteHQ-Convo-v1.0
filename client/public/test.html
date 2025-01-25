@@ -3,76 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Widget Implementation Guide</title>
+    <title>Chat Widget Demo</title>
 </head>
 <body>
-    <h1>Chat Widget Implementation Guide</h1>
+    <h1>Chat Widget Embed Code</h1>
 
     <div class="instructions">
-        <h2>How to Add the Chat Widget to Your Website</h2>
-        <p>Add the following code snippet to your website:</p>
+        <h2>Copy this code to your website:</h2>
         <pre><code>
-&lt;!-- Chat Widget --&gt;
+<!-- Add this code to your website -->
 &lt;script&gt;
-    window.CONVAI_CONFIG = {
-        widgetUrl: "https://{your-middleware-url}/widget.js",
-        apiKey: "your-api-key",  // Get this from your dashboard
-        agentId: "your-agent-id" // Your assigned agent ID
-    };
+    (function(w,d,s,o,f,js,fjs){
+        w['ConvoWidget']=o;w[o]=w[o]||function(){
+        (w[o].q=w[o].q||[]).push(arguments)};
+        js=d.createElement(s),fjs=d.getElementsByTagName(s)[0];
+        js.id=o;js.src=f;js.async=1;fjs.parentNode.insertBefore(js,fjs);
+    }(window,document,'script','cw','https://your-middleware-url/widget.js'));
+
+    cw('init', { 
+        apiKey: 'YOUR_API_KEY',
+        agentId: 'YOUR_AGENT_ID'
+    });
 &lt;/script&gt;
-&lt;script src="https://{your-middleware-url}/widget.js" async&gt;&lt;/script&gt;
-        </code></pre>
 
-        <h3>Required Configuration:</h3>
-        <ul>
-            <li><strong>apiKey</strong>: Your API key from the dashboard</li>
-            <li><strong>agentId</strong>: Your assigned agent ID</li>
-        </ul>
-
-        <h3>Optional: Custom Element Implementation</h3>
-        <p>Alternatively, you can use the widget as a custom element:</p>
-        <pre><code>
+<!-- Or use the custom element directly -->
 &lt;voice-convo-widget 
-    api-key="your-api-key"
-    agent-id="your-agent-id"
-    theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
-&gt;&lt;/voice-convo-widget&gt;
-        </code></pre>
-
-        <h3>Theme Customization</h3>
-        <p>You can customize the widget's appearance using the theme attribute:</p>
-        <ul>
-            <li><strong>primary</strong>: Main color for buttons and accents</li>
-            <li><strong>background</strong>: Chat window background color</li>
-            <li><strong>text</strong>: Text color for buttons</li>
-        </ul>
+    api-key="YOUR_API_KEY"
+    agent-id="YOUR_AGENT_ID"
+&gt;&lt;/voice-convo-widget&gt;</code></pre>
     </div>
 
     <h2>Live Demo</h2>
-    <p>Below is a working example of the widget:</p>
+    <p>Here's how the widget looks:</p>
 
-    <!-- Example Implementation -->
+    <!-- Demo Implementation -->
     <voice-convo-widget 
         api-key="demo-key"
         agent-id="demo-agent"
-        theme='{"primary":"#0066cc","background":"#ffffff","text":"#ffffff"}'
     ></voice-convo-widget>
-    <script src="/widget.js" async></script>
+    <script src="/widget.js"></script>
 
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
-            line-height: 1.6;
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            line-height: 1.6; /* Retained from original */
         }
         .instructions {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
             background: #f5f5f5;
+            padding: 20px;
             border-radius: 8px;
+            margin: 20px 0;
         }
         pre {
             background: #1e1e1e;
@@ -83,9 +66,7 @@
         }
         code {
             font-family: monospace;
-        }
-        ul {
-            margin: 20px 0;
+            white-space: pre-wrap;
         }
     </style>
 </body>
