@@ -2,7 +2,7 @@ class VoiceConvoWidget extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.initialized = false;
+    this.initialized = false; // Flag to track if chat is initialized
   }
 
   async connectedCallback() {
@@ -71,12 +71,6 @@ class VoiceConvoWidget extends HTMLElement {
         color: #333;
         margin-right: auto;
       }
-
-      .error {
-        color: #ff0000;
-        padding: 10px;
-        text-align: center;
-      }
     `;
 
     this.shadowRoot.appendChild(styles);
@@ -108,58 +102,33 @@ class VoiceConvoWidget extends HTMLElement {
       container.appendChild(chatWindow);
       this.shadowRoot.appendChild(container);
 
+      // Apply custom theme if provided
       this.applyTheme();
     } catch (error) {
       console.error('Failed to initialize widget:', error);
     }
   }
 
-  getBaseUrl() {
-    // First try to get URL from the widget script
-    const scriptTags = Array.from(document.getElementsByTagName('script'));
-    const widgetScript = scriptTags.find(script => script.src && script.src.includes('widget.js'));
-
-    if (widgetScript) {
-      const url = new URL(widgetScript.src);
-      return url.origin;
-    }
-
-    // Fallback to looking for the custom element script
-    const customElement = document.querySelector('voice-convo-widget');
-    if (customElement) {
-      const nearestScript = customElement.previousElementSibling;
-      if (nearestScript && nearestScript.tagName === 'SCRIPT' && nearestScript.src) {
-        const url = new URL(nearestScript.src);
-        return url.origin;
-      }
-    }
-
-    throw new Error('Could not determine widget base URL');
-  }
-
   async initializeChat(chatWindow) {
     try {
-      const baseUrl = this.getBaseUrl();
-      console.log('Using base URL:', baseUrl);
+      // Get the base URL from the script tag
+      const scriptTag = document.querySelector('script[src*="widget.js"]');
+      const baseUrl = scriptTag ? new URL(scriptTag.src).origin : window.location.origin;
 
       const response = await fetch(`${baseUrl}/api/get-signed-url`, {
-        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.getAttribute('api-key')}`,
-          'Content-Type': 'application/json'
-        },
-        mode: 'cors', // Enable CORS
+          'Authorization': `Bearer ${this.getAttribute('api-key')}`
+        }
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error('Failed to get signed URL');
       }
 
       const { signedUrl } = await response.json();
       const ws = new WebSocket(signedUrl);
 
       ws.onopen = () => {
-        console.log('Connected to ElevenLabs');
         ws.send(JSON.stringify({
           type: 'init',
           agentId: this.getAttribute('agent-id'),
@@ -169,17 +138,12 @@ class VoiceConvoWidget extends HTMLElement {
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log('Message:', data);
         this.updateChatUI(chatWindow, data);
       };
 
       ws.onerror = (error) => {
         console.error('WebSocket error:', error);
         this.showError(chatWindow, 'Connection error occurred. Please try again.');
-      };
-
-      ws.onclose = () => {
-        console.log('Disconnected from ElevenLabs');
       };
 
       this.ws = ws;
@@ -191,8 +155,8 @@ class VoiceConvoWidget extends HTMLElement {
 
   updateChatUI(chatWindow, message) {
     const messageElement = document.createElement('div');
-    messageElement.className = `message ${message.source || 'ai'}`;
-    messageElement.textContent = message.message || message.text;
+    messageElement.className = `message ${message.role || 'ai'}`;
+    messageElement.textContent = message.content || message.text;
     chatWindow.appendChild(messageElement);
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
@@ -230,4 +194,5 @@ class VoiceConvoWidget extends HTMLElement {
   }
 }
 
+// Register the custom element
 customElements.define('voice-convo-widget', VoiceConvoWidget);
