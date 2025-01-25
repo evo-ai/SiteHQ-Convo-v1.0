@@ -2,7 +2,6 @@ class VoiceConvoWidget extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.initialized = false;
   }
 
   async connectedCallback() {
@@ -71,15 +70,6 @@ class VoiceConvoWidget extends HTMLElement {
         color: #333;
         margin-right: auto;
       }
-
-      .error {
-        background-color: #fee;
-        color: #c00;
-        padding: 10px;
-        margin: 10px;
-        border-radius: 4px;
-        font-size: 14px;
-      }
     `;
 
     this.shadowRoot.appendChild(styles);
@@ -101,9 +91,8 @@ class VoiceConvoWidget extends HTMLElement {
       button.addEventListener('click', () => {
         const isVisible = chatWindow.style.display === 'block';
         chatWindow.style.display = isVisible ? 'none' : 'block';
-        if (!isVisible && !this.initialized) {
+        if (!isVisible) {
           this.initializeChat(chatWindow);
-          this.initialized = true;
         }
       });
 
@@ -120,50 +109,37 @@ class VoiceConvoWidget extends HTMLElement {
   async initializeChat(chatWindow) {
     try {
       const apiKey = this.getAttribute('api-key');
-      const agentId = this.getAttribute('agent-id');
-
-      if (!apiKey || !agentId) {
-        throw new Error('Missing required attributes: api-key and agent-id must be provided');
+      if (!apiKey) {
+        throw new Error('API key is required');
       }
 
-      console.log('Initializing chat with:', { agentId });
-
       // Get the script URL
-      const currentScript = document.currentScript || document.querySelector('script[src*="widget.js"]');
-      const baseUrl = currentScript ? new URL(currentScript.src).origin : window.location.origin;
-      console.log('Base URL:', baseUrl);
+      const scriptTag = document.querySelector('script[src*="widget.js"]');
+      const baseUrl = scriptTag ? new URL(scriptTag.src).origin : window.location.origin;
 
       const response = await fetch(`${baseUrl}/api/get-signed-url`, {
-        method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({ agentId })
+        }
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Server error: ${response.status} - ${errorText}`);
+        throw new Error('Failed to get signed URL');
       }
 
       const { signedUrl } = await response.json();
-      console.log('Connected to WebSocket');
-
       const ws = new WebSocket(signedUrl);
 
       ws.onopen = () => {
-        console.log('Connected to ElevenLabs');
         ws.send(JSON.stringify({
           type: 'init',
-          agentId,
+          agentId: this.getAttribute('agent-id'),
           signedUrl
         }));
       };
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log('Message:', data);
         this.updateChatUI(chatWindow, data);
       };
 
@@ -172,14 +148,10 @@ class VoiceConvoWidget extends HTMLElement {
         this.showError(chatWindow, 'Connection error occurred. Please try again.');
       };
 
-      ws.onclose = () => {
-        console.log('Disconnected from ElevenLabs');
-      };
-
       this.ws = ws;
     } catch (error) {
       console.error('Failed to initialize chat:', error);
-      this.showError(chatWindow, `Failed to initialize chat: ${error.message}`);
+      this.showError(chatWindow, 'Failed to initialize chat. Please check your credentials.');
     }
   }
 
@@ -224,5 +196,4 @@ class VoiceConvoWidget extends HTMLElement {
   }
 }
 
-// Register the custom element
 customElements.define('voice-convo-widget', VoiceConvoWidget);
