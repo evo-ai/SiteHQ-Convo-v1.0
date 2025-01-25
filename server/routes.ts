@@ -2,10 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocket, WebSocketServer } from 'ws';
 import { setupChatWebSocket } from './chat';
-import { insertAdminSchema } from '@db/schema';
 import { db } from '@db';
-import { admins, conversations, conversationMetrics, conversationFeedback } from '@db/schema';
-import { eq, and, gte, lte, sql } from 'drizzle-orm';
+import { admins } from '@db/schema';
+import { eq } from 'drizzle-orm';
 import { requireAuth, hashPassword, comparePasswords } from './auth';
 import session from 'express-session';
 import MemoryStore from 'memorystore';
@@ -15,11 +14,6 @@ import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-const MemoryStoreSession = MemoryStore(session);
-
-const ONE_DAY = 1000 * 60 * 60 * 24;
-const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
 
 export function registerRoutes(app: Express): Server {
   // Session middleware with secure settings
@@ -160,6 +154,7 @@ export function registerRoutes(app: Express): Server {
       });
     }
   });
+
 
   // Analytics routes
   app.get('/api/analytics/metrics', async (req, res) => {
@@ -302,6 +297,11 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Serve the embed page for all routes starting with /embed
+  app.get('/embed*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/public/index.html'));
+  });
+
   // WebSocket setup for chat
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ noServer: true });
@@ -316,3 +316,10 @@ export function registerRoutes(app: Express): Server {
 
   return httpServer;
 }
+
+const ONE_DAY = 1000 * 60 * 60 * 24;
+const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
+const MemoryStoreSession = MemoryStore(session);
+
+//Import statements for removed functions are also removed.
+// Removed functions: insertAdminSchema, conversations, conversationMetrics, conversationFeedback

@@ -35,10 +35,9 @@
 
     <div class="instructions">
         <h2>How to Embed the Widget</h2>
-        <p>Add the following code to your website:</p>
-        <pre><code>
-&lt;iframe
-    src="https://voice-convo-widget-futur-intel.replit.app/embed?apiKey=your-api-key&agentId=your-agent-id&theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
+        <p>Replace the values with your API key and agent ID:</p>
+        <pre><code>&lt;iframe
+    src="https://voice-convo-widget-futur-intel.replit.app/embed?apiKey=YOUR_API_KEY&amp;agentId=YOUR_AGENT_ID&amp;theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
     style="
         width: 400px;
         height: 600px;
@@ -51,32 +50,29 @@
         z-index: 9999;
     "
     allow="microphone"
-&gt;&lt;/iframe&gt;
-        </code></pre>
+&gt;&lt;/iframe&gt;</code></pre>
 
-        <h3>Required Parameters:</h3>
+        <h3>Parameters:</h3>
         <ul>
             <li><strong>apiKey</strong>: Your ElevenLabs API key</li>
             <li><strong>agentId</strong>: Your ConvAI agent ID</li>
-            <li><strong>theme</strong> (optional): Custom theme configuration in URL-encoded JSON format</li>
+            <li><strong>theme</strong>: Custom theme configuration (encoded JSON)</li>
         </ul>
 
-        <h3>Example Theme Configuration</h3>
-        <p>The default theme values are:</p>
-        <pre><code>
-{
+        <h3>Theme Configuration</h3>
+        <p>Default theme values (before URL encoding):</p>
+        <pre><code>{
   "primary": "#0066cc",
   "background": "#ffffff",
   "text": "#ffffff"
-}
-        </code></pre>
+}</code></pre>
     </div>
 
     <h2>Live Demo</h2>
     <p>Below is a working example of the widget:</p>
 
     <iframe
-        src="/embed?apiKey=demo-key&agentId=FnTVTPK2FfEkaktJIFFx&theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
+        src="/embed?apiKey=demo-key&amp;agentId=FnTVTPK2FfEkaktJIFFx&amp;theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
         style="
             width: 400px;
             height: 600px;
