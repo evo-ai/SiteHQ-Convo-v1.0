@@ -14,7 +14,7 @@ export function registerRoutes(app: Express): Server {
   app.get('/widget.js', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
   });
 
@@ -27,10 +27,8 @@ export function registerRoutes(app: Express): Server {
       }
 
       const apiKey = authHeader.split(' ')[1];
-      const { agentId } = req.query;
-
       const response = await fetch(
-        `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${agentId || 'FnTVTPK2FfEkaktJIFFx'}`,
+        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
         {
           headers: {
             'xi-api-key': apiKey
@@ -39,9 +37,7 @@ export function registerRoutes(app: Express): Server {
       );
 
       if (!response.ok) {
-        return res.status(response.status).json({ 
-          message: 'Failed to get signed URL from ElevenLabs'
-        });
+        throw new Error('Failed to get signed URL from ElevenLabs');
       }
 
       const data = await response.json();
@@ -49,7 +45,7 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error('Error getting signed URL:', error);
       return res.status(500).json({
-        message: error instanceof Error ? error.message : 'Failed to get signed URL'
+        message: 'Failed to get signed URL'
       });
     }
   });
