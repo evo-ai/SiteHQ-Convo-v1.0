@@ -126,6 +126,11 @@ export function registerRoutes(app: Express): Server {
   });
 
   app.get('/api/get-signed-url', async (req, res) => {
+    console.log('Request to /api/get-signed-url arrived!', {
+      headers: req.headers,
+      timestamp: new Date().toISOString()
+    });
+
     try {
       const apiKey = process.env.ELEVENLABS_API_KEY;
       if (!apiKey) {
@@ -146,6 +151,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       const data = await response.json();
+      console.log('Successfully retrieved signed URL');
       return res.json({ signedUrl: data.signed_url });
     } catch (error) {
       console.error('Error getting signed URL:', error);
