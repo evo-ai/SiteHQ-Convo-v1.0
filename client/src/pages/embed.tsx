@@ -30,42 +30,17 @@ export default function EmbedPage() {
           </svg>
         </Button>
       ) : (
-        <div 
-          className="bg-white rounded-lg shadow-xl w-[400px] h-[600px] flex flex-col overflow-hidden"
-          style={{ backgroundColor: theme.background || '#ffffff' }}
-        >
-          <div 
-            className="flex justify-between items-center p-4"
-            style={{ backgroundColor: theme.primary || '#0066cc' }}
-          >
-            <span className="font-semibold" style={{ color: theme.text || '#ffffff' }}>
-              Chat Assistant
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-white/10"
-              onClick={() => setIsOpen(false)}
-              style={{ color: theme.text || '#ffffff' }}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </Button>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <ChatBubble
-              apiKey={apiKey}
-              agentId={agentId}
-              title="Chat Assistant"
-              theme={{
-                primary: theme.primary || '#0066cc',
-                background: theme.background || '#ffffff',
-                text: theme.text || '#ffffff'
-              }}
-            />
-          </div>
+        <div className="bg-white rounded-lg shadow-xl w-[400px] h-[600px]">
+          <ChatBubble
+            apiKey={apiKey}
+            agentId={agentId}
+            title="Chat Assistant"
+            theme={{
+              primary: theme.primary || '#0066cc',
+              background: theme.background || '#ffffff',
+              text: theme.text || '#ffffff'
+            }}
+          />
         </div>
       )}
     </div>
