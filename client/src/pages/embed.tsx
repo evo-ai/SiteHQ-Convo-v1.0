@@ -12,10 +12,10 @@ export default function EmbedPage() {
   const theme = JSON.parse(params.get('theme') || '{}');
 
   return (
-    <>
+    <div className="fixed bottom-4 right-4">
       {!isOpen ? (
         <Button
-          className="fixed bottom-4 right-4 h-14 w-14 rounded-full shadow-lg z-50"
+          className="h-14 w-14 rounded-full shadow-lg z-50"
           onClick={() => setIsOpen(true)}
           style={{ 
             backgroundColor: theme.primary || '#0066cc',
@@ -30,17 +30,19 @@ export default function EmbedPage() {
           </svg>
         </Button>
       ) : (
-        <ChatBubble
-          apiKey={apiKey}
-          agentId={agentId}
-          title="Chat Assistant"
-          theme={{
-            primary: theme.primary || '#0066cc',
-            background: theme.background || '#ffffff',
-            text: theme.text || '#ffffff'
-          }}
-        />
+        <div className="relative">
+          <ChatBubble
+            apiKey={apiKey}
+            agentId={agentId}
+            title="Chat Assistant"
+            theme={{
+              primary: theme.primary || '#0066cc',
+              background: theme.background || '#ffffff',
+              text: theme.text || '#ffffff'
+            }}
+          />
+        </div>
       )}
-    </>
+    </div>
   );
 }
