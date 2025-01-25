@@ -125,24 +125,44 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
+  // CORS middleware for the widget endpoints
+  app.use('/api/get-signed-url', (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+    next();
+  });
+
+  // Get signed URL endpoint
   app.get('/api/get-signed-url', async (req, res) => {
     try {
-      const apiKey = process.env.ELEVENLABS_API_KEY;
-      if (!apiKey) {
-        return res.status(500).json({ message: 'ElevenLabs API key not configured' });
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Missing or invalid API key' });
       }
 
+      const apiKey = authHeader.split(' ')[1];
+
+      // Use the client's API key to make the request to ElevenLabs
       const response = await fetch(
         'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
         {
           headers: {
-            'xi-api-key': apiKey
+            'xi-api-key': apiKey,
+            'Content-Type': 'application/json'
           }
         }
       );
 
       if (!response.ok) {
-        throw new Error('Failed to get signed URL from ElevenLabs');
+        console.error('ElevenLabs API error:', await response.text());
+        return res.status(response.status).json({ 
+          message: 'Failed to get signed URL from ElevenLabs'
+        });
       }
 
       const data = await response.json();
@@ -296,7 +316,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // WebSocket setup for chat
+  // Setup WebSocket server for real-time communication
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ noServer: true });
 
