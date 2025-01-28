@@ -130,12 +130,21 @@ export default function ChatBubble({
                     repeat: conversation.isSpeaking ? Infinity : 0,
                     duration: 1.5,
                   }}
-                  className={`w-4 h-4 rounded-full ${
-                    conversation.isSpeaking 
-                      ? 'bg-blue-500' 
-                      : 'bg-green-500'
+                  className={`flex gap-1 items-center ${
+                    conversation.isSpeaking ? 'w-16' : 'w-4'
                   }`}
-                />
+                >
+                  <div className={`w-4 h-4 rounded-full ${
+                    conversation.isSpeaking ? 'bg-blue-500' : 'bg-green-500'
+                  }`} />
+                  {conversation.isSpeaking && (
+                    <>
+                      <div className="w-2 h-3 bg-blue-500 rounded-full animate-pulse" />
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" />
+                      <div className="w-2 h-4 bg-blue-500 rounded-full animate-pulse" />
+                    </>
+                  )}
+                </motion.div>
                 <div className="flex flex-col">
                   <span className="text-lg font-medium">
                     {conversation.isSpeaking ? (
