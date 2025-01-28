@@ -12,7 +12,7 @@ export default function Demo() {
         <div className="px-8 py-12 max-w-7xl mx-auto">
           <div className="flex flex-col items-center text-center mb-12">
             <img 
-              src="lifepod_logo_dark_1716397219.webp" 
+              src="lifepod_logo_dark_1716397219 (1).jpeg" 
               alt="LifePod Logo" 
               className="h-16 mb-8"
             />
