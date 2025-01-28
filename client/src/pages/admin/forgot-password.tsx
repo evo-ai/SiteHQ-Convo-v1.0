@@ -7,44 +7,44 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
-import { useLocation, Link } from "wouter";
+import { Link } from "wouter";
 
-const loginSchema = z.object({
+const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-export default function AdminLogin() {
-  const [, navigate] = useLocation();
+export default function ForgotPassword() {
   const { toast } = useToast();
   const form = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  const loginMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof loginSchema>) => {
-      const res = await fetch("/api/auth/login", {
+  const resetMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof forgotPasswordSchema>) => {
+      const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-        credentials: "include",
       });
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || 'Login failed');
+        throw new Error(error.message || 'Failed to send reset email');
       }
 
       return res.json();
     },
     onSuccess: () => {
-      navigate("/admin/analytics");
+      toast({
+        title: "Success",
+        description: "If an account exists with that email, you will receive password reset instructions.",
+      });
+      form.reset();
     },
     onError: (error) => {
       toast({
@@ -55,15 +55,15 @@ export default function AdminLogin() {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof loginSchema>) => {
-    loginMutation.mutate(data);
+  const onSubmit = (data: z.infer<typeof forgotPasswordSchema>) => {
+    resetMutation.mutate(data);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md mx-4">
         <CardHeader>
-          <CardTitle>Admin Login</CardTitle>
+          <CardTitle>Reset Password</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -77,29 +77,16 @@ export default function AdminLogin() {
                   </p>
                 )}
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Password</label>
-                <Input {...form.register("password")} type="password" />
-                {form.formState.errors.password && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {form.formState.errors.password.message}
-                  </p>
-                )}
-              </div>
               <Button
                 type="submit"
                 className="w-full"
-                disabled={loginMutation.isPending}
+                disabled={resetMutation.isPending}
               >
-                {loginMutation.isPending ? "Logging in..." : "Login"}
+                {resetMutation.isPending ? "Sending..." : "Send Reset Link"}
               </Button>
-
-              <div className="flex justify-between items-center mt-4 text-sm">
-                <Link href="/admin/register" className="text-blue-600 hover:text-blue-800">
-                  Create Account
-                </Link>
-                <Link href="/admin/forgot-password" className="text-blue-600 hover:text-blue-800">
-                  Forgot Password?
+              <div className="text-center mt-4">
+                <Link href="/admin/login" className="text-sm text-blue-600 hover:text-blue-800">
+                  Back to Login
                 </Link>
               </div>
             </form>

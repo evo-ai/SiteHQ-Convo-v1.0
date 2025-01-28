@@ -4,16 +4,22 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { setupChatWebSocket } from './chat';
 import { db } from '@db';
 import { admins } from '@db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and, lte, gte, sql } from 'drizzle-orm';
 import { requireAuth, hashPassword, comparePasswords } from './auth';
 import session from 'express-session';
 import MemoryStore from 'memorystore';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { randomBytes } from 'crypto';
+import { z } from 'zod';
+import { insertAdminSchema } from '@db/schema';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Store password reset tokens (in production this should be in a database)
+const passwordResetTokens = new Map<string, { email: string, expires: Date }>();
 
 export function registerRoutes(app: Express): Server {
   // Session middleware with secure settings
@@ -117,6 +123,67 @@ export function registerRoutes(app: Express): Server {
       res.clearCookie('analytics_session');
       res.json({ message: 'Logged out successfully' });
     });
+  });
+
+  app.post('/api/auth/forgot-password', async (req, res) => {
+    try {
+      const { email } = z.object({ email: z.string().email() }).parse(req.body);
+
+      const admin = await db.query.admins.findFirst({
+        where: eq(admins.email, email),
+      });
+
+      // Don't reveal if the email exists
+      if (!admin) {
+        return res.json({ message: 'If an account exists with that email, you will receive password reset instructions.' });
+      }
+
+      // Generate reset token
+      const token = randomBytes(32).toString('hex');
+      const expires = new Date();
+      expires.setHours(expires.getHours() + 1); // Token expires in 1 hour
+
+      // Store token (in production, this should be in a database)
+      passwordResetTokens.set(token, { email, expires });
+
+      // In production, send email with reset link
+      // For demo, we'll just return the token
+      res.json({ 
+        message: 'Password reset instructions sent',
+        token // Remove this in production
+      });
+    } catch (error) {
+      res.status(400).json({ message: String(error) });
+    }
+  });
+
+  app.post('/api/auth/reset-password', async (req, res) => {
+    try {
+      const { token, password } = z.object({
+        token: z.string(),
+        password: z.string().min(8),
+      }).parse(req.body);
+
+      const resetInfo = passwordResetTokens.get(token);
+
+      if (!resetInfo || resetInfo.expires < new Date()) {
+        return res.status(400).json({ message: 'Invalid or expired reset token' });
+      }
+
+      const hashedPassword = await hashPassword(password);
+
+      // Update password in database
+      await db.update(admins)
+        .set({ password: hashedPassword })
+        .where(eq(admins.email, resetInfo.email));
+
+      // Remove used token
+      passwordResetTokens.delete(token);
+
+      res.json({ message: 'Password reset successful' });
+    } catch (error) {
+      res.status(400).json({ message: String(error) });
+    }
   });
 
   app.get('/api/get-signed-url', async (req, res) => {
@@ -322,4 +389,4 @@ const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-pr
 const MemoryStoreSession = MemoryStore(session);
 
 //Import statements for removed functions are also removed.
-// Removed functions: insertAdminSchema, conversations, conversationMetrics, conversationFeedback
+// Removed functions: conversations, conversationMetrics, conversationFeedback
