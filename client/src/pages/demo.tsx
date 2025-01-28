@@ -14,7 +14,7 @@ export default function Demo() {
             <img 
               src="/assets/lifepod-logo.jpeg" 
               alt="LifePod Logo" 
-              className="h-16 mb-8 object-contain"
+              className="h-7 w-auto object-contain mb-8"
             />
             <h1 className="text-4xl font-bold mb-6">Conversational AI Widget Demo</h1>
             <p className="text-xl text-gray-600 max-w-3xl">
