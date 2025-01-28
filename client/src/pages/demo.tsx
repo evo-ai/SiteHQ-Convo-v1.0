@@ -12,9 +12,9 @@ export default function Demo() {
         <div className="px-8 py-12 max-w-7xl mx-auto">
           <div className="flex flex-col items-center text-center mb-12">
             <img 
-              src="lifepod_logo_dark_1716397219 (1).jpeg" 
+              src="/assets/lifepod-logo.jpeg" 
               alt="LifePod Logo" 
-              className="h-16 mb-8"
+              className="h-16 mb-8 object-contain"
             />
             <h1 className="text-4xl font-bold mb-6">Conversational AI Widget Demo</h1>
             <p className="text-xl text-gray-600 max-w-3xl">
