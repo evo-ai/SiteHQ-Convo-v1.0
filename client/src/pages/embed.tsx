@@ -30,7 +30,7 @@ export default function EmbedPage() {
           </svg>
         </Button>
       ) : (
-        <div className="relative">
+        <div f="relative bg-transparent">
           <ChatBubble
             apiKey={apiKey}
             agentId={agentId}

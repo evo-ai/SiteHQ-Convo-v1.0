@@ -93,7 +93,7 @@ export default function ChatBubble({
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
-            className="w-[300px] rounded-lg shadow-lg p-6"
+            className="w-[300px] rounded-lg shadow-lg p-6 bg-transparent"
           >
             <div className="flex flex-col items-start gap-4">
               <h3 className="text-xl font-semibold tracking-tight">
