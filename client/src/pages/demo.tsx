@@ -12,47 +12,14 @@ export default function Demo() {
         <div className="px-8 py-12 max-w-7xl mx-auto">
           <div className="flex flex-col items-center text-center mb-12">
             <img 
-              src="/assets/SiteHQ-logo.png" 
+              src="/assets/SiteHQ-logo.svg" 
               alt="SiteHQ Logo" 
               className="h-12 w-auto object-contain mb-8"
             />
             <h1 className="text-4xl font-bold mb-6">Conversational AI Widget Demo</h1>
           </div>
 
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            <Card>
-              <CardContent className="p-6">
-                <Gauge className="h-8 w-8 mb-4 text-primary" />
-                <h3 className="text-lg font-semibold mb-2">Low Latency</h3>
-                <p className="text-gray-600">High-quality voices with ultra-low latency for seamless interactions</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <HeartPulse className="h-8 w-8 mb-4 text-primary" />
-                <h3 className="text-lg font-semibold mb-2">Monitoring and Evaluation</h3>
-                <p className="text-gray-600">Full transcripts, recordings, and automated evaluation to monitor agent performance</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <Database className="h-8 w-8 mb-4 text-primary" />
-                <h3 className="text-lg font-semibold mb-2">Knowledge Base Integration</h3>
-                <p className="text-gray-600">Seamlessly integrate and leverage your existing knowledge base</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <Brain className="h-8 w-8 mb-4 text-primary" />
-                <h3 className="text-lg font-semibold mb-2">Emotion Detection</h3>
-                <p className="text-gray-600">Advanced emotion detection and responsive interaction capabilities</p>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Removed Features Grid as requested */}
 
           {/* Implementation Guide */}
           <Card className="mb-12">
@@ -70,7 +37,7 @@ export default function Demo() {
   window.CONVAI_SETTINGS = {
     apiKey: "your-api-key",
     agentId: "your-agent-id",
-    title: "LifePod Assistant"
+    title: "SiteHQ Assistant"
   };
 </script>
 <script src="/widget.js" async></script>`}

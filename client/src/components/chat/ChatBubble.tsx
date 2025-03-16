@@ -93,10 +93,14 @@ export default function ChatBubble({
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
-            className="w-[300px] rounded-lg shadow-lg p-6 bg-transparent"
+            className="w-[300px] rounded-lg shadow-lg p-6 chat-bubble"
+            style={{ 
+              backgroundColor: theme?.background || 'hsl(var(--primary))',
+              color: theme?.text || 'white'
+            }}
           >
             <div className="flex flex-col items-start gap-4">
-              <h3 className="text-xl font-semibold tracking-tight">
+              <h3 className="text-xl font-semibold tracking-tight text-white">
                 Need help?
               </h3>
               <Button
