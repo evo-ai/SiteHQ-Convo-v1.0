@@ -193,7 +193,11 @@ export default function ChatBubble({
             <Button variant="outline" onClick={() => setShowTerms(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAcceptTerms}>
+            <Button 
+              onClick={handleAcceptTerms}
+              className="terms-agree-button"
+              style={{ backgroundColor: '#5c078c' }}
+            >
               Agree
             </Button>
           </DialogFooter>

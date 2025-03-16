@@ -135,8 +135,9 @@ body {
 
 /* Chat bubble and T&Cs styles */
 .chat-bubble {
-    background-color: white !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    background-color: var(--sitehq-purple) !important;
+    opacity: 1 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 .terms-agree-button {

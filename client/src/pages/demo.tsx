@@ -12,14 +12,11 @@ export default function Demo() {
         <div className="px-8 py-12 max-w-7xl mx-auto">
           <div className="flex flex-col items-center text-center mb-12">
             <img 
-              src="/assets/lifepod-logo.jpeg" 
-              alt="LifePod Logo" 
-              className="h-7 w-auto object-contain mb-8"
+              src="/assets/SiteHQ-logo.png" 
+              alt="SiteHQ Logo" 
+              className="h-12 w-auto object-contain mb-8"
             />
             <h1 className="text-4xl font-bold mb-6">Conversational AI Widget Demo</h1>
-            <p className="text-xl text-gray-600 max-w-3xl">
-              Meet LifePod. A proactive voice remote monitoring and caregiving platform that identifies and manages social, behavioral and medical needs, increases engagement and reduces isolation.
-            </p>
           </div>
 
           {/* Features Grid */}
@@ -112,10 +109,10 @@ export default function Demo() {
         <ChatBubble
           apiKey="demo-key"
           agentId="demo-agent"
-          title="LifePod Assistant"
+          title="SiteHQ Assistant"
           theme={{
-            primary: '#0066cc',
-            background: '#ffffff',
+            primary: '#5c078c', /* SiteHQ purple */
+            background: '#5c078c', /* Using the purple for background too */
             text: '#ffffff'
           }}
         />
