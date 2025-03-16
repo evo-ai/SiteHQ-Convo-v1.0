@@ -78,9 +78,9 @@ export default function Demo() {
           agentId="demo-agent"
           title="SiteHQ Assistant"
           theme={{
-            primary: '#5c078c', /* SiteHQ purple */
-            background: '#5c078c', /* Using the purple for background too */
-            text: '#ffffff'
+            primary: '#4CAF50', /* Green button */
+            background: '#ffffff', /* White container */
+            text: '#5c078c' /* Purple text */
           }}
         />
       </div>
