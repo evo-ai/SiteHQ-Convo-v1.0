@@ -79,8 +79,8 @@ export default function Demo() {
           title="SiteHQ Assistant"
           theme={{
             primary: '#5c078c', /* SiteHQ purple */
-            background: '#5c078c', /* Using the purple for background too */
-            text: '#ffffff'
+            background: '#ffffff',
+            text: '#5c078c'
           }}
         />
       </div>
