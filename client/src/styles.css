@@ -1,7 +1,6 @@
 
 :root {
     --sitehq-purple: #5c078c;
-    --sitehq-yellow: #FFD700;
 }
 
 body {
@@ -15,7 +14,6 @@ body {
     text-align: center;
     padding: 2rem 0;
     background-color: white;
-    margin-bottom: 2rem;
 }
 
 .logo-container {
@@ -30,7 +28,7 @@ body {
 
 .tagline {
     font-size: 2rem;
-    margin-bottom: 2rem;
+    margin: 0;
     color: var(--sitehq-purple);
 }
 
@@ -41,54 +39,71 @@ body {
     min-height: calc(100vh - 200px);
 }
 
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.demo-title {
+    text-align: center;
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+}
+
 .features-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 3rem;
-    max-width: 1200px;
-    margin: 3rem auto;
-    padding: 0 2rem;
+    margin-bottom: 4rem;
 }
 
 .feature-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 2.5rem;
     text-align: left;
     transition: transform 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .feature-card:hover {
     transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.05);
 }
 
-.feature-card h3 {
-    margin: 1rem 0;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: rgba(255, 255, 255, 0.95);
+.implementation-guide {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 3rem;
 }
 
-.feature-card p {
-    color: rgba(255, 255, 255, 0.8);
-    line-height: 1.6;
+.implementation-guide h2 {
+    color: white;
+    margin-top: 0;
+}
+
+.implementation-guide pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
     margin: 0;
 }
 
-.feature-icon {
-    width: 32px;
-    height: 32px;
-    stroke: white;
-    stroke-width: 1.5;
-    opacity: 0.9;
+.implementation-guide code {
+    color: #fff;
 }
 
-@media (max-width: 768px) {
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
+/* Chat bubble customization */
+.chat-bubble {
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Terms and conditions button */
+.terms-agree-button {
+    background-color: var(--sitehq-purple) !important;
+    color: white !important;
 }
