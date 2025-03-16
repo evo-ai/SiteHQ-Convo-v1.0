@@ -199,7 +199,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       const response = await fetch(
-        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=FnTVTPK2FfEkaktJIFFx',
+        'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=KRGVz0f5HAU0E7u6BbA5',
         {
           headers: {
             'xi-api-key': apiKey
