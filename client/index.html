@@ -1,11 +1,53 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <body>
-    <div id="root"></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteHQ Assistant - Conversational AI Widget Demo</title>
+    <link href="/src/styles.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.css" rel="stylesheet">
     <script type="module" src="/src/main.tsx"></script>
-  </body>
+</head>
+<body>
+    <div class="header-section">
+        <div class="logo-container">
+            <img src="/SiteHQ-logo.png" alt="SiteHQ Logo">
+        </div>
+        <h1 class="tagline">Australia's Leading Site Solutions Provider</h1>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i data-feather="clock" class="feature-icon"></i>
+                    <h3>Low Latency</h3>
+                    <p>High-quality voices with ultra-low latency for seamless interactions</p>
+                </div>
+                <div class="feature-card">
+                    <i data-feather="activity" class="feature-icon"></i>
+                    <h3>Monitoring and Evaluation</h3>
+                    <p>Full transcripts, recordings, and automated evaluation to monitor agent performance</p>
+                </div>
+                <div class="feature-card">
+                    <i data-feather="database" class="feature-icon"></i>
+                    <h3>Knowledge Base Integration</h3>
+                    <p>Seamlessly integrate and leverage your existing knowledge base</p>
+                </div>
+                <div class="feature-card">
+                    <i data-feather="smile" class="feature-icon"></i>
+                    <h3>Emotion Detection</h3>
+                    <p>Advanced emotion detection and responsive interaction capabilities</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="root"></div>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script>
+        feather.replace();
+    </script>
+</body>
 </html>
