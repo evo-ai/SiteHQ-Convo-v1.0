@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
 import { useConversation } from '@11labs/react';
-import { MessageCircle, MicOff, Volume2, Wand2 } from 'lucide-react';
+import { MessageCircle, MicOff, Volume2, Wand2, Sun, Moon, Mic as MicIcon } from 'lucide-react';
 
 interface ChatBubbleProps {
   apiKey?: string;
@@ -32,15 +32,25 @@ export default function ChatBubble({
 }: ChatBubbleProps) {
   const [showTerms, setShowTerms] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [micVolume, setMicVolume] = useState(0);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
   const { toast } = useToast();
   const primaryColor = theme?.primary || '#5c078c';
 
   const conversation = useConversation({
     onConnect: () => {
       console.log('Connected to ElevenLabs');
+      // Simulate typing indicator when connected
+      setIsTyping(true);
+      setTimeout(() => setIsTyping(false), 3000);
     },
     onDisconnect: () => {
       console.log('Disconnected from ElevenLabs');
+      stopMicVisualization();
     },
     onError: (error: Error) => {
       console.error('Conversation error:', error);
@@ -50,8 +60,82 @@ export default function ChatBubble({
         variant: "destructive"
       });
     },
-    onMessage: (message: unknown) => console.log('Message:', message)
+    onMessage: (message: unknown) => {
+      console.log('Message:', message);
+      // Simulate typing indicator when receiving a message
+      setIsTyping(true);
+      setTimeout(() => setIsTyping(false), 2000);
+    }
   });
+
+  // Start microphone visualization when not speaking (listening to user)
+  useEffect(() => {
+    if (conversation.status === 'connected' && !conversation.isSpeaking) {
+      startMicVisualization();
+    } else {
+      stopMicVisualization();
+    }
+    
+    return () => {
+      stopMicVisualization();
+    };
+  }, [conversation.status, conversation.isSpeaking]);
+
+  // Start microphone volume visualization
+  const startMicVisualization = async () => {
+    try {
+      // Request microphone access if we don't have it yet
+      if (!micStreamRef.current) {
+        micStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
+      
+      // Initialize audio context and analyzer if needed
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        analyserRef.current.fftSize = 256;
+        
+        const source = audioContextRef.current.createMediaStreamSource(micStreamRef.current);
+        source.connect(analyserRef.current);
+      }
+      
+      // Start the volume analysis
+      const analyzeVolume = () => {
+        if (!analyserRef.current || conversation.isSpeaking) return;
+        
+        const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+        analyserRef.current.getByteFrequencyData(dataArray);
+        
+        // Calculate volume level (0-100)
+        const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+        setMicVolume(Math.min(100, average * 1.2)); // Scale up a bit and cap at 100
+        
+        if (conversation.status === 'connected' && !conversation.isSpeaking) {
+          requestAnimationFrame(analyzeVolume);
+        }
+      };
+      
+      analyzeVolume();
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+    }
+  };
+
+  // Stop microphone visualization
+  const stopMicVisualization = () => {
+    if (micStreamRef.current) {
+      micStreamRef.current.getTracks().forEach(track => track.stop());
+      micStreamRef.current = null;
+    }
+    
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(console.error);
+      audioContextRef.current = null;
+      analyserRef.current = null;
+    }
+    
+    setMicVolume(0);
+  };
 
   const handleStartCall = () => {
     setShowTerms(true);
@@ -120,9 +204,59 @@ export default function ChatBubble({
       ))}
     </div>
   );
+  
+  // Typing indicator animation
+  const TypingIndicator = () => (
+    <div className="typing-indicator">
+      <div className="typing-indicator__dot"></div>
+      <div className="typing-indicator__dot"></div>
+      <div className="typing-indicator__dot"></div>
+    </div>
+  );
+
+  // Microphone level visualization
+  const MicrophoneWave = () => (
+    <div className="mic-wave">
+      {[...Array(5)].map((_, i) => (
+        <div 
+          key={i} 
+          className="mic-wave__bar"
+          style={{ 
+            height: `${Math.max(3, micVolume / 10)}px`,
+            animationDuration: `${0.5 + (i * 0.1)}s`
+          }}
+        ></div>
+      ))}
+    </div>
+  );
+
+  // Decorative particles for the background
+  const Particles = () => (
+    <div className="particles-container">
+      <div className="particle"></div>
+      <div className="particle"></div>
+      <div className="particle"></div>
+      <div className="particle"></div>
+      <div className="particle"></div>
+    </div>
+  );
+
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   return (
-    <>
+    <div className="relative">
+      {/* Dark mode toggle */}
+      <button className="dark-mode-toggle" onClick={toggleDarkMode}>
+        {isDarkMode ? (
+          <Sun className="w-4 h-4 text-yellow-400" />
+        ) : (
+          <Moon className="w-4 h-4 text-gray-600" />
+        )}
+      </button>
+
       <AnimatePresence>
         {conversation.status !== 'connected' ? (
           <div className="flex flex-col items-end">
@@ -131,7 +265,7 @@ export default function ChatBubble({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 20, opacity: 0 }}
               transition={{ type: 'spring', damping: 20 }}
-              className="mb-3 bg-white rounded-lg px-4 py-2 shadow-lg max-w-[220px]"
+              className={`mb-3 px-4 py-2 shadow-lg max-w-[220px] rounded-lg ${isDarkMode ? 'dark-theme' : 'bg-white'}`}
               style={{ 
                 opacity: isHovered ? 1 : 0,
                 pointerEvents: isHovered ? 'auto' : 'none',
@@ -139,7 +273,7 @@ export default function ChatBubble({
                 transition: 'opacity 0.3s, transform 0.3s'
               }}
             >
-              <p className="text-sm font-medium" style={{ color: theme?.text || '#333' }}>
+              <p className={`text-sm font-medium ${isDarkMode ? 'dark-text' : ''}`} style={{ color: isDarkMode ? '#eee' : (theme?.text || '#333') }}>
                 Ask me anything! I'm here to help.
               </p>
             </motion.div>
@@ -150,7 +284,7 @@ export default function ChatBubble({
               exit={{ scale: 0.8, opacity: 0 }}
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className="relative cursor-pointer group"
+              className="relative cursor-pointer group float-animation"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onClick={handleStartCall}
@@ -217,6 +351,9 @@ export default function ChatBubble({
                   delay: 0.5
                 }}
               />
+              
+              {/* Floating particles in the background */}
+              <Particles />
             </motion.div>
           </div>
         ) : (
@@ -225,9 +362,11 @@ export default function ChatBubble({
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
             transition={{ type: 'spring', damping: 20 }}
-            className="rounded-xl shadow-xl p-4 bg-white flex items-center gap-3 max-w-[280px]"
+            className={`rounded-xl shadow-xl p-4 flex items-center gap-3 max-w-[280px] ${isDarkMode ? 'dark-theme' : 'bg-white'}`}
             style={{
-              boxShadow: `0 10px 25px -5px rgba(92, 7, 140, 0.15), 0 8px 10px -5px rgba(92, 7, 140, 0.1)`
+              boxShadow: isDarkMode 
+                ? '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -5px rgba(0, 0, 0, 0.2)'
+                : '0 10px 25px -5px rgba(92, 7, 140, 0.15), 0 8px 10px -5px rgba(92, 7, 140, 0.1)'
             }}
           >
             <div className="relative flex-shrink-0">
@@ -247,7 +386,7 @@ export default function ChatBubble({
                       duration: 2
                     }}
                   >
-                    <MessageCircle className="w-5 h-5 text-white" />
+                    <MicIcon className="w-5 h-5 text-white" />
                   </motion.div>
                 )}
               </div>
@@ -261,23 +400,30 @@ export default function ChatBubble({
             </div>
             
             <div className="flex-1">
-              <h3 className="text-sm font-medium mb-1" style={{ color: primaryColor }}>
+              <h3 className={`text-sm font-medium mb-1 ${isDarkMode ? 'text-white' : ''}`} style={{ color: isDarkMode ? '#fff' : primaryColor }}>
                 SiteHQ Assistant
               </h3>
               
-              {conversation.isSpeaking ? (
+              {isTyping ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-blue-600">Speaking</span>
+                  <span className={`text-xs ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>
+                    Thinking
+                  </span>
+                  <TypingIndicator />
+                </div>
+              ) : conversation.isSpeaking ? (
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>
+                    Speaking
+                  </span>
                   <SoundWave />
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-green-600">Listening to you...</span>
-                  <motion.div 
-                    className="w-2 h-2 rounded-full bg-green-500"
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  />
+                  <span className={`text-xs ${isDarkMode ? 'text-green-300' : 'text-green-600'}`}>
+                    Listening
+                  </span>
+                  <MicrophoneWave />
                 </div>
               )}
             </div>
@@ -285,29 +431,35 @@ export default function ChatBubble({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 rounded-full p-0 bg-red-50 hover:bg-red-100"
+              className={`h-8 w-8 rounded-full p-0 ${isDarkMode ? 'bg-red-900 hover:bg-red-800' : 'bg-red-50 hover:bg-red-100'}`}
               onClick={() => conversation.endSession()}
             >
-              <MicOff className="w-4 h-4 text-red-500" />
+              <MicOff className={`w-4 h-4 ${isDarkMode ? 'text-red-200' : 'text-red-500'}`} />
             </Button>
           </motion.div>
         )}
       </AnimatePresence>
 
       <div className="text-center text-xs text-gray-500 mt-1.5">
-        Powered by <a href="https://www.futurnod.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Futur Nod</a>
+        Powered by SiteHQ
       </div>
 
       <Dialog open={showTerms} onOpenChange={setShowTerms}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className={`sm:max-w-lg ${isDarkMode ? 'dark-theme' : ''}`}>
           <DialogHeader>
-            <DialogTitle className="text-xl">Terms and conditions</DialogTitle>
-            <DialogDescription className="text-base leading-relaxed">
+            <DialogTitle className={`text-xl ${isDarkMode ? 'text-white' : ''}`}>
+              Terms and conditions
+            </DialogTitle>
+            <DialogDescription className={`text-base leading-relaxed ${isDarkMode ? 'text-gray-300' : ''}`}>
               By clicking "Agree," and each time I interact with this AI agent, I consent to the recording, storage, and sharing of my communications with third-party service providers, and as described in the Privacy Policy. If you do not wish to have your conversations recorded, please refrain from using this service.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowTerms(false)}>
+            <Button 
+              variant={isDarkMode ? "default" : "outline"} 
+              className={isDarkMode ? "bg-gray-700 text-white" : ""}
+              onClick={() => setShowTerms(false)}
+            >
               Cancel
             </Button>
             <Button 
@@ -320,6 +472,6 @@ export default function ChatBubble({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }
