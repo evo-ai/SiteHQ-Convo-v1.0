@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Widget Implementation Guide</title>
+    <title>SiteHQ Assistant - Implementation Guide</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -11,6 +11,15 @@
             max-width: 800px;
             margin: 20px auto;
             padding: 0 20px;
+            color: #333;
+        }
+        header {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 10px;
         }
         .instructions {
             background: #f5f5f5;
@@ -28,16 +37,24 @@
         code {
             font-family: monospace;
         }
+        .demo-container {
+            margin-top: 40px;
+            position: relative;
+            height: 600px;
+        }
     </style>
 </head>
 <body>
-    <h1>Conversational AI Widget Demo</h1>
+    <header>
+        <img src="/assets/SiteHQ-logo.svg" alt="SiteHQ Logo" class="logo">
+        <h1>SiteHQ Assistant Implementation Guide</h1>
+    </header>
 
     <div class="instructions">
         <h2>Embedding Instructions</h2>
         <p>Add this code to your website:</p>
         <pre><code>&lt;iframe
-    src="https://voice-convo-widget-futur-intel.replit.app/embed?apiKey=YOUR_API_KEY&amp;agentId=YOUR_AGENT_ID&amp;theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
+    src="/embed?apiKey=YOUR_API_KEY&amp;agentId=YOUR_AGENT_ID&amp;theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D"
     style="
         width: 400px;
         height: 600px;
@@ -52,48 +69,22 @@
     allow="microphone"
 &gt;&lt;/iframe&gt;</code></pre>
 
-        <h3>Features</h3>
-        <ul>
-            <li>Voice-based conversational AI using ElevenLabs API</li>
-            <li>Customizable appearance</li>
-            <li>Terms and conditions compliance</li>
-            <li>Real-time conversation status indicators</li>
-        </ul>
-
         <h3>Configuration Parameters</h3>
         <ul>
-            <li><strong>apiKey</strong>: Your ElevenLabs API key</li>
-            <li><strong>agentId</strong>: Your ConvAI agent ID</li>
+            <li><strong>apiKey</strong>: Your API key</li>
+            <li><strong>agentId</strong>: Your agent ID</li>
             <li><strong>theme</strong>: Customize the appearance (optional)</li>
         </ul>
 
         <h3>Theme Configuration</h3>
         <p>Default theme values:</p>
         <pre><code>{
-  "primary": "#0066cc",
+  "primary": "#5c078c",
   "background": "#ffffff",
-  "text": "#ffffff"
+  "text": "#333333"
 }</code></pre>
     </div>
 
-    <h2>Live Demo</h2>
-    <p>Below is a working example of the widget:</p>
-
-    <!-- Test widget with demo credentials -->
-    <iframe
-        src="/embed?apiKey=demo-key&amp;agentId=FnTVTPK2FfEkaktJIFFx&amp;theme=%7B%22primary%22%3A%22%230066cc%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23ffffff%22%7D"
-        style="
-            width: 400px;
-            height: 600px;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            z-index: 9999;
-        "
-        allow="microphone"
-    ></iframe>
+    <p>For more information and support, please contact the SiteHQ team.</p>
 </body>
 </html>
