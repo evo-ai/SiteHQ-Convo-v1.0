@@ -295,7 +295,7 @@ export default function ChatBubble({
       </AnimatePresence>
 
       <div className="text-center text-xs text-gray-500 mt-1.5">
-        Powered by SiteHQ
+        Powered by Futur Nod
       </div>
 
       <Dialog open={showTerms} onOpenChange={setShowTerms}>
