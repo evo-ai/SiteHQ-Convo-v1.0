@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
 import { useConversation } from '@11labs/react';
-import { Mic, MicOff, Volume2 } from 'lucide-react';
+import { Phone, MicOff, Volume2 } from 'lucide-react';
 
 interface ChatBubbleProps {
   apiKey?: string;
@@ -85,105 +85,89 @@ export default function ChatBubble({
     }
   }, [apiKey, conversation, toast]);
 
+  // Create an animated gradient for the avatar
+  const AvatarGradient = () => (
+    <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-purple-300 via-purple-100 to-green-100 avatar-gradient" />
+  );
+
   return (
     <>
       <AnimatePresence>
         {conversation.status !== 'connected' ? (
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            className="w-[300px] rounded-lg shadow-lg p-6 chat-bubble"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+            className="w-[280px] rounded-full shadow-xl p-4 flex items-center justify-between"
             style={{ 
-              backgroundColor: theme?.background || 'hsl(var(--primary))',
-              color: theme?.text || 'white'
+              backgroundColor: theme?.background || 'white',
+              color: theme?.text || 'black',
+              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
             }}
           >
-            <div className="flex flex-col items-start gap-4">
-              <h3 className="text-xl font-semibold tracking-tight text-white">
-                Need help?
+            <div className="flex items-center gap-3">
+              <AvatarGradient />
+              <h3 className="text-lg font-medium" style={{ color: theme?.text || 'black' }}>
+                Have a question?
               </h3>
-              <Button
-                size="lg"
-                className="rounded-full shadow-lg text-base py-6 px-8 gap-2"
-                style={{ 
-                  backgroundColor: theme?.primary || 'hsl(var(--primary))',
-                  color: theme?.text || 'hsl(var(--primary-foreground))'
-                }}
-                onClick={handleStartCall}
-              >
-                <Mic className="w-5 h-5" />
-                Start a call
-              </Button>
             </div>
+            <Button
+              className="rounded-full shadow-md px-4 py-2 flex items-center gap-2 min-h-10"
+              style={{ 
+                backgroundColor: theme?.primary || 'black',
+                color: 'white'
+              }}
+              onClick={handleStartCall}
+            >
+              <Phone className="w-4 h-4" />
+              <span>Start a call</span>
+            </Button>
           </motion.div>
         ) : (
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            className="w-[380px] rounded-lg shadow-lg p-6"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+            className="w-[280px] rounded-full shadow-xl p-4 bg-white flex items-center justify-between"
           >
-            <div className="flex items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <motion.div
-                  animate={{
-                    scale: conversation.isSpeaking ? [1, 1.2, 1] : 1,
-                  }}
-                  transition={{
-                    repeat: conversation.isSpeaking ? Infinity : 0,
-                    duration: 1.5,
-                  }}
-                  className={`flex gap-1 items-center ${
-                    conversation.isSpeaking ? 'w-16' : 'w-4'
-                  }`}
-                >
-                  <div className={`w-4 h-4 rounded-full ${
-                    conversation.isSpeaking ? 'bg-blue-500' : 'bg-green-500'
-                  }`} />
-                  {conversation.isSpeaking && (
-                    <>
-                      <div className="w-2 h-3 bg-blue-500 rounded-full animate-pulse" />
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" />
-                      <div className="w-2 h-4 bg-blue-500 rounded-full animate-pulse" />
-                    </>
-                  )}
-                </motion.div>
-                <div className="flex flex-col">
-                  <span className="text-lg font-medium">
-                    {conversation.isSpeaking ? (
-                      <div className="flex items-center gap-3">
-                        <Volume2 className="w-5 h-5" />
-                        <motion.span
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-blue-600"
-                        >
-                          AI Speaking - Click to Interrupt
-                        </motion.span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-3">
-                        <Mic className="w-5 h-5" />
-                        <span className="text-green-600">Listening to you</span>
-                      </div>
-                    )}
-                  </span>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <AvatarGradient />
+                {conversation.isSpeaking && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                    className="absolute -right-1 -top-1 w-4 h-4 bg-blue-500 rounded-full"
+                  />
+                )}
               </div>
-              <Button
-                size="lg"
-                variant="outline"
-                className="gap-2 text-base"
-                onClick={() => conversation.endSession()}
-              >
-                <MicOff className="w-5 h-5" />
-                End Call
-              </Button>
+              <span className="font-medium">
+                {conversation.isSpeaking ? (
+                  <span className="text-blue-600">AI Speaking...</span>
+                ) : (
+                  <span className="text-green-600">Listening...</span>
+                )}
+              </span>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full border-red-400 text-red-500 hover:bg-red-50"
+              onClick={() => conversation.endSession()}
+            >
+              <MicOff className="w-4 h-4 mr-1" />
+              End
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div className="text-center text-xs text-gray-500 mt-1.5">
+        Powered by SiteHQ Assistant
+      </div>
 
       <Dialog open={showTerms} onOpenChange={setShowTerms}>
         <DialogContent className="sm:max-w-lg">
