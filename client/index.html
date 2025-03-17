@@ -50,12 +50,12 @@
                     <button class="tab-btn" onclick="switchTab('iframe')">IFrame</button>
                 </div>
                 <div id="script" class="tab-content active">
-                    <pre><code>&lt;script src="https://sitehq-assistant.com/widget.js"&gt;&lt;/script&gt;
+                    <pre><code>&lt;script src="${window.location.origin}/widget.js"&gt;&lt;/script&gt;
 &lt;sitehq-convowidget agent-id="YOUR_AGENT_ID"&gt;&lt;/sitehq-convowidget&gt;</code></pre>
                 </div>
                 <div id="iframe" class="tab-content">
                     <pre><code>&lt;iframe
-    src="https://sitehq-assistant.com/embed?agentId=YOUR_AGENT_ID"
+    src="${window.location.origin}/embed?agentId=YOUR_AGENT_ID"
     style="width: 400px; height: 600px; position: fixed; bottom: 20px; 
            right: 20px; border: none; border-radius: 12px; 
            box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;"
