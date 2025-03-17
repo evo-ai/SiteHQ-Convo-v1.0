@@ -295,7 +295,7 @@ export default function ChatBubble({
       </AnimatePresence>
 
       <div className="text-center text-xs text-gray-500 mt-1.5">
-        Powered by Futur Nod
+        Powered by <a href="https://www.futurnod.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Futur Nod</a>
       </div>
 
       <Dialog open={showTerms} onOpenChange={setShowTerms}>
