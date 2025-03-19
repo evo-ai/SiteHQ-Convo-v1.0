@@ -836,13 +836,47 @@
     headerTitle.className = 'sitehq-header-title';
     headerTitle.textContent = config.widgetTitle;
     
+    // Status container
+    const statusContainer = document.createElement('div');
+    statusContainer.className = 'sitehq-status-container';
+    
+    // Status indicator
     const statusEl = document.createElement('div');
     statusEl.className = 'sitehq-status';
     statusEl.id = 'sitehq-status';
     statusEl.textContent = 'Initializing...';
+    statusContainer.appendChild(statusEl);
+    
+    // Sound wave animation (for speaking state)
+    const soundWave = document.createElement('div');
+    soundWave.id = 'sitehq-sound-wave';
+    soundWave.className = 'sitehq-sound-wave';
+    soundWave.style.display = 'none';
+    
+    // Create 5 bars for the sound wave
+    for (let i = 0; i < 5; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'sitehq-sound-wave-bar';
+      soundWave.appendChild(bar);
+    }
+    statusContainer.appendChild(soundWave);
+    
+    // Microphone wave animation (for listening state)
+    const micWave = document.createElement('div');
+    micWave.id = 'sitehq-mic-wave';
+    micWave.className = 'sitehq-mic-wave';
+    micWave.style.display = 'none';
+    
+    // Create 5 bars for the mic wave
+    for (let i = 0; i < 5; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'sitehq-mic-wave-bar';
+      micWave.appendChild(bar);
+    }
+    statusContainer.appendChild(micWave);
     
     headerContent.appendChild(headerTitle);
-    headerContent.appendChild(statusEl);
+    headerContent.appendChild(statusContainer);
     
     const headerActions = document.createElement('div');
     headerActions.className = 'sitehq-header-actions';
@@ -1288,11 +1322,22 @@
             addMessage('assistant', data.content);
             state.isSpeaking = false;
           } else if (data.type === 'status') {
+            console.log('SiteHQ Chat: Status update:', data.status);
             setStatus(data.status);
             if (data.status === 'speaking') {
               state.isSpeaking = true;
             } else if (data.status === 'listening') {
               state.isSpeaking = false;
+            }
+          } else if (data.type === 'voice_status') {
+            // Handle voice-specific status updates
+            console.log('SiteHQ Chat: Voice status update:', data.status);
+            if (data.status === 'listening') {
+              setStatus('listening');
+            } else if (data.status === 'speaking') {
+              setStatus('speaking');
+            } else if (data.status === 'thinking') {
+              setStatus('thinking');
             }
           } else if (data.type === 'error') {
             console.error('SiteHQ Chat: Error from server:', data.message);
@@ -1370,19 +1415,24 @@
   function setStatus(status) {
     const statusIndicator = document.getElementById('sitehq-status');
     const typingIndicator = document.getElementById('sitehq-typing-indicator');
+    const soundWave = document.getElementById('sitehq-sound-wave');
+    const micWave = document.getElementById('sitehq-mic-wave');
     
     if (!statusIndicator || !typingIndicator) return;
+    
+    // Hide all indicators first
+    typingIndicator.style.display = 'none';
+    if (soundWave) soundWave.style.display = 'none';
+    if (micWave) micWave.style.display = 'none';
     
     switch (status) {
       case 'connected':
         statusIndicator.textContent = 'Connected';
         statusIndicator.className = 'sitehq-status sitehq-status-connected';
-        typingIndicator.style.display = 'none';
         break;
       case 'disconnected':
         statusIndicator.textContent = 'Disconnected';
         statusIndicator.className = 'sitehq-status sitehq-status-disconnected';
-        typingIndicator.style.display = 'none';
         break;
       case 'typing':
       case 'thinking':
@@ -1392,8 +1442,14 @@
       case 'speaking':
         statusIndicator.textContent = 'Speaking';
         statusIndicator.className = 'sitehq-status sitehq-status-connected';
-        typingIndicator.style.display = 'none';
+        if (soundWave) soundWave.style.display = 'flex';
         state.isSpeaking = true;
+        break;
+      case 'listening':
+        statusIndicator.textContent = 'Listening';
+        statusIndicator.className = 'sitehq-status sitehq-status-connected';
+        if (micWave) micWave.style.display = 'flex';
+        state.isSpeaking = false;
         break;
       case 'error':
         statusIndicator.textContent = 'Error';
