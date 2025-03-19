@@ -1308,8 +1308,8 @@
         setStatus('disconnected');
       };
       
-      socket.onerror = (error) => {
-        error('WebSocket error:', error);
+      socket.onerror = (err) => {
+        console.error('WebSocket error:', err);
         setStatus('error');
         addMessage('assistant', 'Sorry, there was an error with the connection. Please try again later.');
       };
