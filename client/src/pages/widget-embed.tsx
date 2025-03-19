@@ -17,7 +17,7 @@ export default function WidgetEmbedPage() {
   // Parse URL parameters
   useEffect(() => {
     try {
-      const searchParams = new URLSearchParams(params);
+      const searchParams = new URLSearchParams(params || '');
       
       // Parse theme if provided
       const themeParam = searchParams.get('theme');
@@ -34,12 +34,13 @@ export default function WidgetEmbedPage() {
   }, [params]);
   
   // Get API key and agent ID from URL parameters
-  const apiKey = new URLSearchParams(params).get('apiKey') || 'demo-key';
-  const agentId = new URLSearchParams(params).get('agentId') || 'demo-agent';
+  const searchParams = new URLSearchParams(params || '');
+  const apiKey = searchParams.get('apiKey') || 'demo-key';
+  const agentId = searchParams.get('agentId') || 'demo-agent';
   
   return (
     <div className="w-full h-screen flex justify-center items-center">
-      <style jsx global>{`
+      <style>{`
         body {
           margin: 0;
           padding: 0;
