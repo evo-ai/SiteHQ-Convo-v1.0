@@ -485,38 +485,38 @@
           }
           
           iframeDoc.open();
-          const htmlContent = '<!DOCTYPE html>' +
-          '<html>' +
-          '<head>' +
-          '  <meta charset="UTF-8">' +
-          '  <meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-          '  <title>Sample Page with SiteHQ Chat</title>' +
-          '  <style>' +
-          '    body {' +
-          '      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;' +
-          '      padding: 20px;' +
-          '      margin: 0;' +
-          '    }' +
-          '    h1 { color: #333; }' +
-          '    p { line-height: 1.6; color: #555; }' +
-          '  </style>' +
-          '</head>' +
-          '<body>' +
-          '  <h1>Sample Website</h1>' +
-          '  <p>This is a sample website with the SiteHQ Chat Widget embedded via iframe.</p>' +
-          '  <p>The widget appears in the bottom right corner of this page.</p>' +
-          '  ' +
-          '  <!-- SiteHQ Chat Widget Iframe -->' +
-          '  <iframe ' +
-          '    src="/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" ' +
-          '    style="width: 70px; height: 70px; position: fixed; bottom: 20px; right: 20px; border: none; overflow: hidden; z-index: 9999;" ' +
-          '    allow="microphone"' +
-          '  ></iframe>' +
-          '  <script>' +
-          '    console.log("Iframe demo page loaded with widget");' +
-          '  </script>' +
-          '</body>' +
-          '</html>';
+          const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Page with SiteHQ Chat</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 { color: #333; }
+    p { line-height: 1.6; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Sample Website</h1>
+  <p>This is a sample website with the SiteHQ Chat Widget embedded via iframe.</p>
+  <p>The widget appears in the bottom right corner of this page.</p>
+  
+  <!-- SiteHQ Chat Widget Iframe -->
+  <iframe 
+    src="/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
+    style="width: 70px; height: 70px; position: fixed; bottom: 20px; right: 20px; border: none; overflow: hidden; z-index: 9999;" 
+    allow="microphone">
+  </iframe>
+  <script>
+    console.log("Iframe demo page loaded with widget");
+  </script>
+</body>
+</html>`;
           
           iframeDoc.write(htmlContent);
           iframeDoc.close();
