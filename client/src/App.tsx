@@ -10,6 +10,7 @@ import ForgotPassword from "@/pages/admin/forgot-password";
 import ResetPassword from "@/pages/admin/reset-password";
 import AnalyticsDashboard from "@/pages/analytics";
 import EmbedPage from "@/pages/embed";
+import WidgetEmbedPage from "@/pages/widget-embed";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/admin/reset-password" component={ResetPassword} />
       <Route path="/admin/analytics" component={AnalyticsDashboard} />
       <Route path="/embed" component={EmbedPage} />
+      <Route path="/widget-embed" component={WidgetEmbedPage} />
       <Route component={NotFound} />
     </Switch>
   );
