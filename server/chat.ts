@@ -54,11 +54,40 @@ export function setupChatWebSocket(ws: WebSocket) {
 
         elevenlabsWs.on('message', async (data) => {
           try {
+            // First, pass the original message to the client
             ws.send(data.toString());
+            
+            const elevenlabsMessage = JSON.parse(data.toString());
+            
+            // Check for status indicators from ElevenLabs
+            if (elevenlabsMessage.type === 'status') {
+              console.log('ElevenLabs status update:', elevenlabsMessage);
+              
+              // Send voice-specific status updates to the client
+              if (elevenlabsMessage.status === 'listening') {
+                ws.send(JSON.stringify({
+                  type: 'voice_status',
+                  status: 'listening'
+                }));
+              } else if (elevenlabsMessage.status === 'speaking') {
+                ws.send(JSON.stringify({
+                  type: 'voice_status',
+                  status: 'speaking'
+                }));
+              } else if (elevenlabsMessage.status === 'thinking') {
+                ws.send(JSON.stringify({
+                  type: 'voice_status',
+                  status: 'thinking'
+                }));
+              }
+            }
 
             if (conversationId) {
-              const aiMessage = JSON.parse(data.toString());
+              const aiMessage = elevenlabsMessage;
               const content = aiMessage.content || aiMessage.text;
+              
+              // Only process content messages, not status updates
+              if (!content) return;
 
               // Analyze sentiment
               const words = content.toLowerCase().split(' ');

@@ -1385,6 +1385,7 @@
       state.connection.onmessage = function(event) {
         try {
           const data = JSON.parse(event.data);
+          console.log('SiteHQ Chat: Received WebSocket message:', data);
           
           if (data.type === 'message') {
             addMessage('assistant', data.content);
@@ -1400,11 +1401,15 @@
           } else if (data.type === 'voice_status') {
             // Handle voice-specific status updates
             console.log('SiteHQ Chat: Voice status update:', data.status);
+            // Always log the voice status updates, useful for debugging
             if (data.status === 'listening') {
+              console.log('SiteHQ Chat: Voice UI - LISTENING - showing mic wave animation');
               setStatus('listening');
             } else if (data.status === 'speaking') {
+              console.log('SiteHQ Chat: Voice UI - SPEAKING - showing sound wave animation');
               setStatus('speaking');
             } else if (data.status === 'thinking') {
+              console.log('SiteHQ Chat: Voice UI - THINKING - showing typing indicator');
               setStatus('thinking');
             }
           } else if (data.type === 'error') {
