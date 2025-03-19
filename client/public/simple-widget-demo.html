@@ -61,6 +61,11 @@
     </div>
     
     <div>
+      <h2>Iframe Implementation</h2>
+      <button id="iframe-btn">Load Iframe Widget</button>
+    </div>
+    
+    <div>
       <h3>Voice UI Features:</h3>
       <ul>
         <li>The widget now includes sound wave animations when the AI is speaking</li>
@@ -129,6 +134,30 @@
       };
       
       document.body.appendChild(script);
+      this.textContent = 'Widget Loaded!';
+    });
+    
+    // Iframe Implementation
+    document.getElementById('iframe-btn').addEventListener('click', function() {
+      // Remove any existing iframe
+      const existingIframe = document.querySelector('.sitehq-iframe');
+      if (existingIframe) {
+        existingIframe.remove();
+      }
+      
+      // Create iframe with environment variable for API key
+      const iframe = document.createElement('iframe');
+      iframe.className = 'sitehq-iframe';
+      iframe.src = '/embed?apiKey=<%= process.env.ELEVENLABS_API_KEY %>&agentId=KRGVz0f5HAU0E7u6BbA5&theme={"primary":"#5c078c","background":"#ffffff","text":"#333333"}&solarSystemTheme=true';
+      iframe.style.position = 'fixed';
+      iframe.style.bottom = '20px';
+      iframe.style.right = '20px';
+      iframe.style.width = '375px';
+      iframe.style.height = '600px';
+      iframe.style.border = 'none';
+      iframe.style.zIndex = '9999';
+      
+      document.body.appendChild(iframe);
       this.textContent = 'Widget Loaded!';
     });
   </script>
