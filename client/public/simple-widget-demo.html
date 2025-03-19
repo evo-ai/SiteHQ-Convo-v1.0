@@ -89,7 +89,8 @@
       const script = document.createElement('script');
       script.src = '/fixed-standalone-chat-bubble.js';
       script.setAttribute('data-sitehq-chat', 'auto');
-      script.setAttribute('data-api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+      // Use the environment variable ELEVENLABS_API_KEY from server
+      script.setAttribute('data-api-key', '<%= process.env.ELEVENLABS_API_KEY %>');
       script.setAttribute('data-agent-id', 'KRGVz0f5HAU0E7u6BbA5');
       script.setAttribute('data-position', 'bottom-right');
       script.setAttribute('data-title', 'Simple Demo');
@@ -115,7 +116,8 @@
       script.onload = function() {
         // Create the custom element
         const chatElement = document.createElement('sitehq-chat');
-        chatElement.setAttribute('api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+        // Use the environment variable ELEVENLABS_API_KEY from server
+        chatElement.setAttribute('api-key', '<%= process.env.ELEVENLABS_API_KEY %>');
         chatElement.setAttribute('agent-id', 'KRGVz0f5HAU0E7u6BbA5');
         chatElement.setAttribute('position', 'bottom-left');
         chatElement.setAttribute('title', 'Custom Element Demo');

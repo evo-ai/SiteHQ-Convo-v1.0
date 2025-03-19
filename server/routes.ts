@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { randomBytes } from 'crypto';
 import { z } from 'zod';
+import fs from 'fs';
 import { insertAdminSchema } from '@db/schema';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -421,6 +422,36 @@ export function registerRoutes(app: Express): Server {
       'Cache-Control': 'max-age=3600'
     });
     res.sendFile(path.resolve('./client/public/standalone-chat-bubble.js'));
+  });
+  
+  // Serve the fixed chat bubble script with proper CORS headers
+  app.get('/fixed-standalone-chat-bubble.js', (req, res) => {
+    res.set({
+      'Content-Type': 'application/javascript',
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'max-age=3600'
+    });
+    res.sendFile(path.resolve('./client/public/fixed-standalone-chat-bubble.js'));
+  });
+  
+  // Serve the simple-widget-demo.html with environment variables injected
+  app.get('/simple-widget-demo.html', (req, res) => {
+    // Read the file from disk
+    fs.readFile(path.resolve('./client/public/simple-widget-demo.html'), 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {
+      if (err) {
+        console.error('Error reading simple-widget-demo.html:', err);
+        return res.status(500).send('Error loading the demo page');
+      }
+      
+      // Replace template variables with actual values
+      const processedHTML = data.replace(
+        /<%= process\.env\.ELEVENLABS_API_KEY %>/g, 
+        process.env.ELEVENLABS_API_KEY || ''
+      );
+      
+      res.set('Content-Type', 'text/html');
+      res.send(processedHTML);
+    });
   });
 
   // WebSocket setup for chat
