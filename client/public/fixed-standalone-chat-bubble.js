@@ -6,6 +6,14 @@
 
 (function() {
   'use strict';
+  
+  // Define the global SiteHQChat namespace
+  window.SiteHQChat = window.SiteHQChat || {};
+  
+  // Define the init function in the namespace
+  window.SiteHQChat.init = function(config) {
+    initializeWidget(config);
+  };
 
   // Debug functionality
   let debugMode = false;
@@ -1408,28 +1416,33 @@
 
   // Auto initialize if data attribute is present
   function autoInitialize() {
+    // First look for a script with auto attribute
     const script = document.querySelector('script[data-sitehq-chat="auto"]');
-    if (script) {
+    
+    // If not found, look for any script that might have our attributes
+    const anyScript = script || document.querySelector('script[data-api-key], script[data-agent-id]');
+    
+    if (anyScript) {
       // Check for debug mode
-      debugMode = script.getAttribute('data-debug') === 'true';
+      debugMode = anyScript.getAttribute('data-debug') === 'true';
       
       if (debugMode) {
         console.log('[SiteHQ Chat] Initializing widget in debug mode');
       }
       
       const config = {
-        apiKey: script.getAttribute('data-api-key') || DEFAULT_CONFIG.apiKey,
-        agentId: script.getAttribute('data-agent-id') || DEFAULT_CONFIG.agentId,
-        position: script.getAttribute('data-position') || DEFAULT_CONFIG.position,
-        darkMode: script.getAttribute('data-dark-mode') === 'true',
-        initiallyOpen: script.getAttribute('data-initially-open') === 'true',
-        widgetTitle: script.getAttribute('data-title') || DEFAULT_CONFIG.widgetTitle,
-        useSolarSystemTheme: script.getAttribute('data-solar-system-theme') === 'true' || DEFAULT_CONFIG.useSolarSystemTheme,
+        apiKey: anyScript.getAttribute('data-api-key') || DEFAULT_CONFIG.apiKey,
+        agentId: anyScript.getAttribute('data-agent-id') || DEFAULT_CONFIG.agentId,
+        position: anyScript.getAttribute('data-position') || DEFAULT_CONFIG.position,
+        darkMode: anyScript.getAttribute('data-dark-mode') === 'true',
+        initiallyOpen: anyScript.getAttribute('data-initially-open') === 'true',
+        widgetTitle: anyScript.getAttribute('data-title') || DEFAULT_CONFIG.widgetTitle,
+        useSolarSystemTheme: anyScript.getAttribute('data-solar-system-theme') === 'true' || DEFAULT_CONFIG.useSolarSystemTheme,
         debug: debugMode
       };
       
       // Parse theme if provided
-      const themeAttr = script.getAttribute('data-theme');
+      const themeAttr = anyScript.getAttribute('data-theme');
       if (themeAttr) {
         try {
           const themeData = JSON.parse(themeAttr);
@@ -1459,4 +1472,46 @@
   } else {
     autoInitialize();
   }
+  
+  // Expose initialization functions globally for manual initialization
+  window.SiteHQChatInit = function() {
+    if (debugMode) {
+      console.log('[SiteHQ Chat] Manual initialization triggered');
+    }
+    autoInitialize();
+  };
+  
+  // Allow direct initialization with config object
+  window.SiteHQChatInitWithConfig = function(config) {
+    if (!config) {
+      console.error('[SiteHQ Chat] Config object required for SiteHQChatInitWithConfig');
+      return;
+    }
+    
+    // Set debug mode if specified in config
+    if (config.debug) {
+      debugMode = true;
+      console.log('[SiteHQ Chat] Initializing with custom config in debug mode');
+    }
+    
+    // Ensure we have the required parameters
+    if (!config.apiKey || !config.agentId) {
+      console.error('[SiteHQ Chat] API key and Agent ID are required for initialization');
+      return;
+    }
+    
+    // Use provided config with defaults for missing properties
+    const finalConfig = {
+      ...DEFAULT_CONFIG,
+      ...config,
+      theme: { ...DEFAULT_CONFIG.theme, ...(config.theme || {}) }
+    };
+    
+    if (debugMode) {
+      log('Widget configuration (custom init):', finalConfig);
+    }
+    
+    // Initialize widget with the config
+    window.SiteHQChat.init(finalConfig);
+  };
 })();
