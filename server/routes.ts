@@ -364,9 +364,9 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Serve the widget-only embed page
-  app.get('/widget-embed', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/public/widget.html'));
+  // Serve the embed page for all routes starting with /embed
+  app.get('/embed*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/public/index.html'));
   });
 
   // WebSocket setup for chat
