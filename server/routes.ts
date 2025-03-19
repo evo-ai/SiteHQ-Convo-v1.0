@@ -359,15 +359,37 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ message: 'Conversation not found' });
       }
 
-      const transformedMessages = conversation[0].messages.map((msg: any, index: number) => ({
-        id: `msg-${index}`,
-        ...msg,
-        timestamp: new Date(msg.timestamp).toISOString()
-      }));
+      // Define the conversation type
+      interface ConversationMessage {
+        role: string;
+        content: string;
+        timestamp: string;
+        sentiment?: {
+          score: number;
+          comparative: number;
+          mood: string;
+        };
+      }
+
+      interface ConversationData {
+        id: number;
+        messages: ConversationMessage[];
+        [key: string]: any; // Allow for other properties
+      }
+
+      const conversationData = conversation[0] as ConversationData;
+      
+      const transformedMessages = Array.isArray(conversationData.messages) 
+        ? conversationData.messages.map((msg: ConversationMessage, index: number) => ({
+            id: `msg-${index}`,
+            ...msg,
+            timestamp: new Date(msg.timestamp).toISOString()
+          }))
+        : [];
 
       res.json({
         conversation: {
-          ...conversation[0],
+          ...conversationData,
           messages: transformedMessages
         }
       });

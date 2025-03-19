@@ -1,4 +1,3 @@
-import { useSearch } from 'wouter';
 import { useEffect, useState } from 'react';
 import ChatBubble from '@/components/chat/ChatBubble';
 
@@ -7,17 +6,22 @@ import ChatBubble from '@/components/chat/ChatBubble';
  * It will only render the ChatBubble component with no other UI elements
  */
 export default function WidgetEmbedPage() {
-  const [params] = useSearch();
   const [theme, setTheme] = useState({
     primary: '#5c078c',
     background: '#ffffff',
     text: '#333333'
   });
   
+  // Get query parameters from window.location
+  const getQueryParams = () => {
+    // Use window.location.search to get the query string
+    return new URLSearchParams(window.location.search);
+  };
+  
   // Parse URL parameters
   useEffect(() => {
     try {
-      const searchParams = new URLSearchParams(params || '');
+      const searchParams = getQueryParams();
       
       // Parse theme if provided
       const themeParam = searchParams.get('theme');
@@ -31,23 +35,23 @@ export default function WidgetEmbedPage() {
     } catch (error) {
       console.error('Error parsing URL parameters:', error);
     }
-  }, [params]);
+  }, []);
   
   // Get API key and agent ID from URL parameters
-  const searchParams = new URLSearchParams(params || '');
+  const searchParams = getQueryParams();
   const apiKey = searchParams.get('apiKey') || 'demo-key';
   const agentId = searchParams.get('agentId') || 'demo-agent';
   
   return (
     <div className="w-full h-screen flex justify-center items-center">
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         body {
           margin: 0;
           padding: 0;
           overflow: hidden;
           background-color: transparent;
         }
-      `}</style>
+      `}} />
       
       {/* 
         We render the ChatBubble component with its window already open
