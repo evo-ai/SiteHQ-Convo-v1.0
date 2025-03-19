@@ -663,6 +663,74 @@
         text-decoration: underline;
       }
       
+      /* Sound wave animation (for speaking state) */
+      .sitehq-sound-wave {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 20px;
+        width: 40px;
+        margin-left: 8px;
+      }
+      
+      .sitehq-sound-wave-bar {
+        width: 4px;
+        height: 100%;
+        background-color: var(--primary-color, #5c078c);
+        border-radius: 2px;
+        animation: sitehq-sound-wave 1.2s ease-in-out infinite;
+      }
+      
+      .sitehq-sound-wave-bar:nth-child(1) { animation-delay: 0.0s; }
+      .sitehq-sound-wave-bar:nth-child(2) { animation-delay: 0.2s; }
+      .sitehq-sound-wave-bar:nth-child(3) { animation-delay: 0.4s; }
+      .sitehq-sound-wave-bar:nth-child(4) { animation-delay: 0.6s; }
+      .sitehq-sound-wave-bar:nth-child(5) { animation-delay: 0.8s; }
+      
+      @keyframes sitehq-sound-wave {
+        0%, 100% { transform: scaleY(0.3); }
+        50% { transform: scaleY(1); }
+      }
+      
+      /* Microphone wave animation (for listening state) */
+      .sitehq-mic-wave {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 20px;
+        width: 40px;
+        margin-left: 8px;
+      }
+      
+      .sitehq-mic-wave-bar {
+        width: 4px;
+        height: 100%;
+        background-color: #f43f5e;
+        border-radius: 2px;
+        animation: sitehq-mic-wave 1.5s ease-in-out infinite;
+      }
+      
+      .sitehq-mic-wave-bar:nth-child(1) { animation-delay: 0.2s; }
+      .sitehq-mic-wave-bar:nth-child(2) { animation-delay: 0.4s; }
+      .sitehq-mic-wave-bar:nth-child(3) { animation-delay: 0.6s; }
+      .sitehq-mic-wave-bar:nth-child(4) { animation-delay: 0.8s; }
+      .sitehq-mic-wave-bar:nth-child(5) { animation-delay: 1.0s; }
+      
+      @keyframes sitehq-mic-wave {
+        0%, 100% { transform: scaleY(0.2); }
+        50% { transform: scaleY(0.8); opacity: 1; }
+        75% { opacity: 0.7; }
+      }
+      
+      /* Status container - for status text and animations */
+      .sitehq-status-container {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        color: #666;
+        margin-top: 2px;
+      }
+      
       .sitehq-bubble-state {
         display: flex;
         flex-direction: column;
