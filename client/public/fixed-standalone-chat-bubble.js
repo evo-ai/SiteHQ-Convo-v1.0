@@ -143,11 +143,26 @@
       
       /* Solar System Theme Styles */
       .sitehq-sun-particle {
-        animation: sitehq-orbit 8s linear infinite !important;
+        position: absolute;
+        width: 18px !important;
+        height: 18px !important;
+        border-radius: 50%;
+        background-color: #FFCC00 !important;
         box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+        top: -10px;
+        right: -8px;
+        animation: sitehq-orbit 8s linear infinite !important;
       }
       
       .sitehq-planet-particle {
+        position: absolute;
+        width: 10px !important;
+        height: 10px !important;
+        border-radius: 50%;
+        background-color: #00CCFF !important;
+        box-shadow: 0 0 6px rgba(0, 204, 255, 0.8);
+        bottom: -6px;
+        left: -4px;
         animation: sitehq-orbit-reverse 6s linear infinite !important;
       }
       
@@ -730,180 +745,118 @@
         color: #666;
         margin-top: 2px;
       }
-      
-      .sitehq-bubble-state {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-      }
-      
-      .sitehq-bubble-content {
-        background-color: white;
-        padding: 10px 15px;
-        margin-bottom: 15px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        max-width: 250px;
-      }
-      
-      .sitehq-dark-mode .sitehq-bubble-content {
-        background-color: #2d2d2d;
-        color: #f5f5f5;
-      }
-      
-      .sitehq-active-state {
-        background-color: white;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        max-width: 280px;
-      }
-      
-      .sitehq-dark-mode .sitehq-active-state {
-        background-color: #2d2d2d;
-        color: #f5f5f5;
-      }
-      
-      .sitehq-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 30% 30%, #5c078c, #5c078cDD);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        position: relative;
-      }
-      
-      .sitehq-avatar-indicator {
-        position: absolute;
-        top: -2px;
-        right: -2px;
-        width: 12px;
-        height: 12px;
-        background-color: #4CAF50;
-        border-radius: 50%;
-        border: 2px solid white;
-      }
-      
-      .sitehq-dark-mode .sitehq-avatar-indicator {
-        border-color: #2d2d2d;
-      }
-      
-      .sitehq-dark-mode-toggle {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #555;
-        z-index: 20;
-      }
-      
-      .sitehq-dark-mode .sitehq-dark-mode-toggle {
-        color: #ddd;
-      }
-      
-      .sitehq-dark-mode-toggle:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-      }
-      
-      .sitehq-dark-mode .sitehq-dark-mode-toggle:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-      }
     `;
     document.head.appendChild(styleEl);
   }
 
-  // Function to create SVG elements
-  function createSVG(path) {
+  // Create SVG elements
+  function createSVG(pathData, options = {}) {
+    const { width = 24, height = 24, viewBox = '0 0 24 24' } = options;
+    
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', '24');
-    svg.setAttribute('height', '24');
-    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    svg.setAttribute('viewBox', viewBox);
     svg.setAttribute('fill', 'none');
     svg.setAttribute('stroke', 'currentColor');
     svg.setAttribute('stroke-width', '2');
     svg.setAttribute('stroke-linecap', 'round');
     svg.setAttribute('stroke-linejoin', 'round');
     
-    const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    pathEl.setAttribute('d', path);
+    if (Array.isArray(pathData)) {
+      pathData.forEach(d => {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        svg.appendChild(path);
+      });
+    } else {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pathData);
+      svg.appendChild(path);
+    }
     
-    svg.appendChild(pathEl);
     return svg;
   }
 
-  // SVG path data
-  const SVGS = {
+  // SVG Icons
+  const svgIcons = {
     chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
-    send: 'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z',
-    close: 'M18 6L6 18M6 6l12 12',
-    mic: 'M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z M19 10v2a7 7 0 0 1-14 0v-2 M12 19v4 M8 23h8',
-    sun: 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z M12 1v2 M12 21v2 M4.22 4.22l1.42 1.42 M18.36 18.36l1.42 1.42 M1 12h2 M21 12h2 M4.22 19.78l1.42-1.42 M18.36 5.64l1.42-1.42',
-    moon: 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z',
+    close: [
+      'M18 6L6 18',
+      'M6 6l12 12'
+    ],
+    send: [
+      'M22 2L11 13',
+      'M22 2L15 22L11 13L2 9L22 2'
+    ],
+    sun: [
+      'M12 1v2',
+      'M12 21v2',
+      'M4.22 4.22l1.42 1.42',
+      'M18.36 18.36l1.42 1.42',
+      'M1 12h2',
+      'M21 12h2',
+      'M4.22 19.78l1.42-1.42',
+      'M18.36 5.64l1.42-1.42'
+    ],
+    sunCircle: 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z',
+    moon: 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'
   };
 
-  // Create the widget DOM
-  function createWidgetDOM(config) {
-    // Create container
+  // Create the chat bubble DOM elements
+  function createWidgetDOM(config = {}) {
+    // Main container
     const container = document.createElement('div');
-    container.className = `sitehq-container sitehq-${config.position}`;
+    container.className = `sitehq-container sitehq-${config.position || 'bottom-right'}`;
     if (config.darkMode) {
       container.classList.add('sitehq-dark-mode');
     }
     
-    // Create toggle button
-    const toggleButton = document.createElement('button');
-    toggleButton.className = 'sitehq-toggle-button';
-    toggleButton.setAttribute('aria-label', 'Toggle chat');
+    // Apply primary color as CSS variable for easy theming
+    if (config.theme && config.theme.primary) {
+      container.style.setProperty('--primary-color', config.theme.primary);
+    }
+
+    // Chat toggle button
+    const chatButton = document.createElement('button');
+    chatButton.className = 'sitehq-toggle-button';
+    chatButton.setAttribute('aria-label', 'Toggle chat');
     
-    // Add solar system theme elements if enabled
+    // Solar system theme (if enabled)
     if (config.useSolarSystemTheme) {
       const sunParticle = document.createElement('div');
-      sunParticle.className = 'sitehq-particle sitehq-sun-particle';
+      sunParticle.className = 'sitehq-sun-particle';
       
       const planetParticle = document.createElement('div');
-      planetParticle.className = 'sitehq-particle sitehq-planet-particle';
+      planetParticle.className = 'sitehq-planet-particle';
       
-      toggleButton.appendChild(sunParticle);
-      toggleButton.appendChild(planetParticle);
+      chatButton.appendChild(sunParticle);
+      chatButton.appendChild(planetParticle);
     }
     
-    const chatIcon = createSVG(SVGS.chat);
-    toggleButton.appendChild(chatIcon);
-    
+    const chatIcon = createSVG(svgIcons.chat);
+    chatButton.appendChild(chatIcon);
+
     // Create tooltip
     const tooltip = document.createElement('div');
     tooltip.className = 'sitehq-tooltip';
     tooltip.textContent = 'Chat with our AI assistant';
-    
-    // Create chat window
+
+    // Chat window
     const chatWindow = document.createElement('div');
     chatWindow.className = 'sitehq-chat-window';
-    
-    // Create header
+
+    // Chat window header
     const header = document.createElement('div');
     header.className = 'sitehq-header';
-    
+
     const headerContent = document.createElement('div');
     headerContent.className = 'sitehq-header-content';
-    
+
     const headerTitle = document.createElement('div');
     headerTitle.className = 'sitehq-header-title';
-    headerTitle.textContent = config.widgetTitle;
-    
+    headerTitle.textContent = config.widgetTitle || 'Chat with AI';
+
     // Status container
     const statusContainer = document.createElement('div');
     statusContainer.className = 'sitehq-status-container';
@@ -945,37 +898,40 @@
     
     headerContent.appendChild(headerTitle);
     headerContent.appendChild(statusContainer);
-    
+
     const headerActions = document.createElement('div');
     headerActions.className = 'sitehq-header-actions';
-    
+
+    // Create dark mode toggle
     const darkModeButton = document.createElement('button');
     darkModeButton.className = 'sitehq-icon-button';
     darkModeButton.setAttribute('aria-label', 'Toggle dark mode');
     
+    // Add appropriate icon for dark mode
     const darkModeIcon = state.isDarkMode ? 
-      createSVG(SVGS.sun) : 
-      createSVG(SVGS.moon);
+      createSVG([svgIcons.sun, svgIcons.sunCircle]) : 
+      createSVG(svgIcons.moon);
     darkModeButton.appendChild(darkModeIcon);
-    
+
+    // Create close button
     const closeButton = document.createElement('button');
     closeButton.className = 'sitehq-icon-button';
     closeButton.setAttribute('aria-label', 'Close chat');
     
-    const closeIcon = createSVG(SVGS.close);
+    const closeIcon = createSVG(svgIcons.close);
     closeButton.appendChild(closeIcon);
-    
+
     headerActions.appendChild(darkModeButton);
     headerActions.appendChild(closeButton);
-    
+
     header.appendChild(headerContent);
     header.appendChild(headerActions);
-    
-    // Create messages container
+
+    // Messages container
     const messagesContainer = document.createElement('div');
     messagesContainer.className = 'sitehq-messages';
-    
-    // Create typing indicator
+
+    // Typing indicator
     const typingIndicator = document.createElement('div');
     typingIndicator.className = 'sitehq-typing-indicator';
     typingIndicator.id = 'sitehq-typing-indicator';
@@ -985,418 +941,344 @@
       dot.className = 'sitehq-typing-dot';
       typingIndicator.appendChild(dot);
     }
-    
-    // Create input area
+
+    // Input area
     const inputArea = document.createElement('div');
     inputArea.className = 'sitehq-input-area';
-    
+
     const messageInput = document.createElement('textarea');
     messageInput.className = 'sitehq-message-input';
-    messageInput.placeholder = 'Type your message...';
+    messageInput.placeholder = 'Type a message...';
     messageInput.rows = 1;
-    
+
     const sendButton = document.createElement('button');
     sendButton.className = 'sitehq-send-button';
     sendButton.setAttribute('aria-label', 'Send message');
     
-    const sendIcon = createSVG(SVGS.send);
+    const sendIcon = createSVG(svgIcons.send);
     sendButton.appendChild(sendIcon);
-    
+
     inputArea.appendChild(messageInput);
     inputArea.appendChild(sendButton);
-    
-    // Create terms dialog with improved styling
+
+    // Terms and conditions dialog
     const termsDialog = document.createElement('div');
     termsDialog.className = 'sitehq-terms-dialog';
-    
+
     const termsContent = document.createElement('div');
     termsContent.className = 'sitehq-terms-content';
-    
+
     const termsTitle = document.createElement('h3');
     termsTitle.textContent = 'Terms and conditions';
-    
+
     const termsText = document.createElement('p');
     termsText.textContent = 'By clicking "Agree," and each time I interact with this AI agent, I consent to the recording, storage, and sharing of my communications with third-party service providers, and as described in the Privacy Policy. If you do not wish to have your conversations recorded, please refrain from using this service.';
-    
-    // Create a container for the buttons
-    const buttonsContainer = document.createElement('div');
-    buttonsContainer.className = 'sitehq-terms-buttons';
-    
-    // Create Cancel button
+
+    const termsButtons = document.createElement('div');
+    termsButtons.className = 'sitehq-terms-buttons';
+
     const cancelButton = document.createElement('button');
     cancelButton.className = 'sitehq-cancel-button';
     cancelButton.textContent = 'Cancel';
-    cancelButton.addEventListener('click', function() {
-      toggleChatWindow(false);
-    });
-    
-    // Create Accept button
-    const acceptButton = document.createElement('button');
-    acceptButton.className = 'sitehq-primary-button';
-    acceptButton.textContent = 'Agree';
-    
-    // Add buttons to container
-    buttonsContainer.appendChild(cancelButton);
-    buttonsContainer.appendChild(acceptButton);
-    
+
+    const agreeButton = document.createElement('button');
+    agreeButton.className = 'sitehq-primary-button';
+    agreeButton.textContent = 'Agree';
+
+    termsButtons.appendChild(cancelButton);
+    termsButtons.appendChild(agreeButton);
+
     termsContent.appendChild(termsTitle);
     termsContent.appendChild(termsText);
-    termsContent.appendChild(buttonsContainer);
-    
+    termsContent.appendChild(termsButtons);
+
     termsDialog.appendChild(termsContent);
-    
-    // Assemble chat window
+
+    // Assemble the chat window
     chatWindow.appendChild(header);
     chatWindow.appendChild(messagesContainer);
     chatWindow.appendChild(typingIndicator);
     chatWindow.appendChild(inputArea);
     chatWindow.appendChild(termsDialog);
-    
-    // Create branding
+
+    // Branding footer
     const branding = document.createElement('div');
     branding.className = 'sitehq-branding';
+    
     const brandingText = document.createTextNode('Powered by ');
     const brandingLink = document.createElement('a');
     brandingLink.href = 'https://www.sitehq.ai';
     brandingLink.textContent = 'SiteHQ';
     brandingLink.target = '_blank';
     brandingLink.rel = 'noopener noreferrer';
+    
     branding.appendChild(brandingText);
     branding.appendChild(brandingLink);
-    
-    // Assemble container
+
+    // Assemble the entire widget
     container.appendChild(chatWindow);
-    container.appendChild(toggleButton);
+    container.appendChild(chatButton);
     container.appendChild(tooltip);
     container.appendChild(branding);
-    
-    // Store DOM references
+
+    // Store references for later use
     refs.container = container;
     refs.chatWindow = chatWindow;
-    refs.chatButton = toggleButton;
+    refs.chatButton = chatButton;
     refs.messagesContainer = messagesContainer;
     refs.typingIndicator = typingIndicator;
     refs.messageInput = messageInput;
     refs.termsDialog = termsDialog;
-    
+
     return container;
   }
 
-  // Apply configuration from user settings and data attributes
-  function applyConfig(userConfig) {
+  // Apply configuration from data attributes or passed object
+  function applyConfig(userConfig = {}) {
     // Start with default config
     const config = { ...DEFAULT_CONFIG };
     
-    // Apply any user config from initialization
+    // Apply user config
     if (userConfig) {
-      Object.assign(config, userConfig);
+      Object.keys(userConfig).forEach(key => {
+        if (key === 'theme' && userConfig.theme) {
+          config.theme = { ...config.theme, ...userConfig.theme };
+        } else {
+          config[key] = userConfig[key];
+        }
+      });
     }
     
-    // Apply configs from data attributes if this is being used as a custom element
-    if (this instanceof HTMLElement) {
-      const el = this;
-      
-      if (el.hasAttribute('api-key')) {
-        config.apiKey = el.getAttribute('api-key');
-      }
-      
-      if (el.hasAttribute('agent-id')) {
-        config.agentId = el.getAttribute('agent-id');
-      }
-      
-      if (el.hasAttribute('position')) {
-        config.position = el.getAttribute('position');
-      }
-      
-      if (el.hasAttribute('title')) {
-        config.widgetTitle = el.getAttribute('title');
-      }
-      
-      if (el.hasAttribute('dark-mode')) {
-        config.darkMode = el.getAttribute('dark-mode') === 'true';
-      }
-      
-      if (el.hasAttribute('theme')) {
-        try {
-          const themeData = JSON.parse(el.getAttribute('theme'));
-          config.theme = { ...config.theme, ...themeData };
-        } catch (e) {
-          console.warn('SiteHQ Chat: Invalid theme JSON in data attribute');
-        }
-      }
-      
-      if (el.hasAttribute('initially-open')) {
-        config.initiallyOpen = el.getAttribute('initially-open') === 'true';
-      }
-      
-      // Support both attribute formats for solar system theme
-      if (el.hasAttribute('data-solar-system-theme')) {
-        config.useSolarSystemTheme = el.getAttribute('data-solar-system-theme') === 'true';
-      }
-      
-      // Support standard 'solar-system-theme' attribute (without data- prefix)
-      if (el.hasAttribute('solar-system-theme')) {
-        config.useSolarSystemTheme = el.getAttribute('solar-system-theme') === 'true';
-      }
-      
-      // Enable debug mode if debug attribute is set
-      if (el.hasAttribute('debug')) {
-        config.debug = el.getAttribute('debug') === 'true';
-        if (config.debug) {
-          debugMode = true;
-          console.log('[SiteHQ Chat] Debug mode enabled via custom element');
-        }
-      }
-    }
+    // Check if debug mode should be enabled
+    debugMode = config.debug || false;
     
-    // Update state
-    state.isDarkMode = config.darkMode;
+    if (debugMode) {
+      log('Configuration applied:', config);
+    }
     
     return config;
   }
 
-  // Initialize the widget
-  function initializeWidget(config) {
-    // Enable debug mode if configured
-    debugMode = config.debug === true;
+  // Initialize chat widget
+  function initializeWidget(userConfig) {
+    // Apply configuration
+    const config = applyConfig(userConfig);
     
-    log('Initializing widget with config:', config);
-    
-    // 1. Inject styles
+    // Inject styles
     injectStyles();
-    log('Styles injected');
     
-    // 2. Create widget DOM
-    const widgetElement = createWidgetDOM(config);
-    log('Widget DOM created');
+    // Create DOM elements
+    const container = createWidgetDOM(config);
+    document.body.appendChild(container);
     
-    // 3. Append to document
-    document.body.appendChild(widgetElement);
-    log('Widget appended to document body');
+    // Set up event listeners
+    setupEventListeners(config);
     
-    // 4. Setup event listeners
-    setupEventListeners();
-    log('Event listeners set up');
-    
-    // 5. Open chat if initiallyOpen is true
+    // Open chat if initiallyOpen is true
     if (config.initiallyOpen) {
-      log('Auto-opening chat window based on initiallyOpen=true');
       toggleChatWindow(true);
     }
     
-    log('Widget initialization complete');
+    log('Widget initialized');
   }
 
-  // Setup event listeners
-  function setupEventListeners() {
-    const {
-      chatButton,
-      chatWindow,
-      messageInput,
-      termsDialog
-    } = refs;
+  // Set up event listeners
+  function setupEventListeners(config) {
+    const { chatButton, chatWindow, messageInput, termsDialog } = refs;
     
-    // Toggle chat on button click
-    if (chatButton) {
-      chatButton.addEventListener('click', function() {
-        toggleChatWindow(true);
-      });
-    }
+    // Toggle chat window when chat button is clicked
+    chatButton.addEventListener('click', () => {
+      toggleChatWindow(!state.isOpen);
+    });
     
-    // Dark mode toggle
-    const darkModeToggle = chatWindow.querySelector('.sitehq-icon-button[aria-label="Toggle dark mode"]');
-    if (darkModeToggle) {
-      darkModeToggle.addEventListener('click', toggleDarkMode);
-    }
-    
-    // Close chat
-    const closeButton = chatWindow.querySelector('.sitehq-icon-button[aria-label="Close chat"]');
+    // Close chat window when close button is clicked
+    const closeButton = chatWindow.querySelector('.sitehq-header-actions button:last-child');
     if (closeButton) {
-      closeButton.addEventListener('click', function() {
+      closeButton.addEventListener('click', () => {
         toggleChatWindow(false);
       });
     }
     
-    // Accept terms
-    const acceptButton = termsDialog.querySelector('.sitehq-primary-button');
-    if (acceptButton) {
-      acceptButton.addEventListener('click', function() {
-        acceptTerms();
+    // Toggle dark mode
+    const darkModeButton = chatWindow.querySelector('.sitehq-header-actions button:first-child');
+    if (darkModeButton) {
+      darkModeButton.addEventListener('click', toggleDarkMode);
+    }
+    
+    // Send message when send button is clicked
+    const sendButton = chatWindow.querySelector('.sitehq-send-button');
+    if (sendButton) {
+      sendButton.addEventListener('click', () => {
+        sendMessage();
       });
     }
     
-    // Send message
-    const sendButton = chatWindow.querySelector('.sitehq-send-button');
-    if (sendButton && messageInput) {
-      // Send on button click
-      sendButton.addEventListener('click', function() {
-        const message = messageInput.value.trim();
-        if (message) {
-          sendMessage(message);
-          messageInput.value = '';
+    // Send message when Enter key is pressed (but allow Shift+Enter for new line)
+    if (messageInput) {
+      messageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
         }
       });
       
-      // Send on Enter key
-      messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          const message = messageInput.value.trim();
-          if (message) {
-            sendMessage(message);
-            messageInput.value = '';
-          }
-        }
+      // Auto-resize message input as user types
+      messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+      });
+    }
+    
+    // Handle terms dialog buttons
+    const cancelButton = termsDialog.querySelector('.sitehq-cancel-button');
+    if (cancelButton) {
+      cancelButton.addEventListener('click', () => {
+        toggleChatWindow(false);
+      });
+    }
+    
+    const agreeButton = termsDialog.querySelector('.sitehq-primary-button');
+    if (agreeButton) {
+      agreeButton.addEventListener('click', () => {
+        acceptTerms();
+        initializeChat(config);
       });
     }
   }
 
-  // Toggle the chat window visibility
+  // Toggle chat window visibility
   function toggleChatWindow(open) {
-    const { chatWindow, chatButton, termsDialog } = refs;
-    
-    if (open === undefined) {
-      open = !state.isOpen;
-    }
-    
+    const { chatWindow, termsDialog } = refs;
     state.isOpen = open;
     
-    if (chatWindow && chatButton) {
-      if (open) {
-        chatWindow.style.display = 'flex';
-        chatButton.style.display = 'none';
-        
-        // Initialize chat if not already done
-        if (!state.isInitialized) {
-          showTermsDialog();
-          state.isInitialized = true;
-        }
-        
-        // Focus input
-        setTimeout(() => {
-          if (refs.messageInput) {
-            refs.messageInput.focus();
-          }
-        }, 300);
-      } else {
-        chatWindow.style.display = 'none';
-        chatButton.style.display = 'flex';
+    if (open) {
+      chatWindow.style.display = 'flex';
+      
+      // Show terms dialog if not accepted yet
+      if (!state.acceptedTerms) {
+        termsDialog.style.display = 'flex';
       }
+    } else {
+      chatWindow.style.display = 'none';
     }
+    
+    log(`Chat window ${open ? 'opened' : 'closed'}`);
   }
 
-  // Show terms and conditions dialog
-  function showTermsDialog() {
-    if (refs.termsDialog) {
-      refs.termsDialog.style.display = 'flex';
-    }
-  }
-
-  // Accept terms and connect to chat
+  // Accept terms and conditions
   function acceptTerms() {
+    const { termsDialog } = refs;
     state.acceptedTerms = true;
-    
-    if (refs.termsDialog) {
-      refs.termsDialog.style.display = 'none';
-    }
-    
-    // Initialize the real chat connection
-    initializeChat();
+    termsDialog.style.display = 'none';
+    log('Terms accepted');
   }
 
   // Toggle dark mode
   function toggleDarkMode() {
+    const { container } = refs;
     state.isDarkMode = !state.isDarkMode;
     
-    if (refs.container) {
-      if (state.isDarkMode) {
-        refs.container.classList.add('sitehq-dark-mode');
-      } else {
-        refs.container.classList.remove('sitehq-dark-mode');
+    if (state.isDarkMode) {
+      container.classList.add('sitehq-dark-mode');
+    } else {
+      container.classList.remove('sitehq-dark-mode');
+    }
+    
+    // Update dark mode button icon
+    const darkModeButton = container.querySelector('.sitehq-header-actions button:first-child');
+    if (darkModeButton) {
+      darkModeButton.innerHTML = '';
+      darkModeButton.appendChild(
+        state.isDarkMode ?
+          createSVG([svgIcons.sun, svgIcons.sunCircle]) :
+          createSVG(svgIcons.moon)
+      );
+    }
+    
+    log(`Dark mode ${state.isDarkMode ? 'enabled' : 'disabled'}`);
+  }
+
+  // Initialize chat connection
+  async function initializeChat(config) {
+    try {
+      log('Initializing chat connection');
+      
+      if (!config.apiKey || !config.agentId) {
+        error('Missing required API key or agent ID');
+        setStatus('error');
+        addMessage('assistant', 'Error: Missing required API key or agent ID. Please check your configuration.');
+        return;
       }
+      
+      // Set connected status first
+      setStatus('connected');
+      
+      // Add welcome message
+      addMessage('assistant', 'Hello! How can I assist you today?');
+      
+      // Create WebSocket connection
+      connectWebSocket(config);
+      
+    } catch (err) {
+      error('Failed to initialize chat:', err);
+      setStatus('error');
+      addMessage('assistant', 'Sorry, there was an error initializing the chat. Please try again later.');
     }
   }
 
-  // Initialize the chat connection
-  async function initializeChat() {
+  // Create WebSocket connection
+  function connectWebSocket(config) {
     try {
-      // Add initial greeting message
-      addMessage('assistant', 'Hello! How can I assist you today?');
-      
-      // Get API base URL
-      const apiBase = window.sitehqConfig?.apiBase || 'https://api.sitehq.ai';
-      
-      // Get signed URL for WebSocket connection to ElevenLabs
-      try {
-        const apiKey = window.sitehqConfig?.apiKey || DEFAULT_CONFIG.apiKey;
-        console.log('SiteHQ Chat: Fetching signed URL with API key:', apiKey);
-        
-        const response = await fetch('/api/get-signed-url', {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to get signed URL from server');
-        }
-        
-        const { signedUrl } = await response.json();
-        console.log('SiteHQ Chat: Received signed URL successfully');
-        
-        // Connect to ElevenLabs WebSocket with the signed URL
-        state.connection = new WebSocket(signedUrl);
-        
-        state.connection.onopen = function() {
-          console.log('SiteHQ Chat: WebSocket connection established');
-          setStatus('connected');
-          
-          // Send initialization message with agent ID
-          state.connection.send(JSON.stringify({
-            type: 'init',
-            agentId: window.sitehqConfig?.agentId || DEFAULT_CONFIG.agentId,
-            signedUrl
-          }));
-        };
-      } catch (error) {
-        console.error('SiteHQ Chat: Error getting signed URL:', error);
-        
-        // Fallback to local WebSocket if signed URL fails
-        console.log('SiteHQ Chat: Falling back to local WebSocket connection');
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${window.location.host}/api/chat`;
-        
-        state.connection = new WebSocket(wsUrl);
-        
-        state.connection.onopen = function() {
-          console.log('SiteHQ Chat: WebSocket connection established (fallback)');
-          setStatus('connected');
-          
-          // Send initialization message with API key and agent ID
-          state.connection.send(JSON.stringify({
-            type: 'init',
-            apiKey: window.sitehqConfig?.apiKey || DEFAULT_CONFIG.apiKey,
-            agentId: window.sitehqConfig?.agentId || DEFAULT_CONFIG.agentId
-          }));
-        };
+      // Close existing connection if any
+      if (state.connection) {
+        state.connection.close();
       }
       
-      state.connection.onmessage = function(event) {
+      // Create new WebSocket connection
+      const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      const wsUrl = `${protocol}://api.elevenlabs.io/v1/text-to-speech/synthesis/voice-chat/websocket`;
+      
+      const socket = new WebSocket(wsUrl);
+      state.connection = socket;
+      
+      socket.onopen = () => {
+        log('WebSocket connection established');
+        
+        // Send auth message
+        const authMessage = {
+          text: "",
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75
+          },
+          xi_api_key: config.apiKey,
+          agent_id: config.agentId,
+          initial_latency: 3,
+          model_id: "eleven_turbo_v2",
+          speaker_boost: true,
+          optimize_streaming_latency: 4
+        };
+        
+        socket.send(JSON.stringify(authMessage));
+        log('Authentication message sent');
+        
+        setStatus('connected');
+      };
+      
+      socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log('SiteHQ Chat: Received WebSocket message:', data);
+          log('Message received:', data);
           
           if (data.type === 'message') {
-            addMessage('assistant', data.content);
-            state.isSpeaking = false;
+            addMessage('assistant', data.text);
           } else if (data.type === 'status') {
             console.log('SiteHQ Chat: Status update:', data.status);
             setStatus(data.status);
             if (data.status === 'speaking') {
-              state.isSpeaking = true;
+              // Handle speaking state
             } else if (data.status === 'listening') {
-              state.isSpeaking = false;
+              // Handle listening state 
             }
           } else if (data.type === 'voice_status') {
             // Handle voice-specific status updates
@@ -1421,70 +1303,86 @@
         }
       };
       
-      state.connection.onclose = function() {
-        console.log('SiteHQ Chat: WebSocket connection closed');
+      socket.onclose = () => {
+        log('WebSocket connection closed');
         setStatus('disconnected');
       };
       
-      state.connection.onerror = function(error) {
-        console.error('SiteHQ Chat: WebSocket error:', error);
+      socket.onerror = (error) => {
+        error('WebSocket error:', error);
         setStatus('error');
+        addMessage('assistant', 'Sorry, there was an error with the connection. Please try again later.');
       };
-    } catch (error) {
-      console.error('SiteHQ Chat: Initialization error:', error);
-      addMessage('assistant', 'Sorry, I encountered an error while connecting. Please try again later.');
+    } catch (err) {
+      error('Failed to connect to WebSocket:', err);
+      setStatus('error');
+      addMessage('assistant', 'Sorry, there was an error connecting to the chat service. Please try again later.');
     }
   }
 
-  // Send a message to the server
-  function sendMessage(content) {
-    if (!content || !state.connection) return;
+  // Send a message
+  function sendMessage() {
+    const { messageInput } = refs;
+    const content = messageInput.value.trim();
     
-    // Add user message to UI
+    if (!content) return;
+    
+    // Log the message for debugging
+    log('Sending message:', content);
+    
+    // Add message to UI
     addMessage('user', content);
     
-    // Set typing indicator
+    // Clear input
+    messageInput.value = '';
+    messageInput.style.height = 'auto';
+    
+    // Set UI status to typing
     setStatus('typing');
     
-    // Record timestamp to measure response time
-    state.lastUserMessageTimestamp = Date.now();
-    
-    // Send message to server
-    state.connection.send(JSON.stringify({
-      type: 'message',
-      content
-    }));
+    // Send to websocket if connected
+    if (state.connection && state.connection.readyState === WebSocket.OPEN) {
+      const message = {
+        text: content,
+        action: "message"
+      };
+      
+      try {
+        state.connection.send(JSON.stringify(message));
+        state.lastUserMessageTimestamp = Date.now();
+      } catch (err) {
+        error('Failed to send message:', err);
+        setStatus('error');
+        addMessage('assistant', 'Sorry, there was an error sending your message. Please try again.');
+      }
+    } else {
+      error('Cannot send message - WebSocket not connected');
+      setStatus('error');
+      addMessage('assistant', 'Sorry, the chat connection is not available. Please try refreshing the page.');
+    }
   }
 
-  // Add a message to the chat
+  // Add a message to the chat UI
   function addMessage(role, content) {
     const { messagesContainer } = refs;
     
-    if (!messagesContainer) return;
-    
     // Create message element
-    const messageElement = document.createElement('div');
-    messageElement.className = `sitehq-message sitehq-${role}-message`;
+    const messageEl = document.createElement('div');
+    messageEl.className = `sitehq-message sitehq-${role}-message`;
     
-    // Message bubble
+    // Create message bubble
     const bubble = document.createElement('div');
     bubble.className = 'sitehq-message-bubble';
     bubble.textContent = content;
     
-    // Apply theme
-    if (role === 'assistant') {
-      const primaryColor = window.sitehqConfig?.theme?.primary || DEFAULT_CONFIG.theme.primary;
-      bubble.style.backgroundColor = primaryColor;
-    }
-    
-    messageElement.appendChild(bubble);
-    messagesContainer.appendChild(messageElement);
+    messageEl.appendChild(bubble);
+    messagesContainer.appendChild(messageEl);
     
     // Scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
-  // Set chat status and update UI
+  // Set chat status and update UI elements
   function setStatus(status) {
     console.log('SiteHQ Chat: Setting status to:', status);
     
@@ -1559,150 +1457,101 @@
     }
   }
 
-  // Custom Element for widget
-  class SiteHQChatWidget extends HTMLElement {
+  // Define the custom element
+  class SiteHQChatElement extends HTMLElement {
     constructor() {
       super();
       
-      // Extract config from attributes
-      this.config = applyConfig.call(this);
+      // Extract attributes from custom element
+      const config = {
+        apiKey: this.getAttribute('api-key') || DEFAULT_CONFIG.apiKey,
+        agentId: this.getAttribute('agent-id') || DEFAULT_CONFIG.agentId,
+        position: this.getAttribute('position') || DEFAULT_CONFIG.position,
+        darkMode: this.getAttribute('dark-mode') === 'true',
+        initiallyOpen: this.getAttribute('initially-open') === 'true',
+        widgetTitle: this.getAttribute('title') || DEFAULT_CONFIG.widgetTitle,
+        useSolarSystemTheme: this.getAttribute('solar-system-theme') === 'true' || DEFAULT_CONFIG.useSolarSystemTheme,
+        debug: this.getAttribute('debug') === 'true'
+      };
+      
+      // Try to parse theme if provided
+      if (this.hasAttribute('theme')) {
+        try {
+          const themeData = JSON.parse(this.getAttribute('theme'));
+          config.theme = { ...DEFAULT_CONFIG.theme, ...themeData };
+        } catch (e) {
+          warn('Failed to parse theme JSON:', e);
+        }
+      }
+      
+      this.config = config;
     }
     
     connectedCallback() {
-      // Initialize widget when element is connected to DOM
+      // Initialize the widget when the element is added to the DOM
       initializeWidget(this.config);
     }
     
     disconnectedCallback() {
-      // Clean up when element is removed from DOM
+      // Clean up when the element is removed from the DOM
       if (state.connection) {
         state.connection.close();
       }
       
-      // Remove DOM elements
+      // Remove the widget from the DOM
       if (refs.container && refs.container.parentNode) {
         refs.container.parentNode.removeChild(refs.container);
       }
       
-      // Remove style element
+      // Remove styles
       const styleEl = document.getElementById('sitehq-chat-styles');
-      if (styleEl) {
+      if (styleEl && styleEl.parentNode) {
         styleEl.parentNode.removeChild(styleEl);
       }
     }
   }
 
-  // Register custom element
+  // Register custom element if customElements is supported
   if (window.customElements) {
-    window.customElements.define('sitehq-chat', SiteHQChatWidget);
+    window.customElements.define('sitehq-chat', SiteHQChatElement);
   }
 
-  // Global initialization function
-  window.SiteHQChat = {
-    init: function(config) {
-      window.sitehqConfig = config;
-      initializeWidget(config);
-    }
-  };
-
-  // Auto initialize if data attribute is present
+  // Auto-initialize from script attributes if present
   function autoInitialize() {
-    // First look for a script with auto attribute
-    const script = document.querySelector('script[data-sitehq-chat="auto"]');
+    const scriptEl = document.querySelector('script[data-sitehq-chat="auto"]');
     
-    // If not found, look for any script that might have our attributes
-    const anyScript = script || document.querySelector('script[data-api-key], script[data-agent-id]');
-    
-    if (anyScript) {
-      // Check for debug mode
-      debugMode = anyScript.getAttribute('data-debug') === 'true';
-      
-      if (debugMode) {
-        console.log('[SiteHQ Chat] Initializing widget in debug mode');
-      }
-      
+    if (scriptEl) {
       const config = {
-        apiKey: anyScript.getAttribute('data-api-key') || DEFAULT_CONFIG.apiKey,
-        agentId: anyScript.getAttribute('data-agent-id') || DEFAULT_CONFIG.agentId,
-        position: anyScript.getAttribute('data-position') || DEFAULT_CONFIG.position,
-        darkMode: anyScript.getAttribute('data-dark-mode') === 'true',
-        initiallyOpen: anyScript.getAttribute('data-initially-open') === 'true',
-        widgetTitle: anyScript.getAttribute('data-title') || DEFAULT_CONFIG.widgetTitle,
-        useSolarSystemTheme: anyScript.getAttribute('data-solar-system-theme') === 'true' || DEFAULT_CONFIG.useSolarSystemTheme,
-        debug: debugMode
+        apiKey: scriptEl.getAttribute('data-api-key') || DEFAULT_CONFIG.apiKey,
+        agentId: scriptEl.getAttribute('data-agent-id') || DEFAULT_CONFIG.agentId,
+        position: scriptEl.getAttribute('data-position') || DEFAULT_CONFIG.position,
+        darkMode: scriptEl.getAttribute('data-dark-mode') === 'true',
+        initiallyOpen: scriptEl.getAttribute('data-initially-open') === 'true',
+        widgetTitle: scriptEl.getAttribute('data-title') || DEFAULT_CONFIG.widgetTitle,
+        useSolarSystemTheme: scriptEl.getAttribute('data-solar-system-theme') === 'true' || DEFAULT_CONFIG.useSolarSystemTheme,
+        debug: scriptEl.getAttribute('data-debug') === 'true'
       };
       
-      // Parse theme if provided
-      const themeAttr = anyScript.getAttribute('data-theme');
+      // Try to parse theme if provided
+      const themeAttr = scriptEl.getAttribute('data-theme');
       if (themeAttr) {
         try {
           const themeData = JSON.parse(themeAttr);
           config.theme = { ...DEFAULT_CONFIG.theme, ...themeData };
-          if (debugMode) {
-            log('Parsed theme data:', themeData);
-          }
         } catch (e) {
-          warn('Invalid theme JSON in data attribute:', e);
+          warn('Failed to parse theme JSON:', e);
         }
       }
       
-      if (debugMode) {
-        log('Widget configuration:', config);
-      }
-      
-      // Initialize widget
-      window.SiteHQChat.init(config);
-    } else if (debugMode) {
-      warn('No script with data-sitehq-chat="auto" found');
+      // Initialize the widget
+      initializeWidget(config);
     }
   }
 
-  // Run auto-initialization when DOM is ready
+  // Run auto-initialization when DOM is loaded
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', autoInitialize);
   } else {
     autoInitialize();
   }
-  
-  // Expose initialization functions globally for manual initialization
-  window.SiteHQChatInit = function() {
-    if (debugMode) {
-      console.log('[SiteHQ Chat] Manual initialization triggered');
-    }
-    autoInitialize();
-  };
-  
-  // Allow direct initialization with config object
-  window.SiteHQChatInitWithConfig = function(config) {
-    if (!config) {
-      console.error('[SiteHQ Chat] Config object required for SiteHQChatInitWithConfig');
-      return;
-    }
-    
-    // Set debug mode if specified in config
-    if (config.debug) {
-      debugMode = true;
-      console.log('[SiteHQ Chat] Initializing with custom config in debug mode');
-    }
-    
-    // Ensure we have the required parameters
-    if (!config.apiKey || !config.agentId) {
-      console.error('[SiteHQ Chat] API key and Agent ID are required for initialization');
-      return;
-    }
-    
-    // Use provided config with defaults for missing properties
-    const finalConfig = {
-      ...DEFAULT_CONFIG,
-      ...config,
-      theme: { ...DEFAULT_CONFIG.theme, ...(config.theme || {}) }
-    };
-    
-    if (debugMode) {
-      log('Widget configuration (custom init):', finalConfig);
-    }
-    
-    // Initialize widget with the config
-    window.SiteHQChat.init(finalConfig);
-  };
 })();

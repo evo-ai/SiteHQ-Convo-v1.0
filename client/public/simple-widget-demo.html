@@ -26,10 +26,27 @@
       cursor: pointer;
       margin: 10px 0;
     }
+    .navigation {
+      margin-bottom: 20px;
+    }
+    .navigation a {
+      color: #5c078c;
+      text-decoration: none;
+      margin-right: 15px;
+    }
+    .navigation a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="navigation">
+      <a href="/voice-ui-test.html">Voice UI Test</a>
+      <a href="/simple-widget-demo.html">Simple Widget Demo</a>
+      <a href="/debug-widget-demo.html">Debug Widget Demo</a>
+    </div>
+    
     <h1>Simple Widget Demo</h1>
     <p>Test page for the SiteHQ Chat Widget</p>
     
@@ -42,13 +59,22 @@
       <h2>Custom Element Implementation</h2>
       <button id="custom-element-btn">Load Custom Element Widget</button>
     </div>
+    
+    <div>
+      <h3>Voice UI Features:</h3>
+      <ul>
+        <li>The widget now includes sound wave animations when the AI is speaking</li>
+        <li>Microphone wave animations show when the AI is listening</li>
+        <li>Solar system theme is enabled for visual appeal</li>
+      </ul>
+    </div>
   </div>
 
   <script>
     // Script Tag Implementation
     document.getElementById('script-btn').addEventListener('click', function() {
       // Remove any existing widget
-      const existingWidget = document.querySelector('.sitehq-chat-widget');
+      const existingWidget = document.querySelector('.sitehq-container');
       if (existingWidget) {
         existingWidget.remove();
       }
