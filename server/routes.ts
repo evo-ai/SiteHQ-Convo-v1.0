@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { WebSocket, WebSocketServer } from 'ws';
 import { setupChatWebSocket } from './chat';
 import { db } from '@db';
-import { admins } from '@db/schema';
+import { admins, conversations, conversationMetrics, conversationFeedback } from '@db/schema';
 import { eq, and, lte, gte, sql } from 'drizzle-orm';
 import { requireAuth, hashPassword, comparePasswords } from './auth';
 import session from 'express-session';
@@ -47,6 +47,19 @@ export function registerRoutes(app: Express): Server {
     res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
+  });
+  
+  // Serve standalone-widget.js with CORS enabled
+  app.get('/standalone-widget.js', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'standalone-widget.js'));
+  });
+  
+  // Serve widget demo page
+  app.get('/widget-demo', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget-demo.html'));
   });
 
   // Auth status check endpoint
@@ -366,7 +379,11 @@ export function registerRoutes(app: Express): Server {
 
   // Serve the embed page for all routes starting with /embed
   app.get('/embed*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/public/index.html'));
+    // Redirect to widget-embed instead to avoid loading the entire landing page
+    const queryParams = req.url.includes('?') ? req.url.split('?')[1] : '';
+    const redirectUrl = req.url.replace('/embed', '/widget-embed');
+    const fullRedirectUrl = queryParams ? `${redirectUrl}?${queryParams}` : redirectUrl;
+    res.redirect(307, fullRedirectUrl);
   });
 
   // WebSocket setup for chat
