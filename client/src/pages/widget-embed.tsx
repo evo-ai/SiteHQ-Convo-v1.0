@@ -13,6 +13,9 @@ export default function WidgetEmbedPage() {
   });
   
   const [useSolarSystemTheme, setUseSolarSystemTheme] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+  const [initiallyOpen, setInitiallyOpen] = useState(true);
+  const [widgetTitle, setWidgetTitle] = useState("SiteHQ Assistant");
   
   // Get query parameters from window.location
   const getQueryParams = () => {
@@ -24,21 +27,49 @@ export default function WidgetEmbedPage() {
   useEffect(() => {
     try {
       const searchParams = getQueryParams();
+      console.log('URL parameters:', Object.fromEntries(searchParams.entries()));
       
       // Parse theme if provided
       const themeParam = searchParams.get('theme');
       if (themeParam) {
-        const parsedTheme = JSON.parse(decodeURIComponent(themeParam));
-        setTheme({
-          ...theme,
-          ...parsedTheme
-        });
+        try {
+          const parsedTheme = JSON.parse(decodeURIComponent(themeParam));
+          console.log('Parsed theme:', parsedTheme);
+          setTheme({
+            ...theme,
+            ...parsedTheme
+          });
+        } catch (e) {
+          console.error('Error parsing theme parameter:', e);
+        }
       }
       
       // Check for solar system theme parameter
       const solarSystemTheme = searchParams.get('solarSystemTheme');
       if (solarSystemTheme !== null) {
+        console.log('Solar system theme parameter:', solarSystemTheme);
         setUseSolarSystemTheme(solarSystemTheme === 'true');
+      }
+      
+      // Check for dark mode parameter
+      const darkModeParam = searchParams.get('darkMode');
+      if (darkModeParam !== null) {
+        console.log('Dark mode parameter:', darkModeParam);
+        setDarkMode(darkModeParam === 'true');
+      }
+      
+      // Check for initiallyOpen parameter
+      const initiallyOpenParam = searchParams.get('initiallyOpen');
+      if (initiallyOpenParam !== null) {
+        console.log('Initially open parameter:', initiallyOpenParam);
+        setInitiallyOpen(initiallyOpenParam === 'true');
+      }
+      
+      // Check for title parameter
+      const titleParam = searchParams.get('title');
+      if (titleParam) {
+        console.log('Title parameter:', titleParam);
+        setWidgetTitle(titleParam);
       }
     } catch (error) {
       console.error('Error parsing URL parameters:', error);
@@ -47,8 +78,12 @@ export default function WidgetEmbedPage() {
   
   // Get API key and agent ID from URL parameters
   const searchParams = getQueryParams();
-  const apiKey = searchParams.get('apiKey') || 'demo-key';
-  const agentId = searchParams.get('agentId') || 'demo-agent';
+  // Use trim() to remove any spaces that might have been included in the URL params
+  const apiKey = searchParams.get('apiKey')?.trim() || 'demo-key';
+  const agentId = searchParams.get('agentId')?.trim() || 'demo-agent';
+  
+  console.log('Using apiKey:', apiKey);
+  console.log('Using agentId:', agentId);
   
   return (
     <div className="w-full h-screen flex justify-center items-center">
@@ -69,9 +104,9 @@ export default function WidgetEmbedPage() {
         <ChatBubble
           apiKey={apiKey}
           agentId={agentId}
-          title="SiteHQ Assistant"
+          title={widgetTitle}
           theme={theme}
-          initiallyOpen={true}
+          initiallyOpen={initiallyOpen}
           useSolarSystemTheme={useSolarSystemTheme}
         />
       </div>

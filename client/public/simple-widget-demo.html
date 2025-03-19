@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiteHQ Chat Widget - Simple Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      background-color: #5c078c;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      margin-top: 0;
+    }
+    
+    .demo-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    
+    pre {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    
+    button {
+      background-color: #5c078c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      background-color: #4a0670;
+    }
+    
+    .iframe-container {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      height: 500px;
+    }
+    
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .code-container {
+      position: relative;
+    }
+    
+    .copy-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #5c078c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>SiteHQ Chat Widget Demo</h1>
+    <p>This page demonstrates the working solar system themed chat widget using both script injection and iframe embedding</p>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Method 1: Direct Script Injection</h2>
+    <p>This method injects the widget script directly into your page and initializes it automatically:</p>
+    
+    <div class="code-container">
+      <button class="copy-button" onclick="copyCode('script-code')">Copy Code</button>
+      <pre id="script-code">&lt;script 
+  src="https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev/standalone-chat-bubble.js" 
+  data-sitehq-chat="auto"
+  data-api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
+  data-agent-id="KRGVz0f5HAU0E7u6BbA5"
+  data-position="bottom-right"
+  data-dark-mode="false"
+  data-initially-open="false"
+  data-title="SiteHQ Assistant"
+  data-theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+  data-solar-system-theme="true"
+  data-debug="true"
+&gt;&lt;/script&gt;</pre>
+    </div>
+    
+    <button id="load-script-btn">Load Widget Now</button>
+    <div id="script-status"></div>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Method 2: iFrame Embedding</h2>
+    <p>This method uses an iframe to embed the widget, providing greater isolation:</p>
+    
+    <div class="code-container">
+      <button class="copy-button" onclick="copyCode('iframe-code')">Copy Code</button>
+      <pre id="iframe-code">&lt;iframe 
+  src="https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
+  style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
+  allow="microphone"
+&gt;&lt;/iframe&gt;</pre>
+    </div>
+    
+    <h3>Live iframe preview:</h3>
+    <div class="iframe-container">
+      <iframe 
+        src="https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
+        allow="microphone">
+      </iframe>
+    </div>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Method 3: Custom Element</h2>
+    <p>This method uses the custom element approach, providing more control over placement:</p>
+    
+    <div class="code-container">
+      <button class="copy-button" onclick="copyCode('custom-element-code')">Copy Code</button>
+      <pre id="custom-element-code">&lt;!-- First include the script --&gt;
+&lt;script src="https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev/standalone-chat-bubble.js"&gt;&lt;/script&gt;
+
+&lt;!-- Then use the custom element anywhere you want --&gt;
+&lt;sitehq-chat
+  api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
+  agent-id="KRGVz0f5HAU0E7u6BbA5"
+  position="bottom-right"
+  title="SiteHQ Assistant"
+  theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+  solar-system-theme="true"
+&gt;&lt;/sitehq-chat&gt;</pre>
+    </div>
+    
+    <button id="load-custom-element-btn">Load Custom Element</button>
+    <div id="custom-element-status"></div>
+  </div>
+  
+  <script>
+    // Function to copy code
+    function copyCode(elementId) {
+      const codeBlock = document.getElementById(elementId);
+      const textToCopy = codeBlock.textContent;
+      
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+          const button = document.querySelector(`button[onclick="copyCode('${elementId}')"]`);
+          const originalText = button.textContent;
+          button.textContent = 'Copied!';
+          setTimeout(() => {
+            button.textContent = originalText;
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy text: ', err);
+        });
+    }
+    
+    // Script button handler
+    document.getElementById('load-script-btn').addEventListener('click', function() {
+      const statusEl = document.getElementById('script-status');
+      statusEl.textContent = 'Loading widget...';
+      
+      try {
+        // Create and add the script
+        const script = document.createElement('script');
+        script.src = '/standalone-chat-bubble.js';
+        script.setAttribute('data-sitehq-chat', 'auto');
+        script.setAttribute('data-api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+        script.setAttribute('data-agent-id', 'KRGVz0f5HAU0E7u6BbA5');
+        script.setAttribute('data-position', 'bottom-right');
+        script.setAttribute('data-dark-mode', 'false');
+        script.setAttribute('data-title', 'SiteHQ Assistant');
+        script.setAttribute('data-theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
+        script.setAttribute('data-solar-system-theme', 'true');
+        script.setAttribute('data-debug', 'true');
+        
+        script.onload = function() {
+          statusEl.textContent = 'Widget loaded successfully!';
+          statusEl.style.color = 'green';
+        };
+        
+        script.onerror = function() {
+          statusEl.textContent = 'Error loading widget script.';
+          statusEl.style.color = 'red';
+        };
+        
+        document.body.appendChild(script);
+        console.log('Script added to page', script);
+        
+        this.disabled = true;
+      } catch (error) {
+        statusEl.textContent = 'Error: ' + error.message;
+        statusEl.style.color = 'red';
+        console.error('Error loading script:', error);
+      }
+    });
+    
+    // Custom element button handler
+    document.getElementById('load-custom-element-btn').addEventListener('click', function() {
+      const statusEl = document.getElementById('custom-element-status');
+      statusEl.textContent = 'Loading custom element...';
+      
+      try {
+        // First load the script if not already loaded
+        if (!window.customElements || !window.customElements.get('sitehq-chat')) {
+          const script = document.createElement('script');
+          script.src = '/standalone-chat-bubble.js';
+          
+          script.onload = function() {
+            createCustomElement();
+            statusEl.textContent = 'Custom element loaded successfully!';
+            statusEl.style.color = 'green';
+          };
+          
+          script.onerror = function() {
+            statusEl.textContent = 'Error loading custom element script.';
+            statusEl.style.color = 'red';
+          };
+          
+          document.body.appendChild(script);
+        } else {
+          createCustomElement();
+          statusEl.textContent = 'Custom element loaded successfully!';
+          statusEl.style.color = 'green';
+        }
+        
+        this.disabled = true;
+      } catch (error) {
+        statusEl.textContent = 'Error: ' + error.message;
+        statusEl.style.color = 'red';
+        console.error('Error loading custom element:', error);
+      }
+      
+      function createCustomElement() {
+        // Create and add the custom element
+        const chatElement = document.createElement('sitehq-chat');
+        chatElement.setAttribute('api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+        chatElement.setAttribute('agent-id', 'KRGVz0f5HAU0E7u6BbA5');
+        chatElement.setAttribute('position', 'bottom-left'); // Use different position to avoid overlap
+        chatElement.setAttribute('title', 'SiteHQ Custom Element');
+        chatElement.setAttribute('theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
+        chatElement.setAttribute('solar-system-theme', 'true');
+        chatElement.setAttribute('debug', 'true');
+        
+        document.body.appendChild(chatElement);
+        console.log('Custom element added to page', chatElement);
+      }
+    });
+    
+    console.log('Simple widget demo page initialized');
+  </script>
+</body>
+</html>
