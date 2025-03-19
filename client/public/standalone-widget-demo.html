@@ -385,6 +385,13 @@
         existingWidget.remove();
       }
       
+      // Also remove any existing script to ensure clean initialization
+      const existingScript = document.querySelector('script[data-sitehq-chat]');
+      if (existingScript) {
+        console.log("Removing existing script");
+        existingScript.remove();
+      }
+      
       // Load the script dynamically with debug logging
       const script = document.createElement('script');
       script.src = '/fixed-standalone-chat-bubble.js';
@@ -405,6 +412,8 @@
         if (typeof window.SiteHQChatInit === 'function') {
           console.log("Manually triggering initialization");
           window.SiteHQChatInit();
+        } else {
+          console.error("SiteHQChatInit function not found in window");
         }
       };
       
@@ -414,7 +423,6 @@
       
       document.body.appendChild(script);
       console.log("Script element added to page", script);
-      
       this.disabled = true;
       this.textContent = 'Widget Loaded!';
     });
