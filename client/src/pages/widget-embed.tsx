@@ -7,10 +7,12 @@ import ChatBubble from '@/components/chat/ChatBubble';
  */
 export default function WidgetEmbedPage() {
   const [theme, setTheme] = useState({
-    primary: '#FC5635',
+    primary: '#5c078c', // Updated to use the purple color
     background: '#ffffff',
     text: '#333333'
   });
+  
+  const [useSolarSystemTheme, setUseSolarSystemTheme] = useState(true);
   
   // Get query parameters from window.location
   const getQueryParams = () => {
@@ -31,6 +33,12 @@ export default function WidgetEmbedPage() {
           ...theme,
           ...parsedTheme
         });
+      }
+      
+      // Check for solar system theme parameter
+      const solarSystemTheme = searchParams.get('solarSystemTheme');
+      if (solarSystemTheme !== null) {
+        setUseSolarSystemTheme(solarSystemTheme === 'true');
       }
     } catch (error) {
       console.error('Error parsing URL parameters:', error);

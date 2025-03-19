@@ -410,6 +410,7 @@
         chatElement.setAttribute('position', 'bottom-right');
         chatElement.setAttribute('title', 'SiteHQ Demo');
         chatElement.setAttribute('theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
+        chatElement.setAttribute('data-solar-system-theme', 'true');
         
         document.body.appendChild(chatElement);
       }
@@ -448,7 +449,7 @@
             
             <!-- SiteHQ Chat Widget Iframe -->
             <iframe 
-              src="/widget-embed?apiKey=demo-key&agentId=demo-agent&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D" 
+              src="/widget-embed?apiKey=demo-key&agentId=demo-agent&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
               style="width: 70px; height: 70px; position: fixed; bottom: 20px; right: 20px; border: none; overflow: hidden; z-index: 9999;" 
               allow="microphone">
             </iframe>

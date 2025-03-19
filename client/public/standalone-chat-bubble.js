@@ -1078,6 +1078,10 @@
       if (el.hasAttribute('initially-open')) {
         config.initiallyOpen = el.getAttribute('initially-open') === 'true';
       }
+      
+      if (el.hasAttribute('data-solar-system-theme')) {
+        config.useSolarSystemTheme = el.getAttribute('data-solar-system-theme') === 'true';
+      }
     }
     
     // Update state
@@ -1445,7 +1449,8 @@
         position: script.getAttribute('data-position') || DEFAULT_CONFIG.position,
         darkMode: script.getAttribute('data-dark-mode') === 'true',
         initiallyOpen: script.getAttribute('data-initially-open') === 'true',
-        widgetTitle: script.getAttribute('data-title') || DEFAULT_CONFIG.widgetTitle
+        widgetTitle: script.getAttribute('data-title') || DEFAULT_CONFIG.widgetTitle,
+        useSolarSystemTheme: script.getAttribute('data-solar-system-theme') === 'true' || DEFAULT_CONFIG.useSolarSystemTheme
       };
       
       // Parse theme if provided
