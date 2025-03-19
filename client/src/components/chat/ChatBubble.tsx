@@ -31,6 +31,7 @@ interface ChatBubbleProps {
     text: string;
   };
   initiallyOpen?: boolean;
+  useSolarSystemTheme?: boolean;
 }
 
 export default function ChatBubble({
@@ -39,6 +40,7 @@ export default function ChatBubble({
   title = "AI Assistant",
   theme,
   initiallyOpen = false,
+  useSolarSystemTheme = true,
 }: ChatBubbleProps) {
   const [showTerms, setShowTerms] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -356,31 +358,95 @@ export default function ChatBubble({
               />
 
               {/* Small decorative particle elements */}
-              <motion.div
-                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-300"
-                animate={{
-                  y: [0, -10, 0],
-                  opacity: [0.7, 1, 0.7],
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 3,
-                  ease: "easeInOut",
-                }}
-              />
-              <motion.div
-                className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-blue-400"
-                animate={{
-                  y: [0, 8, 0],
-                  opacity: [0.7, 1, 0.7],
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 2.5,
-                  ease: "easeInOut",
-                  delay: 0.5,
-                }}
-              />
+              {useSolarSystemTheme ? (
+                // Solar System Themed particles
+                <>
+                  <motion.div
+                    className="absolute -top-2.5 -right-2 w-5 h-5 rounded-full"
+                    style={{ 
+                      backgroundColor: '#FFCC00',
+                      boxShadow: '0 0 10px rgba(255, 204, 0, 0.8)'
+                    }}
+                    animate={{
+                      rotate: [0, 360],
+                      x: [0, 3, 0],
+                      y: [0, -3, 0],
+                    }}
+                    transition={{
+                      rotate: {
+                        repeat: Infinity,
+                        duration: 8,
+                        ease: "linear",
+                      },
+                      x: {
+                        repeat: Infinity,
+                        duration: 4,
+                        ease: "easeInOut",
+                      },
+                      y: {
+                        repeat: Infinity,
+                        duration: 4,
+                        ease: "easeInOut",
+                      }
+                    }}
+                  />
+                  <motion.div
+                    className="absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: '#00CCFF' }}
+                    animate={{
+                      rotate: [0, -360],
+                      x: [0, -4, 0],
+                      y: [0, 4, 0],
+                    }}
+                    transition={{
+                      rotate: {
+                        repeat: Infinity,
+                        duration: 6,
+                        ease: "linear",
+                      },
+                      x: {
+                        repeat: Infinity,
+                        duration: 3,
+                        ease: "easeInOut",
+                      },
+                      y: {
+                        repeat: Infinity,
+                        duration: 3,
+                        ease: "easeInOut",
+                      }
+                    }}
+                  />
+                </>
+              ) : (
+                // Standard particles
+                <>
+                  <motion.div
+                    className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-300"
+                    animate={{
+                      y: [0, -10, 0],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 3,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  <motion.div
+                    className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-blue-400"
+                    animate={{
+                      y: [0, 8, 0],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 2.5,
+                      ease: "easeInOut",
+                      delay: 0.5,
+                    }}
+                  />
+                </>
+              )}
 
               {/* Floating particles in the background */}
               <Particles />

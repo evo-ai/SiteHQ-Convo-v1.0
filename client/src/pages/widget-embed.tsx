@@ -72,6 +72,7 @@ export default function WidgetEmbedPage() {
           title="SiteHQ Assistant"
           theme={theme}
           initiallyOpen={true}
+          useSolarSystemTheme={useSolarSystemTheme}
         />
       </div>
     </div>
