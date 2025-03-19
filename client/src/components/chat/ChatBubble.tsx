@@ -30,6 +30,7 @@ interface ChatBubbleProps {
     background: string;
     text: string;
   };
+  initiallyOpen?: boolean;
 }
 
 export default function ChatBubble({
@@ -37,6 +38,7 @@ export default function ChatBubble({
   agentId = "FnTVTPK2FfEkaktJIFFx",
   title = "AI Assistant",
   theme,
+  initiallyOpen = false,
 }: ChatBubbleProps) {
   const [showTerms, setShowTerms] = useState(false);
   const [isHovered, setIsHovered] = useState(false);

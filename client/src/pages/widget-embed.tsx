@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useSearch } from 'wouter';
+import { useEffect, useState } from 'react';
 import ChatBubble from '@/components/chat/ChatBubble';
 
 /**
@@ -6,66 +7,60 @@ import ChatBubble from '@/components/chat/ChatBubble';
  * It will only render the ChatBubble component with no other UI elements
  */
 export default function WidgetEmbedPage() {
-  // Get configuration from URL parameters
-  const params = new URLSearchParams(window.location.search);
-  const apiKey = params.get('apiKey') || '';
-  const agentId = params.get('agentId') || '';
-  const themeParam = params.get('theme') || '{}';
-  
-  // Parse theme from URL parameter
-  let theme = {
+  const [params] = useSearch();
+  const [theme, setTheme] = useState({
     primary: '#5c078c',
     background: '#ffffff',
     text: '#333333'
-  };
+  });
   
-  try {
-    const parsedTheme = JSON.parse(themeParam);
-    theme = {
-      ...theme,
-      ...parsedTheme
-    };
-  } catch (error) {
-    console.error('Failed to parse theme parameter:', error);
-  }
-
-  // Apply specific styles for the embed page to ensure clean embed
+  // Parse URL parameters
   useEffect(() => {
-    // Set background to transparent
-    document.body.style.background = 'transparent';
-    document.documentElement.style.background = 'transparent';
-    
-    // Remove any margins or paddings
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    document.documentElement.style.margin = '0';
-    document.documentElement.style.padding = '0';
-    
-    // Remove any scrollbars
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    
-    // Clean up on unmount
-    return () => {
-      document.body.style.background = '';
-      document.documentElement.style.background = '';
-      document.body.style.margin = '';
-      document.body.style.padding = '';
-      document.documentElement.style.margin = '';
-      document.documentElement.style.padding = '';
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
-  }, []);
-
+    try {
+      const searchParams = new URLSearchParams(params);
+      
+      // Parse theme if provided
+      const themeParam = searchParams.get('theme');
+      if (themeParam) {
+        const parsedTheme = JSON.parse(decodeURIComponent(themeParam));
+        setTheme({
+          ...theme,
+          ...parsedTheme
+        });
+      }
+    } catch (error) {
+      console.error('Error parsing URL parameters:', error);
+    }
+  }, [params]);
+  
+  // Get API key and agent ID from URL parameters
+  const apiKey = new URLSearchParams(params).get('apiKey') || 'demo-key';
+  const agentId = new URLSearchParams(params).get('agentId') || 'demo-agent';
+  
   return (
-    <div className="widget-embed-container">
-      <ChatBubble
-        apiKey={apiKey}
-        agentId={agentId}
-        title="Chat Assistant"
-        theme={theme}
-      />
+    <div className="w-full h-screen flex justify-center items-center">
+      <style jsx global>{`
+        body {
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          background-color: transparent;
+        }
+      `}</style>
+      
+      {/* 
+        We render the ChatBubble component with its window already open
+        This way it appears as a standalone chat window in the iframe
+      */}
+      <div className="w-full h-full">
+        <ChatBubble
+          apiKey={apiKey}
+          agentId={agentId}
+          title="SiteHQ Assistant"
+          theme={theme}
+          initiallyOpen={true}
+        />
+      </div>
     </div>
   );
 }
