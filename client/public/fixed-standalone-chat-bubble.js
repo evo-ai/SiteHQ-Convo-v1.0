@@ -1486,12 +1486,25 @@
 
   // Set chat status and update UI
   function setStatus(status) {
+    console.log('SiteHQ Chat: Setting status to:', status);
+    
     const statusIndicator = document.getElementById('sitehq-status');
     const typingIndicator = document.getElementById('sitehq-typing-indicator');
     const soundWave = document.getElementById('sitehq-sound-wave');
     const micWave = document.getElementById('sitehq-mic-wave');
     
-    if (!statusIndicator || !typingIndicator) return;
+    // Debug elements - log what we found
+    console.log('SiteHQ Chat UI Elements:', {
+      statusIndicator: !!statusIndicator,
+      typingIndicator: !!typingIndicator,
+      soundWave: !!soundWave,
+      micWave: !!micWave
+    });
+    
+    if (!statusIndicator || !typingIndicator) {
+      console.error('SiteHQ Chat: Missing required UI elements');
+      return;
+    }
     
     // Hide all indicators first
     typingIndicator.style.display = 'none';
@@ -1511,17 +1524,28 @@
       case 'thinking':
         statusIndicator.textContent = '';
         typingIndicator.style.display = 'flex';
+        console.log('SiteHQ Chat: Showing typing indicator');
         break;
       case 'speaking':
         statusIndicator.textContent = 'Speaking';
         statusIndicator.className = 'sitehq-status sitehq-status-connected';
-        if (soundWave) soundWave.style.display = 'flex';
+        if (soundWave) {
+          console.log('SiteHQ Chat: Showing sound wave animation');
+          soundWave.style.display = 'flex';
+        } else {
+          console.error('SiteHQ Chat: Sound wave element missing!');
+        }
         state.isSpeaking = true;
         break;
       case 'listening':
         statusIndicator.textContent = 'Listening';
         statusIndicator.className = 'sitehq-status sitehq-status-connected';
-        if (micWave) micWave.style.display = 'flex';
+        if (micWave) {
+          console.log('SiteHQ Chat: Showing mic wave animation');
+          micWave.style.display = 'flex';
+        } else {
+          console.error('SiteHQ Chat: Mic wave element missing!');
+        }
         state.isSpeaking = false;
         break;
       case 'error':

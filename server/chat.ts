@@ -58,6 +58,7 @@ export function setupChatWebSocket(ws: WebSocket) {
             ws.send(data.toString());
             
             const elevenlabsMessage = JSON.parse(data.toString());
+            console.log('ElevenLabs WebSocket message:', elevenlabsMessage);
             
             // Check for status indicators from ElevenLabs
             if (elevenlabsMessage.type === 'status') {
@@ -65,21 +66,44 @@ export function setupChatWebSocket(ws: WebSocket) {
               
               // Send voice-specific status updates to the client
               if (elevenlabsMessage.status === 'listening') {
+                console.log('Sending LISTENING status to client');
                 ws.send(JSON.stringify({
                   type: 'voice_status',
                   status: 'listening'
                 }));
               } else if (elevenlabsMessage.status === 'speaking') {
+                console.log('Sending SPEAKING status to client');
                 ws.send(JSON.stringify({
                   type: 'voice_status',
                   status: 'speaking'
                 }));
               } else if (elevenlabsMessage.status === 'thinking') {
+                console.log('Sending THINKING status to client');
                 ws.send(JSON.stringify({
                   type: 'voice_status',
                   status: 'thinking'
                 }));
               }
+            }
+            
+            // For demo purposes, manually simulate voice status events if they're missing
+            // This is only a fallback to ensure the UI shows the animations
+            if (elevenlabsMessage.content && !elevenlabsMessage.type) {
+              // Simulate speaking state when we receive AI content
+              console.log('Simulating SPEAKING status for content message');
+              ws.send(JSON.stringify({
+                type: 'voice_status',
+                status: 'speaking'
+              }));
+              
+              // After a delay, simulate listening state
+              setTimeout(() => {
+                console.log('Simulating LISTENING status after AI response');
+                ws.send(JSON.stringify({
+                  type: 'voice_status',
+                  status: 'listening'
+                }));
+              }, 2000);
             }
 
             if (conversationId) {
