@@ -7,6 +7,27 @@
 (function() {
   'use strict';
 
+  // Debug functionality
+  let debugMode = false;
+  
+  function log(...args) {
+    if (debugMode) {
+      console.log('[SiteHQ Chat]', ...args);
+    }
+  }
+  
+  function warn(...args) {
+    if (debugMode) {
+      console.warn('[SiteHQ Chat]', ...args);
+    }
+  }
+  
+  function error(...args) {
+    if (debugMode) {
+      console.error('[SiteHQ Chat]', ...args);
+    }
+  }
+
   // Widget configuration
   const DEFAULT_CONFIG = {
     apiKey: 'demo-key',
@@ -20,7 +41,8 @@
     position: 'bottom-right', // or 'bottom-left', 'top-right', 'top-left'
     initiallyOpen: false,
     widgetTitle: 'SiteHQ Assistant',
-    useSolarSystemTheme: true // Enable the solar system theme
+    useSolarSystemTheme: true, // Enable the solar system theme
+    debug: false  // Enable debug logging
   };
 
   // Widget state
@@ -1092,22 +1114,34 @@
 
   // Initialize the widget
   function initializeWidget(config) {
+    // Enable debug mode if configured
+    debugMode = config.debug === true;
+    
+    log('Initializing widget with config:', config);
+    
     // 1. Inject styles
     injectStyles();
+    log('Styles injected');
     
     // 2. Create widget DOM
     const widgetElement = createWidgetDOM(config);
+    log('Widget DOM created');
     
     // 3. Append to document
     document.body.appendChild(widgetElement);
+    log('Widget appended to document body');
     
     // 4. Setup event listeners
     setupEventListeners();
+    log('Event listeners set up');
     
     // 5. Open chat if initiallyOpen is true
     if (config.initiallyOpen) {
+      log('Auto-opening chat window based on initiallyOpen=true');
       toggleChatWindow(true);
     }
+    
+    log('Widget initialization complete');
   }
 
   // Setup event listeners
@@ -1443,6 +1477,13 @@
   function autoInitialize() {
     const script = document.querySelector('script[data-sitehq-chat="auto"]');
     if (script) {
+      // Check for debug mode
+      debugMode = script.getAttribute('data-debug') === 'true';
+      
+      if (debugMode) {
+        console.log('[SiteHQ Chat] Initializing widget in debug mode');
+      }
+      
       const config = {
         apiKey: script.getAttribute('data-api-key') || DEFAULT_CONFIG.apiKey,
         agentId: script.getAttribute('data-agent-id') || DEFAULT_CONFIG.agentId,
@@ -1450,7 +1491,8 @@
         darkMode: script.getAttribute('data-dark-mode') === 'true',
         initiallyOpen: script.getAttribute('data-initially-open') === 'true',
         widgetTitle: script.getAttribute('data-title') || DEFAULT_CONFIG.widgetTitle,
-        useSolarSystemTheme: script.getAttribute('data-solar-system-theme') === 'true' || DEFAULT_CONFIG.useSolarSystemTheme
+        useSolarSystemTheme: script.getAttribute('data-solar-system-theme') === 'true' || DEFAULT_CONFIG.useSolarSystemTheme,
+        debug: debugMode
       };
       
       // Parse theme if provided
@@ -1459,13 +1501,22 @@
         try {
           const themeData = JSON.parse(themeAttr);
           config.theme = { ...DEFAULT_CONFIG.theme, ...themeData };
+          if (debugMode) {
+            log('Parsed theme data:', themeData);
+          }
         } catch (e) {
-          console.warn('SiteHQ Chat: Invalid theme JSON in data attribute');
+          warn('Invalid theme JSON in data attribute:', e);
         }
+      }
+      
+      if (debugMode) {
+        log('Widget configuration:', config);
       }
       
       // Initialize widget
       window.SiteHQChat.init(config);
+    } else if (debugMode) {
+      warn('No script with data-sitehq-chat="auto" found');
     }
   }
 

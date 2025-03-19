@@ -373,7 +373,8 @@
     
     // Demo buttons functionality
     document.getElementById('demo-script-btn').addEventListener('click', function() {
-      // Load the script dynamically
+      console.log("Loading script tag widget...");
+      // Load the script dynamically with debug logging
       const script = document.createElement('script');
       script.src = '/standalone-chat-bubble.js';
       script.setAttribute('data-sitehq-chat', 'auto');
@@ -384,21 +385,40 @@
       script.setAttribute('data-title', 'SiteHQ Demo');
       script.setAttribute('data-theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
       script.setAttribute('data-solar-system-theme', 'true');
+      script.setAttribute('data-debug', 'true');
+      
+      // Add event listeners to debug loading
+      script.onload = function() {
+        console.log("SiteHQ Chat script loaded successfully");
+      };
+      
+      script.onerror = function() {
+        console.error("Error loading SiteHQ Chat script");
+      };
       
       document.body.appendChild(script);
+      console.log("Script element added to page", script);
       
       this.disabled = true;
       this.textContent = 'Widget Loaded!';
     });
     
     document.getElementById('demo-custom-element-btn').addEventListener('click', function() {
+      console.log("Loading custom element widget...");
       // First make sure the script is loaded
       if (!window.customElements || !window.customElements.get('sitehq-chat')) {
         const script = document.createElement('script');
         script.src = '/standalone-chat-bubble.js';
-        script.onload = createCustomElement;
+        script.onload = function() {
+          console.log("SiteHQ Chat script loaded for custom element");
+          createCustomElement();
+        };
+        script.onerror = function() {
+          console.error("Error loading SiteHQ Chat script for custom element");
+        };
         document.body.appendChild(script);
       } else {
+        console.log("SiteHQ Chat custom element already registered");
         createCustomElement();
       }
       
@@ -410,9 +430,11 @@
         chatElement.setAttribute('position', 'bottom-right');
         chatElement.setAttribute('title', 'SiteHQ Demo');
         chatElement.setAttribute('theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
-        chatElement.setAttribute('data-solar-system-theme', 'true');
+        chatElement.setAttribute('solar-system-theme', 'true'); // Removed data- prefix
+        chatElement.setAttribute('debug', 'true');
         
         document.body.appendChild(chatElement);
+        console.log("SiteHQ Chat custom element added to page", chatElement);
       }
       
       this.disabled = true;
@@ -422,6 +444,7 @@
     // Load iframe demo
     document.getElementById('widget-demo-iframe').addEventListener('load', function() {
       if (this.getAttribute('src') === 'about:blank') {
+        console.log("Loading iframe demo content...");
         // Create a sample page with content to demonstrate the iframe embed
         const iframeDoc = this.contentDocument;
         iframeDoc.open();
@@ -453,15 +476,20 @@
               style="width: 70px; height: 70px; position: fixed; bottom: 20px; right: 20px; border: none; overflow: hidden; z-index: 9999;" 
               allow="microphone">
             </iframe>
+            <script>
+              console.log("Iframe demo page loaded with widget");
+            </script>
           </body>
           </html>
         `);
         iframeDoc.close();
+        console.log("Iframe content loaded");
       }
     });
     
     // Load the iframe immediately
     document.getElementById('widget-demo-iframe').src = 'about:blank';
+    console.log("Standalone widget demo page initialized");
   </script>
 </body>
 </html>
