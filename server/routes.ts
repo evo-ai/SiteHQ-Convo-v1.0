@@ -443,10 +443,11 @@ export function registerRoutes(app: Express): Server {
         return res.status(500).send('Error loading the demo page');
       }
       
-      // Replace template variables with actual values
+      // Inject a global JavaScript variable with the API key
+      const apiKeyScript = `<script>window.ELEVENLABS_API_KEY = "${process.env.ELEVENLABS_API_KEY || ''}";</script>`;
       const processedHTML = data.replace(
-        /<%= process\.env\.ELEVENLABS_API_KEY %>/g, 
-        process.env.ELEVENLABS_API_KEY || ''
+        '</head>',
+        apiKeyScript + '</head>'
       );
       
       res.set('Content-Type', 'text/html');

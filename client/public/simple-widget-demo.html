@@ -94,8 +94,8 @@
       const script = document.createElement('script');
       script.src = '/fixed-standalone-chat-bubble.js';
       script.setAttribute('data-sitehq-chat', 'auto');
-      // Use the environment variable ELEVENLABS_API_KEY from server
-      script.setAttribute('data-api-key', '<%= process.env.ELEVENLABS_API_KEY %>');
+      // Use the global API key variable
+      script.setAttribute('data-api-key', window.ELEVENLABS_API_KEY || '');
       script.setAttribute('data-agent-id', 'KRGVz0f5HAU0E7u6BbA5');
       script.setAttribute('data-position', 'bottom-right');
       script.setAttribute('data-title', 'Simple Demo');
@@ -121,8 +121,8 @@
       script.onload = function() {
         // Create the custom element
         const chatElement = document.createElement('sitehq-chat');
-        // Use the environment variable ELEVENLABS_API_KEY from server
-        chatElement.setAttribute('api-key', '<%= process.env.ELEVENLABS_API_KEY %>');
+        // Use the global API key variable
+        chatElement.setAttribute('api-key', window.ELEVENLABS_API_KEY || '');
         chatElement.setAttribute('agent-id', 'KRGVz0f5HAU0E7u6BbA5');
         chatElement.setAttribute('position', 'bottom-left');
         chatElement.setAttribute('title', 'Custom Element Demo');
@@ -145,10 +145,10 @@
         existingIframe.remove();
       }
       
-      // Create iframe with environment variable for API key
+      // Create iframe with global API key variable
       const iframe = document.createElement('iframe');
       iframe.className = 'sitehq-iframe';
-      iframe.src = '/embed?apiKey=<%= process.env.ELEVENLABS_API_KEY %>&agentId=KRGVz0f5HAU0E7u6BbA5&theme={"primary":"#5c078c","background":"#ffffff","text":"#333333"}&solarSystemTheme=true';
+      iframe.src = '/embed?apiKey=' + (window.ELEVENLABS_API_KEY || '') + '&agentId=KRGVz0f5HAU0E7u6BbA5&theme={"primary":"#5c078c","background":"#ffffff","text":"#333333"}&solarSystemTheme=true';
       iframe.style.position = 'fixed';
       iframe.style.bottom = '20px';
       iframe.style.right = '20px';
