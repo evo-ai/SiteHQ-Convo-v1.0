@@ -283,7 +283,7 @@
         
         // Create and add the script
         const script = document.createElement('script');
-        script.src = '/standalone-chat-bubble.js';
+        script.src = '/fixed-standalone-chat-bubble.js';
         script.setAttribute('data-sitehq-chat', 'auto');
         script.setAttribute('data-api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
         script.setAttribute('data-agent-id', 'KRGVz0f5HAU0E7u6BbA5');
@@ -329,11 +329,11 @@
       
       try {
         // First load the script if not already loaded
-        let scriptLoaded = document.querySelector('script[src="/standalone-chat-bubble.js"]');
+        let scriptLoaded = document.querySelector('script[src="/fixed-standalone-chat-bubble.js"]');
         
         if (!scriptLoaded) {
           const script = document.createElement('script');
-          script.src = '/standalone-chat-bubble.js';
+          script.src = '/fixed-standalone-chat-bubble.js';
           
           script.onload = function() {
             createCustomElement();
