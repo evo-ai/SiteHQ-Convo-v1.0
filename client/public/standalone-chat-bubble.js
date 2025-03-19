@@ -19,7 +19,8 @@
     darkMode: false,
     position: 'bottom-right', // or 'bottom-left', 'top-right', 'top-left'
     initiallyOpen: false,
-    widgetTitle: 'SiteHQ Assistant'
+    widgetTitle: 'SiteHQ Assistant',
+    useSolarSystemTheme: true // Enable the solar system theme
   };
 
   // Widget state
@@ -108,6 +109,34 @@
         position: relative;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         animation: sitehq-float 3s ease-in-out infinite;
+      }
+      
+      /* Solar System Theme Styles */
+      .sitehq-sun-particle {
+        animation: sitehq-orbit 8s linear infinite !important;
+        box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+      }
+      
+      .sitehq-planet-particle {
+        animation: sitehq-orbit-reverse 6s linear infinite !important;
+      }
+      
+      @keyframes sitehq-orbit {
+        0% {
+          transform: rotate(0deg) translateX(6px) rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg) translateX(6px) rotate(-360deg);
+        }
+      }
+      
+      @keyframes sitehq-orbit-reverse {
+        0% {
+          transform: rotate(0deg) translateX(4px) rotate(0deg);
+        }
+        100% {
+          transform: rotate(-360deg) translateX(4px) rotate(360deg);
+        }
       }
       
       @keyframes sitehq-float {
@@ -818,21 +847,52 @@
     const container = document.createElement('div');
     container.className = `sitehq-container ${config.position ? 'sitehq-' + config.position : 'sitehq-bottom-right'} ${config.darkMode ? 'sitehq-dark-mode' : ''}`;
     
-    // Create toggle button (chat bubble)
+    // Create toggle button (chat bubble) with solar system theme if enabled
     const toggleButton = document.createElement('button');
     toggleButton.className = 'sitehq-toggle-button';
     toggleButton.setAttribute('aria-label', 'Toggle chat');
+    
+    // Apply primary color from config
+    if (config.theme && config.theme.primary) {
+      toggleButton.style.background = `radial-gradient(circle at 30% 30%, ${config.theme.primary}, ${config.theme.primary}DD)`;
+    }
+    
     toggleButton.appendChild(createSVG(SVGS.chatBubble));
     
-    // Create decorative particles
-    const particle1 = document.createElement('div');
-    particle1.className = 'sitehq-particle';
-    
-    const particle2 = document.createElement('div');
-    particle2.className = 'sitehq-particle';
-    
-    toggleButton.appendChild(particle1);
-    toggleButton.appendChild(particle2);
+    // Create decorative particles for solar system theme
+    if (config.useSolarSystemTheme) {
+      // Sun/planet particle (yellow)
+      const sunParticle = document.createElement('div');
+      sunParticle.className = 'sitehq-particle sitehq-sun-particle';
+      sunParticle.style.top = '-10px';
+      sunParticle.style.right = '-8px';
+      sunParticle.style.width = '18px';
+      sunParticle.style.height = '18px';
+      sunParticle.style.backgroundColor = '#FFCC00';
+      sunParticle.style.boxShadow = '0 0 10px rgba(255, 204, 0, 0.8)';
+      
+      // Small planet particle (blue)
+      const planetParticle = document.createElement('div');
+      planetParticle.className = 'sitehq-particle sitehq-planet-particle';
+      planetParticle.style.bottom = '-5px';
+      planetParticle.style.left = '-3px';
+      planetParticle.style.width = '8px';
+      planetParticle.style.height = '8px';
+      planetParticle.style.backgroundColor = '#00CCFF';
+      
+      toggleButton.appendChild(sunParticle);
+      toggleButton.appendChild(planetParticle);
+    } else {
+      // Standard particles for non-solar theme
+      const particle1 = document.createElement('div');
+      particle1.className = 'sitehq-particle';
+      
+      const particle2 = document.createElement('div');
+      particle2.className = 'sitehq-particle';
+      
+      toggleButton.appendChild(particle1);
+      toggleButton.appendChild(particle2);
+    }
     
     // Create tooltip
     const tooltip = document.createElement('div');
