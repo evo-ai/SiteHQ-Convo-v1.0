@@ -1101,8 +1101,23 @@
         config.initiallyOpen = el.getAttribute('initially-open') === 'true';
       }
       
+      // Support both attribute formats for solar system theme
       if (el.hasAttribute('data-solar-system-theme')) {
         config.useSolarSystemTheme = el.getAttribute('data-solar-system-theme') === 'true';
+      }
+      
+      // Support standard 'solar-system-theme' attribute (without data- prefix)
+      if (el.hasAttribute('solar-system-theme')) {
+        config.useSolarSystemTheme = el.getAttribute('solar-system-theme') === 'true';
+      }
+      
+      // Enable debug mode if debug attribute is set
+      if (el.hasAttribute('debug')) {
+        config.debug = el.getAttribute('debug') === 'true';
+        if (config.debug) {
+          debugMode = true;
+          console.log('[SiteHQ Chat] Debug mode enabled via custom element');
+        }
       }
     }
     

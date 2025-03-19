@@ -3,300 +3,411 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SiteHQ Chat Widget - Fixed Demo</title>
+  <title>SiteHQ Fixed Widget Demo</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       line-height: 1.6;
-      margin: 0;
-      padding: 0;
-      color: #333;
-      background-color: #f5f5f5;
-    }
-    
-    .container {
-      max-width: 1200px;
+      max-width: 800px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: 20px;
     }
     
-    header {
+    .header {
       background-color: #5c078c;
       color: white;
-      padding: 2rem 0;
-      margin-bottom: 2rem;
-    }
-    
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      text-align: center;
     }
     
     h1 {
-      margin: 0;
-      font-size: 2.5rem;
-      font-weight: 700;
+      margin-top: 0;
+    }
+    
+    .demo-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
     }
     
     pre {
-      background-color: #f8f8f8;
-      border: 1px solid #ddd;
+      background-color: #f5f5f5;
+      padding: 15px;
       border-radius: 4px;
-      padding: 1rem;
       overflow-x: auto;
-      margin-bottom: 1.5rem;
     }
     
-    code {
-      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-      font-size: 0.9rem;
-    }
-    
-    .example-container {
-      margin-top: 1.5rem;
-      border: 1px solid #ddd;
+    button {
+      background-color: #5c078c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
       border-radius: 4px;
-      overflow: hidden;
+      cursor: pointer;
     }
     
-    .example-header {
-      background-color: #f3f3f3;
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    button:hover {
+      background-color: #4a0670;
     }
     
-    .example-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    
-    .example-content {
-      padding: 1.5rem;
-      background-color: white;
+    .code-container {
+      position: relative;
     }
     
     .copy-button {
-      background-color: #5c078c;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #5c078c;
       color: white;
       border: none;
-      padding: 0.4rem 0.75rem;
       border-radius: 4px;
-      font-size: 0.8rem;
+      padding: 5px 10px;
+      font-size: 12px;
       cursor: pointer;
-      transition: background-color 0.2s;
     }
     
-    .copy-button:hover {
-      background-color: #4a0670;
+    .debug-log {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 20px;
+      font-family: monospace;
+      max-height: 200px;
+      overflow-y: auto;
     }
     
-    .demo-button {
-      background-color: #5c078c;
-      color: white;
+    #error-banner {
+      background-color: #ffebee;
+      border: 1px solid #ffcdd2;
+      color: #b71c1c;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .iframe-container {
+      height: 400px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    
+    iframe {
+      width: 100%;
+      height: 100%;
       border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-top: 1rem;
-      display: inline-block;
-      transition: background-color 0.2s;
-    }
-    
-    .demo-button:hover {
-      background-color: #4a0670;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <h1>SiteHQ Chat Widget - Fixed Demo</h1>
-      <p>Three ways to embed the chat widget on any website - with proper formatting</p>
-    </div>
-  </header>
-
-  <div class="container">
-    <div>
-      <h2>1. Script Tag Integration (Fixed)</h2>
-      <div class="example-container">
-        <div class="example-header">
-          <div class="example-title">HTML</div>
-          <button class="copy-button" data-code="script">Copy Code</button>
-        </div>
-        <div class="example-content">
-          <pre><code>&lt;!-- SiteHQ Chat Widget --&gt;
-&lt;script 
-  src="https://your-site.com/standalone-chat-bubble.js" 
+  <div class="header">
+    <h1>SiteHQ Solar System Chat Widget Demo</h1>
+    <p>This page demonstrates the repaired widget implementations with solar system theme</p>
+  </div>
+  
+  <div id="error-banner"></div>
+  
+  <div class="demo-section">
+    <h2>Debugging Information</h2>
+    <p>This section provides technical information about the widget initialization</p>
+    <div class="debug-log" id="debug-log">Loading debug info...</div>
+    <button id="clear-log-btn">Clear Log</button>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Method 1: Direct Script Embedding</h2>
+    <p>The chat bubble will appear in the bottom right of the page when you click the button below:</p>
+    <button id="load-script-btn">Load Widget</button>
+    <div id="script-status"></div>
+    
+    <h3>Code Used:</h3>
+    <div class="code-container">
+      <button class="copy-button" onclick="copyCode('script-code')">Copy</button>
+      <pre id="script-code">&lt;script 
+  src="standalone-chat-bubble.js" 
   data-sitehq-chat="auto"
-  data-api-key="YOUR_API_KEY"
-  data-agent-id="YOUR_AGENT_ID"
+  data-api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
+  data-agent-id="KRGVz0f5HAU0E7u6BbA5"
   data-position="bottom-right"
   data-dark-mode="false"
   data-initially-open="false"
   data-title="SiteHQ Assistant"
   data-theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
   data-solar-system-theme="true"
-&gt;&lt;/script&gt;</code></pre>
-        </div>
-      </div>
-      
-      <button id="demo-script-btn" class="demo-button">Try it now</button>
+  data-debug="true"
+&gt;&lt;/script&gt;</pre>
     </div>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Method 2: Custom Element Approach</h2>
+    <p>This method uses the custom element approach, which appears on the bottom left when loaded:</p>
+    <button id="load-custom-element-btn">Load Custom Element</button>
+    <div id="custom-element-status"></div>
     
-    <div style="margin-top: 2rem;">
-      <h2>2. Custom Element Integration (Fixed)</h2>
-      <div class="example-container">
-        <div class="example-header">
-          <div class="example-title">HTML</div>
-          <button class="copy-button" data-code="custom-element">Copy Code</button>
-        </div>
-        <div class="example-content">
-          <pre><code>&lt;!-- Add the script in the head or before the closing body tag --&gt;
-&lt;script src="https://your-site.com/standalone-chat-bubble.js"&gt;&lt;/script&gt;
+    <h3>Code Used:</h3>
+    <div class="code-container">
+      <button class="copy-button" onclick="copyCode('custom-element-code')">Copy</button>
+      <pre id="custom-element-code">&lt;!-- First include the script --&gt;
+&lt;script src="standalone-chat-bubble.js"&gt;&lt;/script&gt;
 
-&lt;!-- Place the custom element anywhere in your HTML --&gt;
+&lt;!-- Then use the custom element anywhere you want --&gt;
 &lt;sitehq-chat
-  api-key="YOUR_API_KEY"
-  agent-id="YOUR_AGENT_ID"
-  position="bottom-right"
-  dark-mode="false"
-  initially-open="false"
+  api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
+  agent-id="KRGVz0f5HAU0E7u6BbA5"
+  position="bottom-left"
   title="SiteHQ Assistant"
   theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
   solar-system-theme="true"
-&gt;&lt;/sitehq-chat&gt;</code></pre>
-        </div>
-      </div>
-      
-      <button id="demo-custom-element-btn" class="demo-button">Try it now</button>
+  debug="true"
+&gt;&lt;/sitehq-chat&gt;</pre>
     </div>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Method 3: iFrame Embedding</h2>
+    <p>This method uses an iframe to embed the widget:</p>
     
-    <div style="margin-top: 2rem;">
-      <h2>3. IFrame Embedding (Fixed)</h2>
-      <div class="example-container">
-        <div class="example-header">
-          <div class="example-title">HTML</div>
-          <button class="copy-button" data-code="iframe">Copy Code</button>
-        </div>
-        <div class="example-content">
-          <pre><code>&lt;iframe 
-  src="https://your-site.com/widget-embed?apiKey=YOUR_API_KEY&agentId=YOUR_AGENT_ID&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
-  style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
-  allow="microphone"
-&gt;&lt;/iframe&gt;</code></pre>
-        </div>
-      </div>
-      
-      <h3>Your Fixed iFrame Code (Copy & Paste Ready)</h3>
-      <div class="example-container">
-        <div class="example-header">
-          <div class="example-title">Ready-to-use code for your website</div>
-          <button class="copy-button" data-code="fixed-iframe">Copy Code</button>
-        </div>
-        <div class="example-content">
-          <pre><code>&lt;iframe 
+    <div class="code-container">
+      <button class="copy-button" onclick="copyCode('iframe-code')">Copy</button>
+      <pre id="iframe-code">&lt;iframe 
   src="https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
   style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
   allow="microphone"
-&gt;&lt;/iframe&gt;</code></pre>
-        </div>
-      </div>
+&gt;&lt;/iframe&gt;</pre>
+    </div>
+    
+    <h3>Live iframe preview:</h3>
+    <div class="iframe-container">
+      <iframe 
+        src="/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
+        allow="microphone">
+      </iframe>
     </div>
   </div>
-
+  
   <script>
-    // Copy code functionality
-    document.querySelectorAll('.copy-button').forEach(button => {
-      button.addEventListener('click', function() {
-        const codeType = this.getAttribute('data-code');
-        let codeText = '';
-        
-        if (codeType === 'script') {
-          codeText = document.querySelector('pre code:nth-of-type(1)').textContent;
-        } else if (codeType === 'custom-element') {
-          codeText = document.querySelector('div:nth-of-type(2) pre code').textContent;
-        } else if (codeType === 'iframe') {
-          codeText = document.querySelector('div:nth-of-type(3) pre code').textContent;
-        } else if (codeType === 'fixed-iframe') {
-          codeText = document.querySelector('div:nth-of-type(4) pre code').textContent;
+    // Debug console override for logging
+    const debugLog = document.getElementById('debug-log');
+    debugLog.textContent = ''; // Clear initial text
+    
+    // Log function to capture logs
+    function logToDebug(text) {
+      const entry = document.createElement('div');
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+      debugLog.appendChild(entry);
+      debugLog.scrollTop = debugLog.scrollHeight;
+    }
+    
+    // Original console methods
+    const originalLog = console.log;
+    const originalWarn = console.warn;
+    const originalError = console.error;
+    
+    // Override console methods to capture SiteHQ Chat logs
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      if (typeof args[0] === 'string' && args[0].includes('[SiteHQ Chat]')) {
+        logToDebug(`LOG: ${args.join(' ')}`);
+      }
+    };
+    
+    console.warn = function(...args) {
+      originalWarn.apply(console, args);
+      if (typeof args[0] === 'string' && args[0].includes('[SiteHQ Chat]')) {
+        logToDebug(`WARN: ${args.join(' ')}`);
+      }
+    };
+    
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      if (typeof args[0] === 'string' && args[0].includes('[SiteHQ Chat]')) {
+        logToDebug(`ERROR: ${args.join(' ')}`);
+        showError(`Error: ${args.join(' ')}`);
+      }
+    };
+    
+    // Function to show errors
+    function showError(message) {
+      const errorBanner = document.getElementById('error-banner');
+      errorBanner.textContent = message;
+      errorBanner.style.display = 'block';
+      
+      setTimeout(() => {
+        errorBanner.style.display = 'none';
+      }, 10000);
+    }
+    
+    // Clear log button
+    document.getElementById('clear-log-btn').addEventListener('click', function() {
+      debugLog.textContent = '';
+    });
+    
+    // Function to copy code
+    function copyCode(elementId) {
+      const codeBlock = document.getElementById(elementId);
+      const textToCopy = codeBlock.textContent;
+      
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+          const button = document.querySelector(`button[onclick="copyCode('${elementId}')"]`);
+          const originalText = button.textContent;
+          button.textContent = 'Copied!';
+          setTimeout(() => {
+            button.textContent = originalText;
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy text: ', err);
+        });
+    }
+    
+    // Script button handler
+    document.getElementById('load-script-btn').addEventListener('click', function() {
+      const statusEl = document.getElementById('script-status');
+      statusEl.textContent = 'Loading widget...';
+      
+      try {
+        // Check if script already exists to avoid duplicates
+        if (document.querySelector('script[data-sitehq-chat="auto"]')) {
+          statusEl.textContent = 'Widget already loaded!';
+          return;
         }
         
-        navigator.clipboard.writeText(codeText).then(() => {
-          const originalText = this.textContent;
-          this.textContent = 'Copied!';
-          setTimeout(() => {
-            this.textContent = originalText;
-          }, 2000);
-        });
-      });
-    });
-    
-    // Demo buttons functionality
-    document.getElementById('demo-script-btn').addEventListener('click', function() {
-      // Load the script dynamically with debug mode
-      const script = document.createElement('script');
-      script.src = '/standalone-chat-bubble.js';
-      script.setAttribute('data-sitehq-chat', 'auto');
-      script.setAttribute('data-api-key', 'demo-key');
-      script.setAttribute('data-agent-id', 'demo-agent');
-      script.setAttribute('data-position', 'bottom-right');
-      script.setAttribute('data-dark-mode', 'false');
-      script.setAttribute('data-title', 'SiteHQ Demo');
-      script.setAttribute('data-theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
-      script.setAttribute('data-solar-system-theme', 'true');
-      script.setAttribute('data-debug', 'true');
-      
-      document.body.appendChild(script);
-      
-      console.log('SiteHQ Chat script added to page with data attributes:', {
-        apiKey: 'demo-key',
-        agentId: 'demo-agent',
-        solarSystemTheme: true
-      });
-      
-      this.disabled = true;
-      this.textContent = 'Widget Loaded!';
-    });
-    
-    document.getElementById('demo-custom-element-btn').addEventListener('click', function() {
-      // First make sure the script is loaded
-      if (!window.customElements || !window.customElements.get('sitehq-chat')) {
+        // Create and add the script
         const script = document.createElement('script');
         script.src = '/standalone-chat-bubble.js';
-        script.onload = createCustomElement;
+        script.setAttribute('data-sitehq-chat', 'auto');
+        script.setAttribute('data-api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+        script.setAttribute('data-agent-id', 'KRGVz0f5HAU0E7u6BbA5');
+        script.setAttribute('data-position', 'bottom-right');
+        script.setAttribute('data-dark-mode', 'false');
+        script.setAttribute('data-title', 'SiteHQ Assistant');
+        script.setAttribute('data-theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
+        script.setAttribute('data-solar-system-theme', 'true');
+        script.setAttribute('data-debug', 'true');
+        
+        script.onload = function() {
+          statusEl.textContent = 'Widget loaded successfully!';
+          statusEl.style.color = 'green';
+          logToDebug('Script loaded via button click');
+        };
+        
+        script.onerror = function() {
+          statusEl.textContent = 'Error loading widget script.';
+          statusEl.style.color = 'red';
+          logToDebug('Script failed to load via button click');
+        };
+        
         document.body.appendChild(script);
-        console.log('Loading SiteHQ Chat script for custom element');
-      } else {
-        createCustomElement();
+        logToDebug('Script added to page with attributes:');
+        
+        // Log all attributes for debugging
+        Array.from(script.attributes).forEach(attr => {
+          logToDebug(`- ${attr.name}: ${attr.value}`);
+        });
+        
+        this.disabled = true;
+      } catch (error) {
+        statusEl.textContent = 'Error: ' + error.message;
+        statusEl.style.color = 'red';
+        logToDebug('Error in script loading: ' + error.message);
+      }
+    });
+    
+    // Custom element button handler
+    document.getElementById('load-custom-element-btn').addEventListener('click', function() {
+      const statusEl = document.getElementById('custom-element-status');
+      statusEl.textContent = 'Loading custom element...';
+      
+      try {
+        // First load the script if not already loaded
+        let scriptLoaded = document.querySelector('script[src="/standalone-chat-bubble.js"]');
+        
+        if (!scriptLoaded) {
+          const script = document.createElement('script');
+          script.src = '/standalone-chat-bubble.js';
+          
+          script.onload = function() {
+            createCustomElement();
+            statusEl.textContent = 'Custom element loaded successfully!';
+            statusEl.style.color = 'green';
+            logToDebug('Script for custom element loaded successfully');
+          };
+          
+          script.onerror = function() {
+            statusEl.textContent = 'Error loading custom element script.';
+            statusEl.style.color = 'red';
+            logToDebug('Script for custom element failed to load');
+          };
+          
+          document.body.appendChild(script);
+        } else {
+          createCustomElement();
+          statusEl.textContent = 'Custom element loaded successfully!';
+          statusEl.style.color = 'green';
+          logToDebug('Using existing script for custom element');
+        }
+        
+        this.disabled = true;
+      } catch (error) {
+        statusEl.textContent = 'Error: ' + error.message;
+        statusEl.style.color = 'red';
+        logToDebug('Error in custom element loading: ' + error.message);
       }
       
       function createCustomElement() {
+        // Check if element already exists
+        if (document.querySelector('sitehq-chat')) {
+          logToDebug('Custom element already exists, not creating duplicate');
+          return;
+        }
+        
         // Create and add the custom element
         const chatElement = document.createElement('sitehq-chat');
-        chatElement.setAttribute('api-key', 'demo-key');
-        chatElement.setAttribute('agent-id', 'demo-agent');
-        chatElement.setAttribute('position', 'bottom-right');
-        chatElement.setAttribute('title', 'SiteHQ Demo');
+        chatElement.setAttribute('api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+        chatElement.setAttribute('agent-id', 'KRGVz0f5HAU0E7u6BbA5');
+        chatElement.setAttribute('position', 'bottom-left'); // Use different position to avoid overlap
+        chatElement.setAttribute('title', 'SiteHQ Custom Element');
         chatElement.setAttribute('theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
         chatElement.setAttribute('solar-system-theme', 'true');
         chatElement.setAttribute('debug', 'true');
         
         document.body.appendChild(chatElement);
-        console.log('SiteHQ Chat custom element added to page with attributes:', {
-          apiKey: 'demo-key',
-          agentId: 'demo-agent',
-          solarSystemTheme: true
+        logToDebug('Custom element added to page with attributes:');
+        
+        // Log all attributes for debugging
+        Array.from(chatElement.attributes).forEach(attr => {
+          logToDebug(`- ${attr.name}: ${attr.value}`);
         });
       }
-      
-      this.disabled = true;
-      this.textContent = 'Widget Loaded!';
     });
+    
+    // Log initial page load
+    logToDebug('Fixed widget demo page loaded');
+    
+    // Check for query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('autoload')) {
+      logToDebug('Autoload parameter detected, will load widgets automatically');
+      
+      // Auto load after a short delay
+      setTimeout(() => {
+        document.getElementById('load-script-btn').click();
+        
+        // Load custom element after another delay
+        setTimeout(() => {
+          document.getElementById('load-custom-element-btn').click();
+        }, 2000);
+      }, 1000);
+    }
   </script>
 </body>
 </html>

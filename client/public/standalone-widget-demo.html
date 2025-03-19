@@ -205,7 +205,7 @@
   <header>
     <div class="header-content">
       <h1>SiteHQ Chat Widget Demo</h1>
-      <p>Three ways to embed the chat widget on any website</p>
+      <p>Three ways to embed the solar system themed chat widget on any website</p>
     </div>
   </header>
 
@@ -238,6 +238,7 @@
   data-initially-open="false"
   data-title="SiteHQ Assistant"
   data-theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+  data-solar-system-theme="true"
 &gt;&lt;/script&gt;</code></pre>
           </div>
         </div>
@@ -267,6 +268,7 @@
   initially-open="false"
   title="SiteHQ Assistant"
   theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+  solar-system-theme="true"
 &gt;&lt;/sitehq-chat&gt;</code></pre>
           </div>
         </div>
@@ -285,7 +287,7 @@
           </div>
           <div class="example-content">
             <pre><code>&lt;iframe 
-  src="https://your-site.com/widget-embed?apiKey=YOUR_API_KEY&agentId=YOUR_AGENT_ID&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D" 
+  src="https://your-site.com/widget-embed?apiKey=YOUR_API_KEY&agentId=YOUR_AGENT_ID&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
   style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
   allow="microphone"
 &gt;&lt;/iframe&gt;</code></pre>
@@ -318,6 +320,7 @@
         <li><code>initially-open</code> - Whether the chat window should be open when loaded (true/false)</li>
         <li><code>title</code> - The title shown in the chat header</li>
         <li><code>theme</code> - A JSON object with theme colors (primary, background, text)</li>
+        <li><code>solar-system-theme</code> - Enable the solar system theme (true/false)</li>
       </ul>
     </div>
   </div>
@@ -378,8 +381,8 @@
       const script = document.createElement('script');
       script.src = '/standalone-chat-bubble.js';
       script.setAttribute('data-sitehq-chat', 'auto');
-      script.setAttribute('data-api-key', 'demo-key');
-      script.setAttribute('data-agent-id', 'demo-agent');
+      script.setAttribute('data-api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+      script.setAttribute('data-agent-id', 'KRGVz0f5HAU0E7u6BbA5');
       script.setAttribute('data-position', 'bottom-right');
       script.setAttribute('data-dark-mode', 'false');
       script.setAttribute('data-title', 'SiteHQ Demo');
@@ -425,12 +428,12 @@
       function createCustomElement() {
         // Create and add the custom element
         const chatElement = document.createElement('sitehq-chat');
-        chatElement.setAttribute('api-key', 'demo-key');
-        chatElement.setAttribute('agent-id', 'demo-agent');
-        chatElement.setAttribute('position', 'bottom-right');
-        chatElement.setAttribute('title', 'SiteHQ Demo');
+        chatElement.setAttribute('api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+        chatElement.setAttribute('agent-id', 'KRGVz0f5HAU0E7u6BbA5');
+        chatElement.setAttribute('position', 'bottom-left'); // Use different position
+        chatElement.setAttribute('title', 'SiteHQ Custom Element');
         chatElement.setAttribute('theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
-        chatElement.setAttribute('solar-system-theme', 'true'); // Removed data- prefix
+        chatElement.setAttribute('solar-system-theme', 'true');
         chatElement.setAttribute('debug', 'true');
         
         document.body.appendChild(chatElement);
@@ -448,40 +451,38 @@
         // Create a sample page with content to demonstrate the iframe embed
         const iframeDoc = this.contentDocument;
         iframeDoc.open();
-        iframeDoc.write(`
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Sample Page with SiteHQ Chat</title>
-            <style>
-              body {
-                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                padding: 20px;
-                margin: 0;
-              }
-              h1 { color: #333; }
-              p { line-height: 1.6; color: #555; }
-            </style>
-          </head>
-          <body>
-            <h1>Sample Website</h1>
-            <p>This is a sample website with the SiteHQ Chat Widget embedded via iframe.</p>
-            <p>The widget appears in the bottom right corner of this page.</p>
-            
-            <!-- SiteHQ Chat Widget Iframe -->
-            <iframe 
-              src="/widget-embed?apiKey=demo-key&agentId=demo-agent&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
-              style="width: 70px; height: 70px; position: fixed; bottom: 20px; right: 20px; border: none; overflow: hidden; z-index: 9999;" 
-              allow="microphone">
-            </iframe>
-            <script>
-              console.log("Iframe demo page loaded with widget");
-            </script>
-          </body>
-          </html>
-        `);
+        iframeDoc.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Page with SiteHQ Chat</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 { color: #333; }
+    p { line-height: 1.6; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Sample Website</h1>
+  <p>This is a sample website with the SiteHQ Chat Widget embedded via iframe.</p>
+  <p>The widget appears in the bottom right corner of this page.</p>
+  
+  <!-- SiteHQ Chat Widget Iframe -->
+  <iframe 
+    src="/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
+    style="width: 70px; height: 70px; position: fixed; bottom: 20px; right: 20px; border: none; overflow: hidden; z-index: 9999;" 
+    allow="microphone">
+  </iframe>
+  <script>
+    console.log("Iframe demo page loaded with widget");
+  </script>
+</body>
+</html>`);
         iframeDoc.close();
         console.log("Iframe content loaded");
       }
