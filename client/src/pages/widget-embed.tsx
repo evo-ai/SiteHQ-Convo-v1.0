@@ -7,7 +7,7 @@ import ChatBubble from '@/components/chat/ChatBubble';
  */
 export default function WidgetEmbedPage() {
   const [theme, setTheme] = useState({
-    primary: '#5c078c',
+    primary: '#FC5635',
     background: '#ffffff',
     text: '#333333'
   });
