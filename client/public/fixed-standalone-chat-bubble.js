@@ -1216,7 +1216,7 @@
   }
 
   // Initialize the chat connection
-  function initializeChat() {
+  async function initializeChat() {
     try {
       // Add initial greeting message
       addMessage('assistant', 'Hello! How can I assist you today?');
@@ -1224,23 +1224,61 @@
       // Get API base URL
       const apiBase = window.sitehqConfig?.apiBase || 'https://api.sitehq.ai';
       
-      // Create WebSocket connection
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${wsProtocol}//${window.location.host}/api/chat`;
-      
-      state.connection = new WebSocket(wsUrl);
-      
-      state.connection.onopen = function() {
-        console.log('SiteHQ Chat: WebSocket connection established');
-        setStatus('connected');
+      // Get signed URL for WebSocket connection to ElevenLabs
+      try {
+        const apiKey = window.sitehqConfig?.apiKey || DEFAULT_CONFIG.apiKey;
+        console.log('SiteHQ Chat: Fetching signed URL with API key:', apiKey);
         
-        // Send initialization message with API key and agent ID
-        state.connection.send(JSON.stringify({
-          type: 'init',
-          apiKey: window.sitehqConfig?.apiKey || DEFAULT_CONFIG.apiKey,
-          agentId: window.sitehqConfig?.agentId || DEFAULT_CONFIG.agentId
-        }));
-      };
+        const response = await fetch('/api/get-signed-url', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to get signed URL from server');
+        }
+        
+        const { signedUrl } = await response.json();
+        console.log('SiteHQ Chat: Received signed URL successfully');
+        
+        // Connect to ElevenLabs WebSocket with the signed URL
+        state.connection = new WebSocket(signedUrl);
+        
+        state.connection.onopen = function() {
+          console.log('SiteHQ Chat: WebSocket connection established');
+          setStatus('connected');
+          
+          // Send initialization message with agent ID
+          state.connection.send(JSON.stringify({
+            type: 'init',
+            agentId: window.sitehqConfig?.agentId || DEFAULT_CONFIG.agentId,
+            signedUrl
+          }));
+        };
+      } catch (error) {
+        console.error('SiteHQ Chat: Error getting signed URL:', error);
+        
+        // Fallback to local WebSocket if signed URL fails
+        console.log('SiteHQ Chat: Falling back to local WebSocket connection');
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/api/chat`;
+        
+        state.connection = new WebSocket(wsUrl);
+        
+        state.connection.onopen = function() {
+          console.log('SiteHQ Chat: WebSocket connection established (fallback)');
+          setStatus('connected');
+          
+          // Send initialization message with API key and agent ID
+          state.connection.send(JSON.stringify({
+            type: 'init',
+            apiKey: window.sitehqConfig?.apiKey || DEFAULT_CONFIG.apiKey,
+            agentId: window.sitehqConfig?.agentId || DEFAULT_CONFIG.agentId
+          }));
+        };
+      }
       
       state.connection.onmessage = function(event) {
         try {
