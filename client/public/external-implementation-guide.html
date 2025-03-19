@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiteHQ Widget - External Implementation Guide</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      margin: 0 auto;
+      padding: 20px;
+      max-width: 800px;
+      color: #333;
+    }
+    
+    h1, h2, h3 {
+      color: #5c078c;
+    }
+    
+    .section {
+      margin: 30px 0;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+    
+    .code-block {
+      background-color: #f3f3f3;
+      padding: 15px;
+      border-radius: 4px;
+      border-left: 4px solid #5c078c;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      font-family: monospace;
+      margin: 15px 0;
+    }
+    
+    .note {
+      background-color: #fff8e1;
+      border-left: 4px solid #ffc107;
+      padding: 12px 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+    
+    .important {
+      background-color: #ffebee;
+      border-left: 4px solid #f44336;
+      padding: 12px 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+    
+    button {
+      background-color: #5c078c;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    
+    button:hover {
+      background-color: #4a0670;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #f3f3f3;
+    }
+    
+    .copy-btn {
+      float: right;
+      font-size: 12px;
+      cursor: pointer;
+      background-color: #5c078c;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <h1>SiteHQ Chat Widget - External Implementation Guide</h1>
+  <p>This guide provides instructions for implementing the SiteHQ solar system themed chat widget on external websites.</p>
+  
+  <div class="section">
+    <h2>Method 1: Script Tag Implementation</h2>
+    <p>This is the simplest method to embed the chat widget on your website:</p>
+    
+    <div class="code-block" id="script-code">
+<script 
+  src="https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev/standalone-chat-bubble.js" 
+  data-sitehq-chat="auto"
+  data-api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
+  data-agent-id="KRGVz0f5HAU0E7u6BbA5"
+  data-position="bottom-right"
+  data-dark-mode="false"
+  data-initially-open="false"
+  data-title="SiteHQ Assistant"
+  data-theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+  data-solar-system-theme="true"
+  data-debug="true"
+></script>
+    </div>
+    <button class="copy-btn" onclick="copyToClipboard('script-code')">Copy Code</button>
+    
+    <div class="note">
+      <strong>Note:</strong> The script tag should be placed before the closing <code>&lt;/body&gt;</code> tag in your HTML.
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2>Method 2: Custom Element Approach</h2>
+    <p>Use this method for more control over the placement and initialization of the widget:</p>
+    
+    <div class="code-block" id="custom-element-code">
+<!-- First include the script -->
+<script src="https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev/standalone-chat-bubble.js"></script>
+
+<!-- Then use the custom element anywhere you want -->
+<sitehq-chat
+  api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
+  agent-id="KRGVz0f5HAU0E7u6BbA5"
+  position="bottom-left"
+  title="SiteHQ Assistant"
+  theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+  solar-system-theme="true"
+  debug="true"
+></sitehq-chat>
+    </div>
+    <button class="copy-btn" onclick="copyToClipboard('custom-element-code')">Copy Code</button>
+  </div>
+  
+  <div class="section">
+    <h2>Method 3: iFrame Embedding</h2>
+    <p>Use the iframe approach for complete isolation:</p>
+    
+    <div class="code-block" id="iframe-code">
+<iframe 
+  src="https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
+  style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
+  allow="microphone"
+></iframe>
+    </div>
+    <button class="copy-btn" onclick="copyToClipboard('iframe-code')">Copy Code</button>
+  </div>
+  
+  <div class="section">
+    <h2>CORS Considerations for External Websites</h2>
+    <p>You don't need to configure anything on your external website for CORS when using our chat widget. The SiteHQ server already has the necessary CORS headers configured to allow scripts to be loaded from external domains.</p>
+    
+    <div class="note">
+      <strong>How CORS Works:</strong> Cross-Origin Resource Sharing is a security feature that restricts web pages from making requests to a different domain than the one that served the original page. Our server is configured to allow external domains to load our resources.
+    </div>
+    
+    <h3>Common CORS-Related Issues and Solutions:</h3>
+    <ol>
+      <li><strong>Content Security Policy (CSP):</strong> If your site has a strict CSP, you may need to whitelist our domain. Add the following to your CSP headers:
+        <div class="code-block">
+script-src 'self' https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev;
+frame-src 'self' https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev;
+connect-src 'self' https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev;
+        </div>
+      </li>
+      <li><strong>Mixed Content:</strong> If your site is served over HTTPS, make sure you're using our HTTPS URLs (which are provided in the code snippets above).</li>
+      <li><strong>Browser Extensions:</strong> Some privacy or security browser extensions might block cross-origin requests. If the widget doesn't appear, try disabling these extensions temporarily for testing.</li>
+    </ol>
+  </div>
+  
+  <div class="section">
+    <h2>Troubleshooting</h2>
+    <table>
+      <tr>
+        <th>Issue</th>
+        <th>Solution</th>
+      </tr>
+      <tr>
+        <td>Widget doesn't appear on external site</td>
+        <td>
+          <ul>
+            <li>Check browser console for errors</li>
+            <li>Ensure you're using the full URL path to the script</li>
+            <li>Verify the API key and agent ID are correct</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>Terms & Conditions dialog formatting issues</td>
+        <td>
+          <ul>
+            <li>Make sure you're using the latest version of the script</li>
+            <li>Check if your website's CSS is conflicting with the widget's styles</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>Console errors about blocked requests</td>
+        <td>Check your website's Content Security Policy and adjust as noted in the CORS section</td>
+      </tr>
+    </table>
+  </div>
+  
+  <script>
+    function copyToClipboard(elementId) {
+      const codeBlock = document.getElementById(elementId);
+      const textToCopy = codeBlock.textContent;
+      
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+          const button = document.querySelector(`button[onclick="copyToClipboard('${elementId}')"]`);
+          const originalText = button.textContent;
+          button.textContent = 'Copied!';
+          setTimeout(() => {
+            button.textContent = originalText;
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy text: ', err);
+        });
+    }
+  </script>
+</body>
+</html>
