@@ -407,6 +407,21 @@ export function registerRoutes(app: Express): Server {
     const fullRedirectUrl = queryParams ? `${redirectUrl}?${queryParams}` : redirectUrl;
     res.redirect(307, fullRedirectUrl);
   });
+  
+  // Serve the standalone widget demo page
+  app.get('/widget-demo', (req, res) => {
+    res.sendFile(path.resolve('./client/public/standalone-widget-demo.html'));
+  });
+  
+  // Serve the standalone chat bubble script with proper CORS headers
+  app.get('/standalone-chat-bubble.js', (req, res) => {
+    res.set({
+      'Content-Type': 'application/javascript',
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'max-age=3600'
+    });
+    res.sendFile(path.resolve('./client/public/standalone-chat-bubble.js'));
+  });
 
   // WebSocket setup for chat
   const httpServer = createServer(app);

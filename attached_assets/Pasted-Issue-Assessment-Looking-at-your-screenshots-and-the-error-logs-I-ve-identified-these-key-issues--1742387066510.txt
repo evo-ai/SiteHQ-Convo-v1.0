@@ -1,0 +1,55 @@
+Issue Assessment
+Looking at your screenshots and the error logs, I've identified these key issues:
+
+Wrong UI Loaded: Instead of showing the chat bubble (solar system style UI), the widget is showing the Terms & Conditions dialog with the landing page in the background.
+
+WebSocket Connection Error: There's an error in the console: Invalid URL: undefined when trying to establish the WebSocket connection.
+
+Iframe Integration Problem: The iframe implementation is loading the entire widget-embed page instead of just the ChatBubble component.
+
+Conflicting Components: There appears to be a conflict between the standalone widget implementation and the embedded version.
+
+Root Causes
+After thoroughly analyzing the codebase, I've identified these root causes:
+
+Widget-Embed Page Issue: The widget-embed page is rendering the ChatBubble with initiallyOpen={true}, which immediately triggers the Terms dialog, but it's still loading within the context of our app.
+
+CSS Context Issues: The CSS styling is not properly isolated in the iframe, causing visual conflicts.
+
+Component Architecture: The ChatBubble component is designed to work within our React app, not as a standalone component that can be loaded externally.
+
+Missing Self-Contained Widget: We're missing a truly self-contained version of the ChatBubble that works independently of our React app.
+
+Action Plan
+Here's a systematic approach to fix these issues:
+
+1. Create a Truly Standalone Widget Implementation
+We need a self-contained JavaScript file that creates the chat bubble UI without any React dependencies.
+
+// Action: Create dedicated standalone-chat-bubble.js that:
+// - Injects all necessary CSS
+// - Creates DOM elements programmatically
+// - Handles all interactions without React
+// - Establishes WebSocket connections directly
+2. Refactor the Widget-Embed Page
+// Action: Modify widget-embed.tsx to:
+// - Remove all dependencies on the main app
+// - Create a minimal page that only loads the ChatBubble
+// - Set proper transparent background
+// - Prevent loading of any unnecessary components
+3. Adjust the Server Routes
+// Action: Update routes.ts to:
+// - Create a dedicated endpoint for the standalone widget
+// - Serve static standalone-chat-bubble.js file
+// - Configure proper CORS for cross-domain embedding
+4. Create Proper Isolation for the Embedded Widget
+// Action: Implement shadow DOM or iframe isolation to:
+// - Prevent CSS conflicts with host page
+// - Isolate JavaScript execution
+// - Create proper scoping for event listeners
+5. Test Each Embedding Method Independently
+Test each of these integration methods:
+
+Script tag integration
+Custom element embedding
+Iframe embedding

@@ -83,6 +83,7 @@ export default function Demo() {
           agentId="demo-agent"
           title="SiteHQ Assistant"
           theme={{
+            primary: '#5c078c', /* Primary brand color */
             background: '#ffffff', /* White container */
             text: '#333333' /* Dark text */
           }}

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiteHQ Chat Widget - Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      background-color: #5c078c;
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+    
+    h2 {
+      font-size: 1.75rem;
+      margin-top: 3rem;
+      margin-bottom: 1.5rem;
+      color: #5c078c;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    
+    h3 {
+      font-size: 1.3rem;
+      margin-top: 2rem;
+      color: #333;
+    }
+    
+    p {
+      margin-bottom: 1.5rem;
+    }
+    
+    pre {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    
+    code {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.9rem;
+    }
+    
+    .demo-section {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .demo-tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 2rem;
+    }
+    
+    .demo-tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      font-weight: 500;
+    }
+    
+    .demo-tab.active {
+      border-bottom-color: #5c078c;
+      color: #5c078c;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .example-container {
+      margin-top: 1.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .example-header {
+      background-color: #f3f3f3;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .example-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .example-content {
+      padding: 1.5rem;
+      background-color: white;
+    }
+    
+    .copy-button {
+      background-color: #5c078c;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .copy-button:hover {
+      background-color: #4a0670;
+    }
+    
+    .demo-button {
+      background-color: #5c078c;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
+    
+    .demo-button:hover {
+      background-color: #4a0670;
+    }
+    
+    footer {
+      margin-top: 4rem;
+      text-align: center;
+      padding: 2rem 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .logo {
+      height: 40px;
+      margin-right: 1rem;
+    }
+    
+    .demo-iframe {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    /* Example page styling */
+    .example-page {
+      padding: 2rem;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .example-page h1 {
+      color: #333;
+      font-size: 2rem;
+    }
+    
+    .example-page p {
+      line-height: 1.6;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>SiteHQ Chat Widget Demo</h1>
+      <p>Three ways to embed the chat widget on any website</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="demo-section">
+      <div class="demo-tabs">
+        <div class="demo-tab active" data-tab="script">Script Tag</div>
+        <div class="demo-tab" data-tab="custom-element">Custom Element</div>
+        <div class="demo-tab" data-tab="iframe">IFrame</div>
+      </div>
+      
+      <div class="tab-content active" id="script-content">
+        <h3>Script Tag Integration</h3>
+        <p>The easiest way to add the SiteHQ Chat Widget to your website. Just add the script tag to your HTML.</p>
+        
+        <div class="example-container">
+          <div class="example-header">
+            <div class="example-title">HTML</div>
+            <button class="copy-button" data-code="script">Copy Code</button>
+          </div>
+          <div class="example-content">
+            <pre><code>&lt;!-- SiteHQ Chat Widget --&gt;
+&lt;script 
+  src="https://your-site.com/standalone-chat-bubble.js" 
+  data-sitehq-chat="auto"
+  data-api-key="YOUR_API_KEY"
+  data-agent-id="YOUR_AGENT_ID"
+  data-position="bottom-right"
+  data-dark-mode="false"
+  data-initially-open="false"
+  data-title="SiteHQ Assistant"
+  data-theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+&gt;&lt;/script&gt;</code></pre>
+          </div>
+        </div>
+        
+        <button id="demo-script-btn" class="demo-button">Try it now</button>
+      </div>
+      
+      <div class="tab-content" id="custom-element-content">
+        <h3>Custom Element</h3>
+        <p>Use the custom element approach for more control over placement and initialization.</p>
+        
+        <div class="example-container">
+          <div class="example-header">
+            <div class="example-title">HTML</div>
+            <button class="copy-button" data-code="custom-element">Copy Code</button>
+          </div>
+          <div class="example-content">
+            <pre><code>&lt;!-- Add the script in the head or before the closing body tag --&gt;
+&lt;script src="https://your-site.com/standalone-chat-bubble.js"&gt;&lt;/script&gt;
+
+&lt;!-- Place the custom element anywhere in your HTML --&gt;
+&lt;sitehq-chat
+  api-key="YOUR_API_KEY"
+  agent-id="YOUR_AGENT_ID"
+  position="bottom-right"
+  dark-mode="false"
+  initially-open="false"
+  title="SiteHQ Assistant"
+  theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+&gt;&lt;/sitehq-chat&gt;</code></pre>
+          </div>
+        </div>
+        
+        <button id="demo-custom-element-btn" class="demo-button">Try it now</button>
+      </div>
+      
+      <div class="tab-content" id="iframe-content">
+        <h3>IFrame Embedding</h3>
+        <p>Use an iframe for the highest level of isolation between the widget and your website.</p>
+        
+        <div class="example-container">
+          <div class="example-header">
+            <div class="example-title">HTML</div>
+            <button class="copy-button" data-code="iframe">Copy Code</button>
+          </div>
+          <div class="example-content">
+            <pre><code>&lt;iframe 
+  src="https://your-site.com/widget-embed?apiKey=YOUR_API_KEY&agentId=YOUR_AGENT_ID&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D" 
+  style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
+  allow="microphone"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+        </div>
+        
+        <h3>Live Demo (iframe)</h3>
+        <iframe 
+          id="widget-demo-iframe"
+          class="demo-iframe"
+          src="about:blank" 
+          allow="microphone">
+        </iframe>
+      </div>
+    </div>
+    
+    <div class="demo-section">
+      <h2>Configuration Options</h2>
+      
+      <h3>Required Parameters</h3>
+      <ul>
+        <li><code>api-key</code> - Your SiteHQ API key</li>
+        <li><code>agent-id</code> - The ID of the AI agent to use</li>
+      </ul>
+      
+      <h3>Optional Parameters</h3>
+      <ul>
+        <li><code>position</code> - Where to place the chat bubble (bottom-right, bottom-left, top-right, top-left)</li>
+        <li><code>dark-mode</code> - Whether to use dark mode by default (true/false)</li>
+        <li><code>initially-open</code> - Whether the chat window should be open when loaded (true/false)</li>
+        <li><code>title</code> - The title shown in the chat header</li>
+        <li><code>theme</code> - A JSON object with theme colors (primary, background, text)</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 SiteHQ. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Tab switching logic
+    document.querySelectorAll('.demo-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Remove active class from all tabs
+        document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        this.classList.add('active');
+        
+        // Show corresponding content
+        const tabId = this.getAttribute('data-tab');
+        document.getElementById(`${tabId}-content`).classList.add('active');
+      });
+    });
+    
+    // Copy code functionality
+    document.querySelectorAll('.copy-button').forEach(button => {
+      button.addEventListener('click', function() {
+        const codeType = this.getAttribute('data-code');
+        let codeText = '';
+        
+        switch(codeType) {
+          case 'script':
+            codeText = document.querySelector('#script-content pre code').textContent;
+            break;
+          case 'custom-element':
+            codeText = document.querySelector('#custom-element-content pre code').textContent;
+            break;
+          case 'iframe':
+            codeText = document.querySelector('#iframe-content pre code').textContent;
+            break;
+        }
+        
+        navigator.clipboard.writeText(codeText).then(() => {
+          const originalText = this.textContent;
+          this.textContent = 'Copied!';
+          setTimeout(() => {
+            this.textContent = originalText;
+          }, 2000);
+        });
+      });
+    });
+    
+    // Demo buttons functionality
+    document.getElementById('demo-script-btn').addEventListener('click', function() {
+      // Load the script dynamically
+      const script = document.createElement('script');
+      script.src = '/standalone-chat-bubble.js';
+      script.setAttribute('data-sitehq-chat', 'auto');
+      script.setAttribute('data-api-key', 'demo-key');
+      script.setAttribute('data-agent-id', 'demo-agent');
+      script.setAttribute('data-position', 'bottom-right');
+      script.setAttribute('data-dark-mode', 'false');
+      script.setAttribute('data-title', 'SiteHQ Demo');
+      script.setAttribute('data-theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
+      
+      document.body.appendChild(script);
+      
+      this.disabled = true;
+      this.textContent = 'Widget Loaded!';
+    });
+    
+    document.getElementById('demo-custom-element-btn').addEventListener('click', function() {
+      // First make sure the script is loaded
+      if (!window.customElements || !window.customElements.get('sitehq-chat')) {
+        const script = document.createElement('script');
+        script.src = '/standalone-chat-bubble.js';
+        script.onload = createCustomElement;
+        document.body.appendChild(script);
+      } else {
+        createCustomElement();
+      }
+      
+      function createCustomElement() {
+        // Create and add the custom element
+        const chatElement = document.createElement('sitehq-chat');
+        chatElement.setAttribute('api-key', 'demo-key');
+        chatElement.setAttribute('agent-id', 'demo-agent');
+        chatElement.setAttribute('position', 'bottom-right');
+        chatElement.setAttribute('title', 'SiteHQ Demo');
+        chatElement.setAttribute('theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
+        
+        document.body.appendChild(chatElement);
+      }
+      
+      this.disabled = true;
+      this.textContent = 'Widget Loaded!';
+    });
+    
+    // Load iframe demo
+    document.getElementById('widget-demo-iframe').addEventListener('load', function() {
+      if (this.getAttribute('src') === 'about:blank') {
+        // Create a sample page with content to demonstrate the iframe embed
+        const iframeDoc = this.contentDocument;
+        iframeDoc.open();
+        iframeDoc.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Sample Page with SiteHQ Chat</title>
+            <style>
+              body {
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                padding: 20px;
+                margin: 0;
+              }
+              h1 { color: #333; }
+              p { line-height: 1.6; color: #555; }
+            </style>
+          </head>
+          <body>
+            <h1>Sample Website</h1>
+            <p>This is a sample website with the SiteHQ Chat Widget embedded via iframe.</p>
+            <p>The widget appears in the bottom right corner of this page.</p>
+            
+            <!-- SiteHQ Chat Widget Iframe -->
+            <iframe 
+              src="/widget-embed?apiKey=demo-key&agentId=demo-agent&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D" 
+              style="width: 70px; height: 70px; position: fixed; bottom: 20px; right: 20px; border: none; overflow: hidden; z-index: 9999;" 
+              allow="microphone">
+            </iframe>
+          </body>
+          </html>
+        `);
+        iframeDoc.close();
+      }
+    });
+    
+    // Load the iframe immediately
+    document.getElementById('widget-demo-iframe').src = 'about:blank';
+  </script>
+</body>
+</html>
