@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiteHQ Chat Widget - Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      background-color: #5c078c;
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+    
+    h2 {
+      font-size: 1.75rem;
+      margin-top: 3rem;
+      margin-bottom: 1.5rem;
+      color: #5c078c;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    
+    h3 {
+      font-size: 1.3rem;
+      margin-top: 2rem;
+      color: #333;
+    }
+    
+    p {
+      margin-bottom: 1.5rem;
+    }
+    
+    pre {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    
+    code {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.9rem;
+    }
+    
+    .demo-section {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .demo-tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 2rem;
+    }
+    
+    .demo-tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      font-weight: 500;
+    }
+    
+    .demo-tab.active {
+      border-bottom-color: #5c078c;
+      color: #5c078c;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .example-container {
+      margin-top: 1.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .example-header {
+      background-color: #f3f3f3;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .example-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .example-content {
+      padding: 1.5rem;
+      background-color: white;
+    }
+    
+    .copy-button {
+      background-color: #5c078c;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .copy-button:hover {
+      background-color: #4a0670;
+    }
+    
+    .demo-button {
+      background-color: #5c078c;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
+    
+    .demo-button:hover {
+      background-color: #4a0670;
+    }
+    
+    footer {
+      margin-top: 4rem;
+      text-align: center;
+      padding: 2rem 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .logo {
+      height: 40px;
+      margin-right: 1rem;
+    }
+    
+    .demo-iframe {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    /* Example page styling */
+    .example-page {
+      padding: 2rem;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .example-page h1 {
+      color: #333;
+      font-size: 2rem;
+    }
+    
+    .example-page p {
+      line-height: 1.6;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>SiteHQ Chat Widget Demo</h1>
+      <p>Three ways to embed the solar system themed chat widget on any website</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="demo-section">
+      <div class="demo-tabs">
+        <div class="demo-tab active" data-tab="script">Script Tag</div>
+        <div class="demo-tab" data-tab="custom-element">Custom Element</div>
+        <div class="demo-tab" data-tab="iframe">IFrame</div>
+      </div>
+      
+      <div class="tab-content active" id="script-content">
+        <h3>Script Tag Integration</h3>
+        <p>The easiest way to add the SiteHQ Chat Widget to your website. Just add the script tag to your HTML.</p>
+        
+        <div class="example-container">
+          <div class="example-header">
+            <div class="example-title">HTML</div>
+            <button class="copy-button" data-code="script">Copy Code</button>
+          </div>
+          <div class="example-content">
+            <pre><code>&lt;!-- SiteHQ Chat Widget --&gt;
+&lt;script 
+  src="https://your-site.com/standalone-chat-bubble.js" 
+  data-sitehq-chat="auto"
+  data-api-key="YOUR_API_KEY"
+  data-agent-id="YOUR_AGENT_ID"
+  data-position="bottom-right"
+  data-dark-mode="false"
+  data-initially-open="false"
+  data-title="SiteHQ Assistant"
+  data-theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+  data-solar-system-theme="true"
+&gt;&lt;/script&gt;</code></pre>
+          </div>
+        </div>
+        
+        <button id="demo-script-btn" class="demo-button">Try it now</button>
+      </div>
+      
+      <div class="tab-content" id="custom-element-content">
+        <h3>Custom Element</h3>
+        <p>Use the custom element approach for more control over placement and initialization.</p>
+        
+        <div class="example-container">
+          <div class="example-header">
+            <div class="example-title">HTML</div>
+            <button class="copy-button" data-code="custom-element">Copy Code</button>
+          </div>
+          <div class="example-content">
+            <pre><code>&lt;!-- Add the script in the head or before the closing body tag --&gt;
+&lt;script src="https://your-site.com/standalone-chat-bubble.js"&gt;&lt;/script&gt;
+
+&lt;!-- Place the custom element anywhere in your HTML --&gt;
+&lt;sitehq-chat
+  api-key="YOUR_API_KEY"
+  agent-id="YOUR_AGENT_ID"
+  position="bottom-right"
+  dark-mode="false"
+  initially-open="false"
+  title="SiteHQ Assistant"
+  theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+  solar-system-theme="true"
+&gt;&lt;/sitehq-chat&gt;</code></pre>
+          </div>
+        </div>
+        
+        <button id="demo-custom-element-btn" class="demo-button">Try it now</button>
+      </div>
+      
+      <div class="tab-content" id="iframe-content">
+        <h3>IFrame Embedding</h3>
+        <p>Use an iframe for the highest level of isolation between the widget and your website.</p>
+        
+        <div class="example-container">
+          <div class="example-header">
+            <div class="example-title">HTML</div>
+            <button class="copy-button" data-code="iframe">Copy Code</button>
+          </div>
+          <div class="example-content">
+            <pre><code>&lt;iframe 
+  src="https://your-site.com/widget-embed?apiKey=YOUR_API_KEY&agentId=YOUR_AGENT_ID&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
+  style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
+  allow="microphone"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+        </div>
+        
+        <h3>Live Demo (iframe)</h3>
+        <iframe 
+          id="widget-demo-iframe"
+          class="demo-iframe"
+          src="about:blank" 
+          allow="microphone">
+        </iframe>
+      </div>
+    </div>
+    
+    <div class="demo-section">
+      <h2>Configuration Options</h2>
+      
+      <h3>Required Parameters</h3>
+      <ul>
+        <li><code>api-key</code> - Your SiteHQ API key</li>
+        <li><code>agent-id</code> - The ID of the AI agent to use</li>
+      </ul>
+      
+      <h3>Optional Parameters</h3>
+      <ul>
+        <li><code>position</code> - Where to place the chat bubble (bottom-right, bottom-left, top-right, top-left)</li>
+        <li><code>dark-mode</code> - Whether to use dark mode by default (true/false)</li>
+        <li><code>initially-open</code> - Whether the chat window should be open when loaded (true/false)</li>
+        <li><code>title</code> - The title shown in the chat header</li>
+        <li><code>theme</code> - A JSON object with theme colors (primary, background, text)</li>
+        <li><code>solar-system-theme</code> - Enable the solar system theme (true/false)</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 SiteHQ. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Tab switching logic
+    document.querySelectorAll('.demo-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Remove active class from all tabs
+        document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        this.classList.add('active');
+        
+        // Show corresponding content
+        const tabId = this.getAttribute('data-tab');
+        document.getElementById(`${tabId}-content`).classList.add('active');
+      });
+    });
+    
+    // Copy code functionality
+    document.querySelectorAll('.copy-button').forEach(button => {
+      button.addEventListener('click', function() {
+        const codeType = this.getAttribute('data-code');
+        let codeText = '';
+        
+        switch(codeType) {
+          case 'script':
+            codeText = document.querySelector('#script-content pre code').textContent;
+            break;
+          case 'custom-element':
+            codeText = document.querySelector('#custom-element-content pre code').textContent;
+            break;
+          case 'iframe':
+            codeText = document.querySelector('#iframe-content pre code').textContent;
+            break;
+        }
+        
+        navigator.clipboard.writeText(codeText).then(() => {
+          const originalText = this.textContent;
+          this.textContent = 'Copied!';
+          setTimeout(() => {
+            this.textContent = originalText;
+          }, 2000);
+        });
+      });
+    });
+    
+    // Script Tag Demo Button
+    document.getElementById('demo-script-btn').addEventListener('click', function() {
+      console.log("Loading script tag widget...");
+      
+      // First, check if widget already exists and remove it if it does
+      const existingWidget = document.querySelector('.sitehq-chat-widget');
+      if (existingWidget) {
+        console.log("Removing existing widget");
+        existingWidget.remove();
+      }
+      
+      // Also remove any existing script to ensure clean initialization
+      const existingScript = document.querySelector('script[data-sitehq-chat]');
+      if (existingScript) {
+        console.log("Removing existing script");
+        existingScript.remove();
+      }
+      
+      // Load the script dynamically with debug logging
+      const script = document.createElement('script');
+      script.src = '/fixed-standalone-chat-bubble.js';
+      script.setAttribute('data-sitehq-chat', 'auto');
+      script.setAttribute('data-api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+      script.setAttribute('data-agent-id', 'KRGVz0f5HAU0E7u6BbA5');
+      script.setAttribute('data-position', 'bottom-right');
+      script.setAttribute('data-dark-mode', 'false');
+      script.setAttribute('data-title', 'SiteHQ Demo');
+      script.setAttribute('data-theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
+      script.setAttribute('data-solar-system-theme', 'true');
+      script.setAttribute('data-debug', 'true');
+      
+      // Add event listeners to debug loading
+      script.onload = function() {
+        console.log("SiteHQ Chat script loaded successfully");
+        // Force initialization after script loads
+        if (typeof window.SiteHQChatInit === 'function') {
+          console.log("Manually triggering initialization");
+          window.SiteHQChatInit();
+        } else {
+          console.error("SiteHQChatInit function not found in window");
+        }
+      };
+      
+      script.onerror = function() {
+        console.error("Error loading SiteHQ Chat script");
+      };
+      
+      document.body.appendChild(script);
+      console.log("Script element added to page", script);
+      this.disabled = true;
+      this.textContent = 'Widget Loaded!';
+    });
+    
+    // Custom Element Demo Button
+    document.getElementById('demo-custom-element-btn').addEventListener('click', function() {
+      console.log("Loading custom element widget...");
+      
+      // First, check if widget already exists and remove it
+      const existingElement = document.querySelector('sitehq-chat');
+      if (existingElement) {
+        console.log("Removing existing custom element");
+        existingElement.remove();
+      }
+      
+      // First make sure the script is loaded
+      if (!window.customElements || !window.customElements.get('sitehq-chat')) {
+        const script = document.createElement('script');
+        script.src = '/fixed-standalone-chat-bubble.js';
+        script.onload = function() {
+          console.log("SiteHQ Chat script loaded for custom element");
+          setTimeout(() => {
+            if (window.customElements && window.customElements.get('sitehq-chat')) {
+              createCustomElement();
+            } else {
+              console.error("Custom element 'sitehq-chat' not registered after script loaded");
+            }
+          }, 100); // Give a slight delay for registration to complete
+        };
+        script.onerror = function() {
+          console.error("Error loading SiteHQ Chat script for custom element");
+        };
+        document.body.appendChild(script);
+      } else {
+        console.log("SiteHQ Chat custom element already registered");
+        createCustomElement();
+      }
+      
+      function createCustomElement() {
+        // Create and add the custom element
+        const chatElement = document.createElement('sitehq-chat');
+        chatElement.setAttribute('api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
+        chatElement.setAttribute('agent-id', 'KRGVz0f5HAU0E7u6BbA5');
+        chatElement.setAttribute('position', 'bottom-left'); // Use different position
+        chatElement.setAttribute('title', 'SiteHQ Custom Element');
+        chatElement.setAttribute('theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
+        chatElement.setAttribute('solar-system-theme', 'true');
+        chatElement.setAttribute('debug', 'true');
+        
+        document.body.appendChild(chatElement);
+        console.log("SiteHQ Chat custom element added to page", chatElement);
+      }
+      
+      this.disabled = true;
+      this.textContent = 'Widget Loaded!';
+    });
+    
+    // Iframe Demo
+    document.getElementById('widget-demo-iframe').addEventListener('load', function() {
+      if (this.getAttribute('src') === 'about:blank') {
+        console.log("Loading iframe demo content...");
+        try {
+          // Create a sample page with content to demonstrate the iframe embed
+          const iframeDoc = this.contentDocument;
+          if (!iframeDoc) {
+            console.error("Could not access iframe document");
+            return;
+          }
+          
+          iframeDoc.open();
+          const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Page with SiteHQ Chat</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 { color: #333; }
+    p { line-height: 1.6; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Sample Website</h1>
+  <p>This is a sample website with the SiteHQ Chat Widget embedded via iframe.</p>
+  <p>The widget appears in the bottom right corner of this page.</p>
+  
+  <!-- SiteHQ Chat Widget Iframe -->
+  <iframe 
+    src="/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
+    style="width: 70px; height: 70px; position: fixed; bottom: 20px; right: 20px; border: none; overflow: hidden; z-index: 9999;" 
+    allow="microphone">
+  </iframe>
+  <script>
+    console.log("Iframe demo page loaded with widget");
+  </script>
+</body>
+</html>`;
+          
+          iframeDoc.write(htmlContent);
+          iframeDoc.close();
+          console.log("Iframe content loaded successfully");
+        } catch (error) {
+          console.error("Error loading iframe content:", error);
+        }
+      }
+    });
+    
+    // Initialize page
+    window.addEventListener('DOMContentLoaded', function() {
+      console.log("Standalone widget demo page initialized");
+      
+      // Load the iframe immediately
+      const iframeEl = document.getElementById('widget-demo-iframe');
+      if (iframeEl) {
+        // Set iframe src to trigger the load event
+        iframeEl.src = 'about:blank';
+        console.log("Iframe source set to about:blank to trigger the load event");
+      } else {
+        console.error("Could not find iframe element");
+      }
+    });
+  </script>
+</body>
+</html>
