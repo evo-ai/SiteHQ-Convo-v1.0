@@ -1133,6 +1133,7 @@
     const cancelButton = termsDialog.querySelector('.sitehq-cancel-button');
     if (cancelButton) {
       cancelButton.addEventListener('click', () => {
+        termsDialog.style.display = 'none';
         toggleChatWindow(false);
       });
     }
@@ -1140,10 +1141,19 @@
     const agreeButton = termsDialog.querySelector('.sitehq-primary-button');
     if (agreeButton) {
       agreeButton.addEventListener('click', () => {
+        termsDialog.style.display = 'none';
         acceptTerms();
         initializeChat(config);
       });
     }
+
+    // Close dialog when clicking outside
+    termsDialog.addEventListener('click', (event) => {
+      if (event.target === termsDialog) {
+        termsDialog.style.display = 'none';
+        toggleChatWindow(false);
+      }
+    });
   }
 
   // Toggle chat window visibility
