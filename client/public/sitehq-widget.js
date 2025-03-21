@@ -16,14 +16,16 @@ class SiteHQChat extends HTMLElement {
       isSpeaking: false,
       acceptedTerms: false,
       isTyping: false,
-      isRecording: false, // New state for recording
+      isRecording: false,
     };
     this.refs = {};
     this.micStream = null;
     this.audioContext = null;
     this.analyser = null;
     this.ws = null;
-    this.silenceTimeout = null; // To detect when user stops speaking
+    this.silenceTimeout = null;
+    this.speechRecognition = null; // For Web Speech API
+    this.speechSynthesis = window.speechSynthesis; // For text-to-speech
   }
 
   connectedCallback() {
@@ -79,7 +81,6 @@ class SiteHQChat extends HTMLElement {
     this.shadowRoot.host.style.setProperty('--primary-color', this.config.theme.primary);
   }
 
-  // Function to create SVG elements
   createSVG(path) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('width', '24');
@@ -98,14 +99,13 @@ class SiteHQChat extends HTMLElement {
     return svg;
   }
 
-  // SVG path data
   SVGS = {
     chatBubble: 'M21 11.5C21 16.1944 16.9706 20 12 20C10.9 20 9.83943 19.8325 8.85145 19.5247C8.17238 19.3139 7.8323 19.2083 7.68265 19.2292C7.53301 19.25 7.31884 19.3693 6.88694 19.6084L4.8 20.8L4.3636 20.9964C4.01558 21.1495 3.84157 21.2261 3.67736 21.2433C3.38636 21.2725 3.09829 21.1872 2.87926 21.0113C2.79366 20.9488 2.72192 20.8663 2.5764 20.7055C2.19781 20.2685 2.18538 19.6598 2.54001 19.2082L3 18.6462L4.09513 17.2981C4.25177 17.1069 4.33008 17.0113 4.38058 16.9031C4.43108 16.795 4.4473 16.6716 4.47097 16.4224C4.49464 16.1732 4.45304 15.9049 4.37088 15.3755C4.12225 13.7754 4 13 4 11.5C4 6.80558 8.02944 3 13 3C17.9706 3 21 6.80558 21 11.5Z',
     close: 'M18 6L6 18 M6 6L18 18',
     send: 'M22 2L11 13 M22 2L15 22L11 13M22 2L2 9L11 13',
     sun: 'M12 16A4 4 0 0 0 16 12A4 4 0 0 0 12 8A4 4 0 0 0 8 12A4 4 0 0 0 12 16Z M12 2V4 M12 20V22 M4.93 4.93L6.34 6.34 M17.66 17.66L19.07 19.07 M2 12H4 M20 12H22 M6.34 17.66L4.93 19.07 M19.07 4.93L17.66 6.34',
     moon: 'M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z',
-    mic: 'M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z M5 10v2a7 7 0 0 0 14 0v-2 M12 19v4'
+    hangup: 'M10 14L12 12M12 12L14 10M12 12L10 10M12 12L14 14M6 18H18C20.2091 18 22 16.2091 22 14V10C22 7.79086 20.2091 6 18 6H6C3.79086 6 2 7.79086 2 10V14C2 16.2091 3.79086 18 6 18Z'
   };
 
   render() {
@@ -154,21 +154,19 @@ class SiteHQChat extends HTMLElement {
           width: 56px;
           height: 56px;
           border-radius: 50%;
-          background: radial-gradient(circle at 30% 30%, #F95638, #F95638); /* #FFA500 Solid orange color, resembling the sun */
+          background: radial-gradient(circle at 30% 30%, #F95638, #F95638);
           color: white;
           border: none;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 10px rgba(92, 7, 140, 0.3); /* 0 0 0 16px rgba(255, 165, 0, 0.15), /* Subtle outer glow */
-                    /* 0 4px 10px rgba(0, 0, 0, 0.2); /* Outer shadow for depth */
+          box-shadow: 0 4px 10px rgba(92, 7, 140, 0.3);
           position: relative;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
           animation: sitehq-float 3s ease-in-out infinite;
         }
 
-        /* Solar System Theme Styles */
         .sitehq-sun-particle {
           animation: sitehq-orbit 8s linear infinite !important;
           box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
@@ -207,7 +205,7 @@ class SiteHQChat extends HTMLElement {
 
         .sitehq-toggle-button:hover {
           transform: scale(1.05);
-          box-shadow: 0 0 0 8px rgba(255, 165, 0, 0.4), /* Increased hover glow area */
+          box-shadow: 0 0 0 8px rgba(255, 165, 0, 0.4),
                       0 6px 25px rgba(0, 0, 0, 0.3);
         }
 
@@ -228,14 +226,14 @@ class SiteHQChat extends HTMLElement {
 
         @keyframes sitehq-pulse {
           0% {
-            transform: scale(1); /* Start at the edge of the circle */
+            transform: scale(1);
             opacity: 0.3;
-            box-shadow: 0 0 8px rgba(255, 165, 0, 0.5); /* Subtle glow outside the circle */
+            box-shadow: 0 0 8px rgba(255, 165, 0, 0.5);
           }
           100% {
-            transform: scale(1.5); /* Expand outward */
+            transform: scale(1.5);
             opacity: 0;
-            box-shadow: 0 0 20px rgba(255, 165, 0, 0); /* Glow fades as it expands */
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0);
           }
         }
 
@@ -486,26 +484,8 @@ class SiteHQChat extends HTMLElement {
           background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .sitehq-cancel-voice {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background-color: #F44336;
-          color: white;
-          border: none;
-          cursor: pointer;
-          display: none;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .sitehq-status-listening ~ .sitehq-cancel-voice,
-        .sitehq-status-speaking ~ .sitehq-cancel-voice {
-          display: flex;
-        }
-
         .sitehq-messages {
-          display: none; /* Hide text messages for voice-focused UI */
+          display: none;
         }
 
         .sitehq-typing-indicator {
@@ -563,18 +543,18 @@ class SiteHQChat extends HTMLElement {
         }
 
         .sitehq-message-input {
-          display: none; /* Hide text input for voice-focused UI */
+          display: none;
         }
 
         .sitehq-send-button {
-          display: none; /* Hide send button for voice-focused UI */
+          display: none;
         }
 
-        .sitehq-mic-button {
+        .sitehq-disconnect-button {
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          background-color: var(--primary-color, #5c078c);
+          background-color: #F44336;
           color: white;
           border: none;
           cursor: pointer;
@@ -584,17 +564,8 @@ class SiteHQChat extends HTMLElement {
           transition: background-color 0.2s;
         }
 
-        .sitehq-dark-mode .sitehq-mic-button {
-          background-color: #bb86fc;
-          color: #000;
-        }
-
-        .sitehq-mic-button:hover {
-          background-color: #4a0670;
-        }
-
-        .sitehq-dark-mode .sitehq-mic-button:hover {
-          background-color: #a370db;
+        .sitehq-disconnect-button:hover {
+          background-color: #d32f2f;
         }
 
         .sitehq-terms-dialog {
@@ -725,8 +696,6 @@ class SiteHQChat extends HTMLElement {
             </div>
             <div class="sitehq-header-actions">
               <button class="sitehq-icon-button" aria-label="Toggle dark mode"></button>
-              <button class="sitehq-icon-button" aria-label="Close chat"></button>
-              <button class="sitehq-cancel-voice" aria-label="Cancel voice"></button>
             </div>
           </div>
           <div class="sitehq-messages"></div>
@@ -736,9 +705,7 @@ class SiteHQChat extends HTMLElement {
             <div class="sitehq-typing-dot"></div>
           </div>
           <div class="sitehq-input-area">
-            <button class="sitehq-mic-button" aria-label="Start voice input"></button>
-            <textarea class="sitehq-message-input" placeholder="Type a message..." rows="1"></textarea>
-            <button class="sitehq-send-button" aria-label="Send message"></button>
+            <button class="sitehq-disconnect-button" aria-label="Disconnect call"></button>
           </div>
         </div>
         <button class="sitehq-toggle-button" aria-label="Toggle chat"></button>
@@ -755,7 +722,6 @@ class SiteHQChat extends HTMLElement {
       </div>
     `;
 
-    // Store references to key elements
     this.refs.container = this.shadowRoot.querySelector('.sitehq-container');
     this.refs.chatWindow = this.shadowRoot.querySelector('.sitehq-chat-window');
     this.refs.chatButton = this.shadowRoot.querySelector('.sitehq-toggle-button');
@@ -763,19 +729,13 @@ class SiteHQChat extends HTMLElement {
     this.refs.typingIndicator = this.shadowRoot.querySelector('.sitehq-typing-indicator');
     this.refs.messageInput = this.shadowRoot.querySelector('.sitehq-message-input');
     this.refs.termsDialog = this.shadowRoot.querySelector('.sitehq-terms-dialog');
-    this.refs.micButton = this.shadowRoot.querySelector('.sitehq-mic-button');
-    this.refs.cancelVoiceButton = this.shadowRoot.querySelector('.sitehq-cancel-voice');
+    this.refs.disconnectButton = this.shadowRoot.querySelector('.sitehq-disconnect-button');
     this.refs.equalizerBars = this.shadowRoot.querySelectorAll('.sitehq-equalizer-bar');
 
-    // Add SVG icons
     this.refs.chatButton.appendChild(this.createSVG(this.SVGS.chatBubble));
-    this.refs.chatWindow.querySelector('.sitehq-send-button').appendChild(this.createSVG(this.SVGS.send));
-    this.refs.chatWindow.querySelector('[aria-label="Close chat"]').appendChild(this.createSVG(this.SVGS.close));
-    this.refs.micButton.appendChild(this.createSVG(this.SVGS.mic));
-    this.refs.cancelVoiceButton.appendChild(this.createSVG(this.SVGS.close));
+    this.refs.disconnectButton.appendChild(this.createSVG(this.SVGS.hangup));
     this.updateDarkModeIcon();
 
-    // Add solar system particles if enabled
     if (this.config.useSolarSystemTheme) {
       const sunParticle = document.createElement('div');
       sunParticle.className = 'sitehq-particle sitehq-sun-particle';
@@ -816,17 +776,8 @@ class SiteHQChat extends HTMLElement {
 
   setupEventListeners() {
     this.refs.chatButton.addEventListener('click', () => this.toggleChatWindow(!this.state.isOpen));
-    this.refs.chatWindow.querySelector('[aria-label="Close chat"]').addEventListener('click', () => this.toggleChatWindow(false));
     this.refs.chatWindow.querySelector('[aria-label="Toggle dark mode"]').addEventListener('click', () => this.toggleDarkMode());
-    this.refs.chatWindow.querySelector('.sitehq-send-button').addEventListener('click', () => this.sendMessage());
-    this.refs.micButton.addEventListener('click', () => this.startMicVisualization());
-    this.refs.cancelVoiceButton.addEventListener('click', () => this.stopRecording());
-    this.refs.messageInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        this.sendMessage();
-      }
-    });
+    this.refs.disconnectButton.addEventListener('click', () => this.disconnectCall());
     this.refs.termsDialog.querySelector('.sitehq-cancel-button').addEventListener('click', () => {
       this.refs.termsDialog.style.display = 'none';
       this.toggleChatWindow(false);
@@ -843,9 +794,8 @@ class SiteHQChat extends HTMLElement {
     this.refs.chatWindow.style.display = open ? 'flex' : 'none';
     if (open && !this.state.acceptedTerms) {
       this.refs.termsDialog.style.display = 'flex';
-    }
-    if (open) {
-      setTimeout(() => this.refs.messageInput.focus(), 300);
+    } else if (!open) {
+      this.disconnectCall();
     }
   }
 
@@ -870,10 +820,53 @@ class SiteHQChat extends HTMLElement {
       this.state.isRecording = true;
       this.setStatus('listening');
       this.analyzeVolume();
+
+      // Start speech recognition
+      this.startSpeechRecognition();
     } catch (err) {
       console.error('Microphone error:', err);
       this.setStatus('error');
     }
+  }
+
+  startSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.error('Speech Recognition API not supported in this browser.');
+      this.setStatus('error');
+      return;
+    }
+
+    this.speechRecognition = new SpeechRecognition();
+    this.speechRecognition.continuous = true;
+    this.speechRecognition.interimResults = false;
+    this.speechRecognition.lang = 'en-US';
+
+    this.speechRecognition.onresult = (event) => {
+      const transcript = event.results[event.results.length - 1][0].transcript.trim();
+      if (transcript) {
+        this.sendMessage(transcript);
+      }
+    };
+
+    this.speechRecognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      if (event.error === 'no-speech') {
+        // Restart recognition if no speech is detected
+        this.speechRecognition.stop();
+        if (this.state.isRecording) {
+          setTimeout(() => this.speechRecognition.start(), 100);
+        }
+      }
+    };
+
+    this.speechRecognition.onend = () => {
+      if (this.state.isRecording) {
+        this.speechRecognition.start();
+      }
+    };
+
+    this.speechRecognition.start();
   }
 
   analyzeVolume() {
@@ -881,25 +874,7 @@ class SiteHQChat extends HTMLElement {
     this.analyser.getByteFrequencyData(dataArray);
     this.state.micVolume = dataArray.reduce((sum, val) => sum + val, 0) / dataArray.length;
 
-    // Update UI with volume for equalizer animation
     this.updateEqualizer();
-
-    // Detect if user is speaking (volume threshold)
-    const volumeThreshold = 10; // Adjust as needed
-    if (this.state.micVolume > volumeThreshold) {
-      this.state.isSpeaking = true;
-      if (this.silenceTimeout) {
-        clearTimeout(this.silenceTimeout);
-        this.silenceTimeout = null;
-      }
-    } else if (this.state.isSpeaking) {
-      // User stopped speaking, wait for 2 seconds of silence before stopping
-      if (!this.silenceTimeout) {
-        this.silenceTimeout = setTimeout(() => {
-          this.stopRecording();
-        }, 2000);
-      }
-    }
 
     if (this.state.isRecording) {
       requestAnimationFrame(() => this.analyzeVolume());
@@ -907,12 +882,11 @@ class SiteHQChat extends HTMLElement {
   }
 
   updateEqualizer() {
-    // Update equalizer bars based on micVolume
     const bars = this.refs.equalizerBars;
     if (!bars) return;
-    const normalizedVolume = Math.min(this.state.micVolume / 255, 1); // Normalize to 0-1
+    const normalizedVolume = Math.min(this.state.micVolume / 255, 1);
     bars.forEach((bar, index) => {
-      const height = normalizedVolume * 20 + (Math.sin(Date.now() * 0.01 + index) * 5); // Add some animation
+      const height = normalizedVolume * 20 + (Math.sin(Date.now() * 0.01 + index) * 5);
       bar.style.height = `${height}px`;
     });
   }
@@ -926,18 +900,17 @@ class SiteHQChat extends HTMLElement {
       this.audioContext.close();
       this.audioContext = null;
     }
+    if (this.speechRecognition) {
+      this.speechRecognition.stop();
+      this.speechRecognition = null;
+    }
     this.state.isRecording = false;
     this.state.isSpeaking = false;
-    this.setStatus('connected');
-
-    // Simulate speech-to-text (replace with real API later)
-    const transcribedText = "Hello, this is a voice message!"; // Placeholder
-    this.sendMessage(transcribedText);
+    this.setStatus('disconnected');
   }
 
   async initializeChat() {
     try {
-      // Use the absolute URL of the Replit server
       const serverUrl = 'https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev';
       const response = await fetch(`${serverUrl}/api/get-signed-url?agentId=${this.config.agentId}`, {
         headers: { 'Authorization': `Bearer ${this.config.apiKey}` },
@@ -963,14 +936,18 @@ class SiteHQChat extends HTMLElement {
         agentId: this.config.agentId,
         signedUrl
       }));
+      // Start listening automatically
+      this.startMicVisualization();
     };
     this.ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'message') {
-        this.addMessage('assistant', data.content || data.text);
+        const content = data.content || data.text;
+        this.addMessage('assistant', content);
+        this.speak(content);
         this.state.isTyping = false;
         this.setStatus('speaking');
-        setTimeout(() => this.setStatus('connected'), 3000); // Simulate speaking for 3 seconds
+        setTimeout(() => this.setStatus('listening'), 3000);
       } else if (data.type === 'status' && data.status === 'thinking') {
         this.state.isTyping = true;
         this.setStatus('thinking');
@@ -980,12 +957,18 @@ class SiteHQChat extends HTMLElement {
     this.ws.onclose = () => this.setStatus('disconnected');
   }
 
-  sendMessage(content = null) {
-    const messageContent = content || this.refs.messageInput.value.trim();
-    if (!messageContent || !this.ws || this.ws.readyState !== WebSocket.OPEN) return;
-    this.addMessage('user', messageContent);
-    this.ws.send(JSON.stringify({ type: 'message', content: messageContent }));
-    if (!content) this.refs.messageInput.value = '';
+  speak(text) {
+    if (this.speechSynthesis) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      this.speechSynthesis.speak(utterance);
+    }
+  }
+
+  sendMessage(content) {
+    if (!content || !this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    this.addMessage('user', content);
+    this.ws.send(JSON.stringify({ type: 'message', content }));
     this.state.isTyping = true;
     this.setStatus('thinking');
   }
@@ -1009,8 +992,18 @@ class SiteHQChat extends HTMLElement {
     this.refs.typingIndicator.style.display = (status === 'thinking' || this.state.isTyping) ? 'flex' : 'none';
   }
 
+  disconnectCall() {
+    this.stopRecording();
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+    this.setStatus('disconnected');
+    this.toggleChatWindow(false);
+  }
+
   cleanup() {
-    if (this.micStream) this.micStream.getTracks().forEach(track => track.stop());
+    this.stopRecording();
     if (this.ws) this.ws.close();
   }
 }
