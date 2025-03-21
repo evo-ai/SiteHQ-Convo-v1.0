@@ -51,12 +51,12 @@
                     <button class="tab-btn" onclick="switchTab('iframe')">IFrame</button>
                 </div>
                 <div id="script" class="tab-content active">
-                    <pre><code>&lt;script src="${window.location.origin}/widget.js"&gt;&lt;/script&gt;
-&lt;sitehq-convowidget agent-id="YOUR_AGENT_ID"&gt;&lt;/sitehq-convowidget&gt;</code></pre>
+                    <pre><code>&lt;script src="${window.location.origin}/sitehq-widget.js"&gt;&lt;/script&gt;
+&lt;sitehq-convowidget agent-id="KRGVz0f5HAU0E7u6BbA5"&gt;&lt;/sitehq-convowidget&gt;</code></pre>
                 </div>
                 <div id="iframe" class="tab-content">
                     <pre><code>&lt;iframe
-    src="${window.location.origin}/embed?agentId=YOUR_AGENT_ID"
+    src="${window.location.origin}/embed?agentId=KRGVz0f5HAU0E7u6BbA5"
     style="width: 400px; height: 600px; position: fixed; bottom: 20px; 
            right: 20px; border: none; border-radius: 12px; 
            box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;"
@@ -68,12 +68,8 @@
 
     <div id="root"></div>
     
-    <!-- Commented out standard chat widget -->
-    <!-- <sitehq-convowidget agent-id="KRGVz0f5HAU0E7u6BbA5"></sitehq-convowidget> -->
-    
-    <!-- Solar System Themed Widget Scripts -->
     <script src="/static/js/chat-handler.js"></script>
-    <!-- <script src="/static/js/sitehq-widget.js"></script> -->
+    <script src="/sitehq-widget.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script>
