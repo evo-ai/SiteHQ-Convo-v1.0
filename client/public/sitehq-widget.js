@@ -12,29 +12,27 @@ class SiteHQChat extends HTMLElement {
       isOpen: false,
       isDarkMode: false,
       status: 'disconnected',
-      micVolume: 0,
       isSpeaking: false,
       acceptedTerms: false,
       isTyping: false,
-      isRecording: false,
     };
     this.refs = {};
-    this.micStream = null;
-    this.audioContext = null;
-    this.analyser = null;
-    this.ws = null;
     this.silenceTimeout = null;
-    this.speechRecognition = null; // For Web Speech API
-    this.speechSynthesis = window.speechSynthesis; // For text-to-speech
   }
 
   connectedCallback() {
     this.loadConfig();
     this.render();
     this.setupEventListeners();
+    this.setupReactContainer();
     if (this.config.initiallyOpen) {
       this.toggleChatWindow(true);
     }
+
+    // Listen for status updates from React component
+    document.addEventListener('sitehq-status-update', (event) => {
+      this.setStatus(event.detail.status);
+    });
   }
 
   disconnectedCallback() {
@@ -409,6 +407,15 @@ class SiteHQChat extends HTMLElement {
           height: 10px;
           background-color: #4CAF50;
           border-radius: 2px;
+          animation: sitehq-wave 1s infinite ease-in-out;
+        }
+
+        .sitehq-equalizer-bar:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+
+        .sitehq-equalizer-bar:nth-child(3) {
+          animation-delay: 0.4s;
         }
 
         .sitehq-status-listening ~ .sitehq-equalizer {
@@ -675,6 +682,10 @@ class SiteHQChat extends HTMLElement {
         .sitehq-branding a:hover {
           text-decoration: underline;
         }
+
+        .sitehq-react-container {
+          display: none;
+        }
       </style>
       <div class="sitehq-container ${this.config.position ? 'sitehq-' + this.config.position : 'sitehq-bottom-right'} ${this.state.isDarkMode ? 'sitehq-dark-mode' : ''}">
         <div class="sitehq-chat-window" style="display: none;">
@@ -713,12 +724,13 @@ class SiteHQChat extends HTMLElement {
         <div class="sitehq-terms-dialog" style="display: none;">
           <div class="sitehq-terms-content">
             <h3>Terms and Conditions</h3>
-            <p>By clicking "Agree," and each time I interact with this AI agent, I consent to the recording, storage, and sharing of my communications with third-party service providers, and as described in the Privacy Policy. If you do not wish to have your conversations recorded, please refrain from using this service.</p>
-            <button class="sitehq-primary-button">Agree</button>
+            <p>By clicking " Agree," and each time I interact with this AI agent, I consent to the recording, storage, and sharing of my communications with third-party service providers, and as described in the Privacy Policy. If you do not wish to have your conversations recorded, please refrain from using this service.</p>
+            <button class="sitehq-primary-button"> Agree</button>
             <button class="sitehq-cancel-button">Cancel</button>
           </div>
         </div>
         <div class="sitehq-branding">Powered by <a href="https://www.sitehq.ai" target="_blank">SiteHQ</a></div>
+        <div class="sitehq-react-container"></div>
       </div>
     `;
 
@@ -730,7 +742,7 @@ class SiteHQChat extends HTMLElement {
     this.refs.messageInput = this.shadowRoot.querySelector('.sitehq-message-input');
     this.refs.termsDialog = this.shadowRoot.querySelector('.sitehq-terms-dialog');
     this.refs.disconnectButton = this.shadowRoot.querySelector('.sitehq-disconnect-button');
-    this.refs.equalizerBars = this.shadowRoot.querySelectorAll('.sitehq-equalizer-bar');
+    this.refs.reactContainer = this.shadowRoot.querySelector('.sitehq-react-container');
 
     this.refs.chatButton.appendChild(this.createSVG(this.SVGS.chatBubble));
     this.refs.disconnectButton.appendChild(this.createSVG(this.SVGS.hangup));
@@ -789,13 +801,26 @@ class SiteHQChat extends HTMLElement {
     });
   }
 
+  setupReactContainer() {
+    // Dispatch an event to initialize the React component with config
+    const event = new CustomEvent('sitehq-init', {
+      detail: {
+        apiKey: this.config.apiKey,
+        agentId: this.config.agentId,
+        container: this.refs.reactContainer,
+      },
+    });
+    document.dispatchEvent(event);
+  }
+
   toggleChatWindow(open) {
     this.state.isOpen = open;
     this.refs.chatWindow.style.display = open ? 'flex' : 'none';
     if (open && !this.state.acceptedTerms) {
       this.refs.termsDialog.style.display = 'flex';
     } else if (!open) {
-      this.disconnectCall();
+      this.state.acceptedTerms = false;
+      this.setStatus('disconnected');
     }
   }
 
@@ -809,179 +834,9 @@ class SiteHQChat extends HTMLElement {
     this.updateDarkModeIcon();
   }
 
-  async startMicVisualization() {
-    try {
-      this.micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      this.audioContext = new AudioContext();
-      this.analyser = this.audioContext.createAnalyser();
-      this.analyser.fftSize = 256;
-      const source = this.audioContext.createMediaStreamSource(this.micStream);
-      source.connect(this.analyser);
-      this.state.isRecording = true;
-      this.setStatus('listening');
-      this.analyzeVolume();
-
-      // Start speech recognition
-      this.startSpeechRecognition();
-    } catch (err) {
-      console.error('Microphone error:', err);
-      this.setStatus('error');
-    }
-  }
-
-  startSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.error('Speech Recognition API not supported in this browser.');
-      this.setStatus('error');
-      return;
-    }
-
-    this.speechRecognition = new SpeechRecognition();
-    this.speechRecognition.continuous = true;
-    this.speechRecognition.interimResults = false;
-    this.speechRecognition.lang = 'en-US';
-
-    this.speechRecognition.onresult = (event) => {
-      const transcript = event.results[event.results.length - 1][0].transcript.trim();
-      if (transcript) {
-        this.sendMessage(transcript);
-      }
-    };
-
-    this.speechRecognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      if (event.error === 'no-speech') {
-        // Restart recognition if no speech is detected
-        this.speechRecognition.stop();
-        if (this.state.isRecording) {
-          setTimeout(() => this.speechRecognition.start(), 100);
-        }
-      }
-    };
-
-    this.speechRecognition.onend = () => {
-      if (this.state.isRecording) {
-        this.speechRecognition.start();
-      }
-    };
-
-    this.speechRecognition.start();
-  }
-
-  analyzeVolume() {
-    const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-    this.analyser.getByteFrequencyData(dataArray);
-    this.state.micVolume = dataArray.reduce((sum, val) => sum + val, 0) / dataArray.length;
-
-    this.updateEqualizer();
-
-    if (this.state.isRecording) {
-      requestAnimationFrame(() => this.analyzeVolume());
-    }
-  }
-
-  updateEqualizer() {
-    const bars = this.refs.equalizerBars;
-    if (!bars) return;
-    const normalizedVolume = Math.min(this.state.micVolume / 255, 1);
-    bars.forEach((bar, index) => {
-      const height = normalizedVolume * 20 + (Math.sin(Date.now() * 0.01 + index) * 5);
-      bar.style.height = `${height}px`;
-    });
-  }
-
-  stopRecording() {
-    if (this.micStream) {
-      this.micStream.getTracks().forEach(track => track.stop());
-      this.micStream = null;
-    }
-    if (this.audioContext) {
-      this.audioContext.close();
-      this.audioContext = null;
-    }
-    if (this.speechRecognition) {
-      this.speechRecognition.stop();
-      this.speechRecognition = null;
-    }
-    this.state.isRecording = false;
-    this.state.isSpeaking = false;
-    this.setStatus('disconnected');
-  }
-
-  async initializeChat() {
-    try {
-      const serverUrl = 'https://c46a1c6d-3d97-4f35-8e97-39c88d29fcc3-00-3jso8wzm23kek.pike.replit.dev';
-      const response = await fetch(`${serverUrl}/api/get-signed-url?agentId=${this.config.agentId}`, {
-        headers: { 'Authorization': `Bearer ${this.config.apiKey}` },
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch signed URL: ${response.statusText}`);
-      }
-      const { signedUrl } = await response.json();
-      this.connectWebSocket(signedUrl);
-    } catch (err) {
-      console.error('Chat initialization error:', err);
-      this.setStatus('error');
-    }
-  }
-
-  connectWebSocket(signedUrl) {
-    this.ws = new WebSocket(signedUrl);
-    this.ws.onopen = () => {
-      this.setStatus('connected');
-      this.addMessage('assistant', 'Hello! How can I assist you?');
-      this.ws.send(JSON.stringify({
-        type: 'init',
-        agentId: this.config.agentId,
-        signedUrl
-      }));
-      // Start listening automatically
-      this.startMicVisualization();
-    };
-    this.ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'message') {
-        const content = data.content || data.text;
-        this.addMessage('assistant', content);
-        this.speak(content);
-        this.state.isTyping = false;
-        this.setStatus('speaking');
-        setTimeout(() => this.setStatus('listening'), 3000);
-      } else if (data.type === 'status' && data.status === 'thinking') {
-        this.state.isTyping = true;
-        this.setStatus('thinking');
-      }
-    };
-    this.ws.onerror = () => this.setStatus('error');
-    this.ws.onclose = () => this.setStatus('disconnected');
-  }
-
-  speak(text) {
-    if (this.speechSynthesis) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      this.speechSynthesis.speak(utterance);
-    }
-  }
-
-  sendMessage(content) {
-    if (!content || !this.ws || this.ws.readyState !== WebSocket.OPEN) return;
-    this.addMessage('user', content);
-    this.ws.send(JSON.stringify({ type: 'message', content }));
-    this.state.isTyping = true;
-    this.setStatus('thinking');
-  }
-
-  addMessage(role, content) {
-    const messageEl = document.createElement('div');
-    messageEl.className = `sitehq-message sitehq-${role}-message`;
-    const bubble = document.createElement('div');
-    bubble.className = 'sitehq-message-bubble';
-    bubble.textContent = content;
-    messageEl.appendChild(bubble);
-    this.refs.messagesContainer.appendChild(messageEl);
-    this.refs.messagesContainer.scrollTop = this.refs.messagesContainer.scrollHeight;
+  initializeChat() {
+    // Dispatch event to React component to start the conversation
+    document.dispatchEvent(new CustomEvent('sitehq-accept-terms'));
   }
 
   setStatus(status) {
@@ -993,18 +848,16 @@ class SiteHQChat extends HTMLElement {
   }
 
   disconnectCall() {
-    this.stopRecording();
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
-    }
+    // Dispatch event to React component to end the conversation
+    document.dispatchEvent(new CustomEvent('sitehq-disconnect'));
     this.setStatus('disconnected');
-    this.toggleChatWindow(false);
+    this.state.acceptedTerms = false;
+    this.state.isOpen = false;
+    this.refs.chatWindow.style.display = 'none';
   }
 
   cleanup() {
-    this.stopRecording();
-    if (this.ws) this.ws.close();
+    // No cleanup needed for WebSocket or audio, handled by React component
   }
 }
 
