@@ -1,3 +1,5 @@
+console.log('SiteHQChatController: Script loaded');
+
 // client/src/components/SiteHQChatController.jsx
 import React, { useEffect, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';

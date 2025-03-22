@@ -2,7 +2,7 @@
  * SiteHQ Chat Widget
  * A self-contained chat widget for embedding on any website
  */
-
+import '../src/components/SiteHQChatController.jsx'; // Ensure Webpack includes this file in the bundle
 class SiteHQChat extends HTMLElement {
   constructor() {
     super();
