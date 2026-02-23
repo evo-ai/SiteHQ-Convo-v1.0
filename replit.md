@@ -91,6 +91,7 @@ See `docs/process/new-agent-setup.md` for the full process. Quick steps:
 - **2026-02-23**: Major refactor — cleaned up dead code, created agent registry system, avatar config system, reusable landing page and deploy guide components, structured docs directory. Added FuturNod agent.
 - **2026-02-23**: Restored chat bubble CSS overrides from deleted styles.css. Created comprehensive Solar System Bubble design reference documentation with version tracking.
 - **2026-02-23**: Full documentation pass — enriched agent docs, created docs index, documented theme system architecture.
+- **2026-02-23**: Standardized widget naming convention — replaced all `sitehq-` prefixes with generic `convo-` prefix for scalability. Widget file is now `convo-widget.js`, custom element is `<convo-chat-widget>`.
 
 ## User Preferences
 

@@ -19,7 +19,7 @@ export default function AgentLandingPage({ agent }: AgentLandingPageProps) {
     return () => { document.title = "FuturNod Agent Hub"; };
   }, [agent.name]);
 
-  const scriptCode = `<script src="${baseUrl}/sitehq-widget.js"></script>\n<sitehq-convowidget agent-id="${agent.agentId}"></sitehq-convowidget>`;
+  const scriptCode = `<script src="${baseUrl}/convo-widget.js"></script>\n<convo-chat-widget agent-id="${agent.agentId}"></convo-chat-widget>`;
 
   const iframeCode = `<iframe\n    src="${baseUrl}/embed?agentId=${agent.agentId}"\n    style="width: 400px; height: 600px; position: fixed; bottom: 20px;\n           right: 20px; border: none; border-radius: 12px;\n           box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;"\n    allow="microphone"></iframe>`;
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SiteHQ Chat Widget - Demo</title>
+  <title>Convo Chat Widget - Demo</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -204,7 +204,7 @@
 <body>
   <header>
     <div class="header-content">
-      <h1>SiteHQ Chat Widget Demo</h1>
+      <h1>Convo Chat Widget Demo</h1>
       <p>Three ways to embed the solar system themed chat widget on any website</p>
     </div>
   </header>
@@ -219,7 +219,7 @@
       
       <div class="tab-content active" id="script-content">
         <h3>Script Tag Integration</h3>
-        <p>The easiest way to add the SiteHQ Chat Widget to your website. Just add the script tag to your HTML.</p>
+        <p>The easiest way to add the Convo Chat Widget to your website. Just add the script tag to your HTML.</p>
         
         <div class="example-container">
           <div class="example-header">
@@ -227,16 +227,16 @@
             <button class="copy-button" data-code="script">Copy Code</button>
           </div>
           <div class="example-content">
-            <pre><code>&lt;!-- SiteHQ Chat Widget --&gt;
+            <pre><code>&lt;!-- Convo Chat Widget --&gt;
 &lt;script 
-  src="https://your-site.com/standalone-chat-bubble.js" 
-  data-sitehq-chat="auto"
+  src="https://your-site.com/convo-widget.js" 
+  data-auto-init="auto"
   data-api-key="YOUR_API_KEY"
   data-agent-id="YOUR_AGENT_ID"
   data-position="bottom-right"
   data-dark-mode="false"
   data-initially-open="false"
-  data-title="SiteHQ Assistant"
+  data-title="Convo Assistant"
   data-theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
   data-solar-system-theme="true"
 &gt;&lt;/script&gt;</code></pre>
@@ -257,19 +257,19 @@
           </div>
           <div class="example-content">
             <pre><code>&lt;!-- Add the script in the head or before the closing body tag --&gt;
-&lt;script src="https://your-site.com/standalone-chat-bubble.js"&gt;&lt;/script&gt;
+&lt;script src="https://your-site.com/convo-widget.js"&gt;&lt;/script&gt;
 
 &lt;!-- Place the custom element anywhere in your HTML --&gt;
-&lt;sitehq-chat
+&lt;convo-chat-widget
   api-key="YOUR_API_KEY"
   agent-id="YOUR_AGENT_ID"
   position="bottom-right"
   dark-mode="false"
   initially-open="false"
-  title="SiteHQ Assistant"
+  title="Convo Assistant"
   theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
   solar-system-theme="true"
-&gt;&lt;/sitehq-chat&gt;</code></pre>
+&gt;&lt;/convo-chat-widget&gt;</code></pre>
           </div>
         </div>
         
@@ -309,7 +309,7 @@
       
       <h3>Required Parameters</h3>
       <ul>
-        <li><code>api-key</code> - Your SiteHQ API key</li>
+        <li><code>api-key</code> - Your API key</li>
         <li><code>agent-id</code> - The ID of the AI agent to use</li>
       </ul>
       
@@ -326,7 +326,7 @@
   </div>
 
   <footer>
-    <p>&copy; 2025 SiteHQ. All rights reserved.</p>
+    <p>&copy; 2025 Convo. All rights reserved.</p>
   </footer>
 
   <script>
@@ -379,14 +379,14 @@
       console.log("Loading script tag widget...");
       
       // First, check if widget already exists and remove it if it does
-      const existingWidget = document.querySelector('.sitehq-chat-widget');
+      const existingWidget = document.querySelector('.convo-chat-widget');
       if (existingWidget) {
         console.log("Removing existing widget");
         existingWidget.remove();
       }
       
       // Also remove any existing script to ensure clean initialization
-      const existingScript = document.querySelector('script[data-sitehq-chat]');
+      const existingScript = document.querySelector('script[data-auto-init]');
       if (existingScript) {
         console.log("Removing existing script");
         existingScript.remove();
@@ -394,31 +394,31 @@
       
       // Load the script dynamically with debug logging
       const script = document.createElement('script');
-      script.src = '/fixed-standalone-chat-bubble.js';
-      script.setAttribute('data-sitehq-chat', 'auto');
+      script.src = '/convo-widget.js';
+      script.setAttribute('data-auto-init', 'auto');
       script.setAttribute('data-api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
       script.setAttribute('data-agent-id', 'KRGVz0f5HAU0E7u6BbA5');
       script.setAttribute('data-position', 'bottom-right');
       script.setAttribute('data-dark-mode', 'false');
-      script.setAttribute('data-title', 'SiteHQ Demo');
+      script.setAttribute('data-title', 'Convo Demo');
       script.setAttribute('data-theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
       script.setAttribute('data-solar-system-theme', 'true');
       script.setAttribute('data-debug', 'true');
       
       // Add event listeners to debug loading
       script.onload = function() {
-        console.log("SiteHQ Chat script loaded successfully");
+        console.log("Convo Chat script loaded successfully");
         // Force initialization after script loads
-        if (typeof window.SiteHQChatInit === 'function') {
+        if (typeof window.ConvoChatInit === 'function') {
           console.log("Manually triggering initialization");
-          window.SiteHQChatInit();
+          window.ConvoChatInit();
         } else {
-          console.error("SiteHQChatInit function not found in window");
+          console.error("ConvoChatInit function not found in window");
         }
       };
       
       script.onerror = function() {
-        console.error("Error loading SiteHQ Chat script");
+        console.error("Error loading Convo Chat script");
       };
       
       document.body.appendChild(script);
@@ -432,48 +432,48 @@
       console.log("Loading custom element widget...");
       
       // First, check if widget already exists and remove it
-      const existingElement = document.querySelector('sitehq-chat');
+      const existingElement = document.querySelector('convo-chat-widget');
       if (existingElement) {
         console.log("Removing existing custom element");
         existingElement.remove();
       }
       
       // First make sure the script is loaded
-      if (!window.customElements || !window.customElements.get('sitehq-chat')) {
+      if (!window.customElements || !window.customElements.get('convo-chat-widget')) {
         const script = document.createElement('script');
-        script.src = '/fixed-standalone-chat-bubble.js';
+        script.src = '/convo-widget.js';
         script.onload = function() {
-          console.log("SiteHQ Chat script loaded for custom element");
+          console.log("Convo Chat script loaded for custom element");
           setTimeout(() => {
-            if (window.customElements && window.customElements.get('sitehq-chat')) {
+            if (window.customElements && window.customElements.get('convo-chat-widget')) {
               createCustomElement();
             } else {
-              console.error("Custom element 'sitehq-chat' not registered after script loaded");
+              console.error("Custom element 'convo-chat-widget' not registered after script loaded");
             }
           }, 100); // Give a slight delay for registration to complete
         };
         script.onerror = function() {
-          console.error("Error loading SiteHQ Chat script for custom element");
+          console.error("Error loading Convo Chat script for custom element");
         };
         document.body.appendChild(script);
       } else {
-        console.log("SiteHQ Chat custom element already registered");
+        console.log("Convo Chat custom element already registered");
         createCustomElement();
       }
       
       function createCustomElement() {
         // Create and add the custom element
-        const chatElement = document.createElement('sitehq-chat');
+        const chatElement = document.createElement('convo-chat-widget');
         chatElement.setAttribute('api-key', 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500');
         chatElement.setAttribute('agent-id', 'KRGVz0f5HAU0E7u6BbA5');
         chatElement.setAttribute('position', 'bottom-left'); // Use different position
-        chatElement.setAttribute('title', 'SiteHQ Custom Element');
+        chatElement.setAttribute('title', 'Convo Custom Element');
         chatElement.setAttribute('theme', '{"primary":"#5c078c","background":"#ffffff","text":"#333333"}');
         chatElement.setAttribute('solar-system-theme', 'true');
         chatElement.setAttribute('debug', 'true');
         
         document.body.appendChild(chatElement);
-        console.log("SiteHQ Chat custom element added to page", chatElement);
+        console.log("Convo Chat custom element added to page", chatElement);
       }
       
       this.disabled = true;
@@ -498,7 +498,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sample Page with SiteHQ Chat</title>
+  <title>Sample Page with Convo Chat</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -511,10 +511,10 @@
 </head>
 <body>
   <h1>Sample Website</h1>
-  <p>This is a sample website with the SiteHQ Chat Widget embedded via iframe.</p>
+  <p>This is a sample website with the Convo Chat Widget embedded via iframe.</p>
   <p>The widget appears in the bottom right corner of this page.</p>
   
-  <!-- SiteHQ Chat Widget Iframe -->
+  <!-- Convo Chat Widget Iframe -->
   <iframe 
     src="/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&solarSystemTheme=true" 
     style="width: 70px; height: 70px; position: fixed; bottom: 20px; right: 20px; border: none; overflow: hidden; z-index: 9999;" 

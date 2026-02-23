@@ -21,24 +21,24 @@ export default function AgentDeployGuide({ agent }: AgentDeployGuideProps) {
   const baseUrl = window.location.origin;
 
   const scriptCode = `<script 
-  src="${baseUrl}/standalone-widget.js" 
-  data-sitehq-auto="true" 
+  src="${baseUrl}/convo-widget.js" 
+  data-auto-init="true" 
   data-api-key="${agent.apiKey}" 
   data-agent-id="${agent.agentId}"
   data-theme='${JSON.stringify(agent.theme)}'>
 </script>`;
 
   const customElementCode = `<!-- Step 1: Include the script -->
-<script src="${baseUrl}/standalone-widget.js"></script>
+<script src="${baseUrl}/convo-widget.js"></script>
 
 <!-- Step 2: Add the custom element -->
-<sitehq-chat-widget 
+<convo-chat-widget 
   api-key="${agent.apiKey}"
   agent-id="${agent.agentId}"
   title="${agent.widgetTitle}"
   theme='${JSON.stringify(agent.theme)}'
   dark-mode="false">
-</sitehq-chat-widget>`;
+</convo-chat-widget>`;
 
   const iframeCode = `<iframe 
   src="${baseUrl}/widget-embed?apiKey=${agent.apiKey}&agentId=${agent.agentId}&theme=${encodeURIComponent(JSON.stringify(agent.theme))}&title=${encodeURIComponent(agent.widgetTitle)}" 

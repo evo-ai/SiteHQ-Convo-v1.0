@@ -118,3 +118,14 @@ Create a new file at `docs/agents/{slug}.md` with:
 | Agent deploy guide template | `client/src/pages/agents/AgentDeployGuide.tsx` |
 | Route registration | `client/src/App.tsx` (dynamic, no changes needed) |
 | Server API (signed URL) | `server/routes.ts` |
+| Embeddable widget script | `client/public/convo-widget.js` |
+
+## Naming Convention
+
+All embed code and widget references use the generic `convo-` prefix for scalability:
+- Script file: `convo-widget.js`
+- Custom element: `<convo-chat-widget>`
+- Data attributes: `data-auto-init`, `data-api-key`, `data-agent-id`, `data-theme`
+- Internal CSS/IDs: `convo-` prefix (e.g., `convo-container`, `convo-toggle-btn`)
+
+Never use client-specific names (e.g., "sitehq") in generic widget code or embed templates.

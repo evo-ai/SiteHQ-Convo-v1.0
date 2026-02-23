@@ -10,26 +10,26 @@ export default function StandaloneWidgetDocs() {
   const baseUrl = window.location.origin;
   
   const scriptCode = `<script 
-  src="${baseUrl}/standalone-widget.js" 
-  data-sitehq-auto="true" 
+  src="${baseUrl}/convo-widget.js" 
+  data-auto-init="true" 
   data-api-key="YOUR_API_KEY" 
   data-agent-id="YOUR_AGENT_ID"
-  data-theme='{"primary":"#5c078c","background":"#ffffff","text":"#ffffff"}'>
+  data-theme='{"primary":"#F95638","background":"#ffffff","text":"#333333"}'>
 </script>`;
 
   const customElementCode = `<!-- Step 1: Include the script -->
-<script src="${baseUrl}/standalone-widget.js"></script>
+<script src="${baseUrl}/convo-widget.js"></script>
 
 <!-- Step 2: Add the custom element anywhere on your page -->
-<sitehq-chat-widget 
+<convo-chat-widget 
   api-key="YOUR_API_KEY"
   agent-id="YOUR_AGENT_ID"
-  theme='{"primary":"#5c078c","background":"#ffffff","text":"#333333"}'
+  theme='{"primary":"#F95638","background":"#ffffff","text":"#333333"}'
   dark-mode="false">
-</sitehq-chat-widget>`;
+</convo-chat-widget>`;
 
   const iframeCode = `<iframe 
-  src="${baseUrl}/widget-embed?apiKey=YOUR_API_KEY&agentId=YOUR_AGENT_ID&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D" 
+  src="${baseUrl}/widget-embed?apiKey=YOUR_API_KEY&agentId=YOUR_AGENT_ID&theme=%7B%22primary%22%3A%22%23F95638%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D" 
   style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
   allow="microphone">
 </iframe>`;
@@ -43,7 +43,7 @@ export default function StandaloneWidgetDocs() {
   return (
     <div className="container mx-auto py-10 max-w-4xl">
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold mb-4">SiteHQ Widget Integration</h1>
+        <h1 className="text-4xl font-bold mb-4">Conversational AI Widget Integration</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Add conversational AI capabilities to your website with our easy-to-integrate widget.
         </p>
@@ -136,8 +136,8 @@ export default function StandaloneWidgetDocs() {
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2">
-              <li><strong>api-key</strong>: Your SiteHQ API key</li>
-              <li><strong>agent-id</strong>: The ID of the AI agent to use</li>
+              <li><strong>api-key</strong>: Your API key for authentication</li>
+              <li><strong>agent-id</strong>: The ElevenLabs agent ID</li>
               <li><strong>theme</strong>: JSON object with color settings</li>
               <li><strong>dark-mode</strong>: Enable dark mode by default</li>
             </ul>
@@ -152,7 +152,7 @@ export default function StandaloneWidgetDocs() {
             <p className="mb-4">Customize the appearance with a JSON theme object:</p>
             <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto">
               <code className="text-sm font-mono">{`{
-  "primary": "#5c078c",  // Primary color
+  "primary": "#F95638",  // Primary color
   "background": "#ffffff",  // Background color
   "text": "#333333"  // Text color
 }`}</code>
@@ -169,7 +169,7 @@ export default function StandaloneWidgetDocs() {
           <ol className="list-decimal pl-5 space-y-4">
             <li>
               <strong>Get your API Key and Agent ID</strong>
-              <p className="text-gray-600 mt-1">Contact the SiteHQ team to get your API key and agent ID.</p>
+              <p className="text-gray-600 mt-1">Contact the FuturNod team to get your API key and agent ID.</p>
             </li>
             <li>
               <strong>Choose an integration method</strong>
@@ -187,7 +187,7 @@ export default function StandaloneWidgetDocs() {
           
           <div className="mt-6">
             <Button
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
               onClick={() => window.open('/widget-demo', '_blank')}
             >
               View Live Demo
