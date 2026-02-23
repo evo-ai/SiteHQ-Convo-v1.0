@@ -13,7 +13,6 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { randomBytes } from 'crypto';
 import { z } from 'zod';
-import fs from 'fs';
 import { insertAdminSchema } from '@db/schema';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,27 +40,6 @@ export function registerRoutes(app: Express): Server {
       name: 'analytics_session'
     })
   );
-
-  // Serve widget.js with CORS enabled
-  app.get('/widget.js', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget.js'));
-  });
-
-  // Serve standalone-widget.js with CORS enabled
-  app.get('/standalone-widget.js', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'standalone-widget.js'));
-  });
-
-  // Serve widget demo page
-  app.get('/widget-demo', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'widget-demo.html'));
-  });
 
   // Auth status check endpoint
   app.get('/api/auth/status', (req, res) => {
@@ -435,43 +413,6 @@ export function registerRoutes(app: Express): Server {
     const redirectUrl = req.url.replace('/embed', '/widget-embed');
     const fullRedirectUrl = queryParams ? `${redirectUrl}?${queryParams}` : redirectUrl;
     res.redirect(307, fullRedirectUrl);
-  });
-
-  // Serve the standalone widget demo page
-  app.get('/widget-demo', (req, res) => {
-    res.sendFile(path.resolve('./client/public/standalone-widget-demo.html'));
-  });
-
-  // Serve the standalone chat bubble script with proper CORS headers
-  app.get('/standalone-chat-bubble.js', (req, res) => {
-    res.set({
-      'Content-Type': 'application/javascript',
-      'Access-Control-Allow-Origin': '*',
-      'Cache-Control': 'max-age=3600'
-    });
-    res.sendFile(path.resolve('./client/public/standalone-chat-bubble.js'));
-  });
-
-
-  // Serve the simple-widget-demo.html with environment variables injected
-  app.get('/simple-widget-demo.html', (req, res) => {
-    // Read the file from disk
-    fs.readFile(path.resolve('./client/public/simple-widget-demo.html'), 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {
-      if (err) {
-        console.error('Error reading simple-widget-demo.html:', err);
-        return res.status(500).send('Error loading the demo page');
-      }
-
-      // Inject a global JavaScript variable with the API key
-      const apiKeyScript = `<script>window.ELEVENLABS_API_KEY = "${process.env.ELEVENLABS_API_KEY || ''}";</script>`;
-      const processedHTML = data.replace(
-        '</head>',
-        apiKeyScript + '</head>'
-      );
-
-      res.set('Content-Type', 'text/html');
-      res.send(processedHTML);
-    });
   });
 
   // WebSocket setup for chat

@@ -19,7 +19,6 @@ client/src/
       ChatBubble.tsx    # Solar System Bubble avatar (main widget)
     conversation/
       ConversationFlow.tsx  # Analytics visualization
-    SiteHQChatController.jsx  # Web component controller
     ui/                 # shadcn UI components
   pages/
     agents/
@@ -92,6 +91,8 @@ See `docs/process/new-agent-setup.md` for the full process. Quick steps:
 - **2026-02-23**: Restored chat bubble CSS overrides from deleted styles.css. Created comprehensive Solar System Bubble design reference documentation with version tracking.
 - **2026-02-23**: Full documentation pass — enriched agent docs, created docs index, documented theme system architecture.
 - **2026-02-23**: Standardized widget naming convention — replaced all `sitehq-` prefixes with generic `convo-` prefix for scalability. Widget file is now `convo-widget.js`, custom element is `<convo-chat-widget>`.
+- **2026-02-23**: Rebuilt convo-widget.js as lightweight iframe loader (~140 lines) embedding the real Solar System Bubble via /widget-embed. Added secure postMessage resize communication.
+- **2026-02-23**: Complete legacy cleanup — removed all old text-based chatbot code, demo HTML pages, webpack config, old deployment guides, SiteHQChatController, and legacy server routes. Only the Solar System Bubble (and future avatars) remain.
 
 ## User Preferences
 

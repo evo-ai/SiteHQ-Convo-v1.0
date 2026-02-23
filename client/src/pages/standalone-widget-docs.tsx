@@ -188,9 +188,9 @@ export default function StandaloneWidgetDocs() {
           <div className="mt-6">
             <Button
               className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
-              onClick={() => window.open('/widget-demo', '_blank')}
+              onClick={() => window.open('/', '_blank')}
             >
-              View Live Demo
+              View Agent Hub
             </Button>
           </div>
         </CardContent>
