@@ -115,13 +115,40 @@ interface ChatBubbleProps {
 
 ## Theme Variants
 
-| ID | Name | Primary | Sun | Planet | Used By |
-|----|------|---------|-----|--------|---------|
-| purple-cosmos | Purple Cosmos | #5c078c | #FFCC00 | #00CCFF | SiteHQ |
-| orange-fire | Orange Fire | #F95638 | #FFD700 | #FF6B35 | FuturNod |
-| ocean-blue | Ocean Blue | #0066CC | #00CED1 | #4169E1 | Available |
-| emerald-green | Emerald Green | #059669 | #34D399 | #10B981 | Available |
-| midnight-dark | Midnight Dark | #1E1E2E | #CBA6F7 | #89B4FA | Available |
+Theme variants define the color palette applied to the base Solar System Bubble design. The base design (structure, animations, particle behavior, sizing) never changes — only the colors do.
+
+**Theme assignment is user-controlled.** A future UI will allow designing and tweaking theme variants per agent. Current assignments are temporary and subject to change by the user at any time.
+
+| ID | Name | Primary | Sun (Accent 1) | Planet (Accent 2) | Glow | Current Agent |
+|----|------|---------|-----------------|--------------------|----- |---------------|
+| purple-cosmos | Purple Cosmos | #5c078c | #FFCC00 | #00CCFF | rgba(92, 7, 140, 0.3) | SiteHQ |
+| orange-fire | Orange Fire | #F95638 | #FFD700 | #FF6B35 | rgba(249, 86, 56, 0.3) | FuturNod |
+| ocean-blue | Ocean Blue | #0066CC | #00CED1 | #4169E1 | rgba(0, 102, 204, 0.3) | Unassigned |
+| emerald-green | Emerald Green | #059669 | #34D399 | #10B981 | rgba(5, 150, 105, 0.3) | Unassigned |
+| midnight-dark | Midnight Dark | #1E1E2E | #CBA6F7 | #89B4FA | rgba(30, 30, 46, 0.3) | Unassigned |
+
+### Adding a New Theme Variant
+
+Edit `client/src/config/avatars.ts` and add a new entry to the `themeVariants` array in the `solar-system` avatar config:
+
+```typescript
+{
+  id: "your-theme-id",
+  name: "Your Theme Name",
+  primary: "#PRIMARY_COLOR",
+  accent1: "#SUN_COLOR",
+  accent2: "#PLANET_COLOR",
+  glow: "rgba(R, G, B, 0.3)",
+}
+```
+
+### Future: Theme Editor UI
+
+A planned UI feature will allow users to:
+- Create custom theme variants visually
+- Preview themes on the Solar System Bubble in real time
+- Assign/reassign themes to agents
+- Adjust individual color values (primary, sun, planet, glow)
 
 ## Integrity Rules
 

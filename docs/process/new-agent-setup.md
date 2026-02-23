@@ -60,9 +60,11 @@ newagent: {
 Open `client/src/config/avatars.ts` to see available avatar designs and their theme variants.
 
 Currently available avatars:
-- **solar-system**: Animated bubble with orbiting particles
+- **solar-system**: Animated bubble with orbiting particles (see `docs/avatars/solar-system-bubble.md`)
 
 Each avatar has multiple color theme variants. You can also add new variants by extending the `themeVariants` array.
+
+**Important**: Theme colors are user-controlled. When adding a new agent, use a placeholder theme or an existing variant. The user will choose the final colors via the future theme editor UI. Do not pre-assign or change theme colors without explicit user direction.
 
 ---
 
