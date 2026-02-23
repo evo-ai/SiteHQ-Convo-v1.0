@@ -46,9 +46,6 @@ export default function AgentDeployGuide({ agent }: AgentDeployGuideProps) {
   allow="microphone">
 </iframe>`;
 
-  const elevenlabsEmbedCode = `<elevenlabs-convai agent-id="${agent.agentId}"></elevenlabs-convai>
-<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>`;
-
   const copyToClipboard = (text: string, tab: string) => {
     navigator.clipboard.writeText(text);
     setCopiedTab(tab);
@@ -110,11 +107,10 @@ export default function AgentDeployGuide({ agent }: AgentDeployGuideProps) {
       </Card>
 
       <Tabs defaultValue="script" className="mb-10">
-        <TabsList className="grid grid-cols-4">
+        <TabsList className="grid grid-cols-3">
           <TabsTrigger value="script">Script Tag</TabsTrigger>
           <TabsTrigger value="element">Custom Element</TabsTrigger>
           <TabsTrigger value="iframe">IFrame</TabsTrigger>
-          <TabsTrigger value="elevenlabs">ElevenLabs Embed</TabsTrigger>
         </TabsList>
 
         <TabsContent value="script">
@@ -214,39 +210,6 @@ export default function AgentDeployGuide({ agent }: AgentDeployGuideProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="elevenlabs">
-          <Card>
-            <CardHeader>
-              <CardTitle>ElevenLabs Native Embed</CardTitle>
-              <CardDescription>
-                Use ElevenLabs' own embed widget directly on any website.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto text-sm">
-                <code>{elevenlabsEmbedCode}</code>
-              </pre>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  copyToClipboard(elevenlabsEmbedCode, "elevenlabs")
-                }
-                className="mt-4"
-              >
-                {copiedTab === "elevenlabs" ? (
-                  <>
-                    <Check className="w-4 h-4 mr-1" /> Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-1" /> Copy Code
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -260,7 +223,7 @@ export default function AgentDeployGuide({ agent }: AgentDeployGuideProps) {
                 <strong>api-key</strong>: Your API key for authentication
               </li>
               <li>
-                <strong>agent-id</strong>: The ElevenLabs agent ID
+                <strong>agent-id</strong>: Your agent's unique ID
               </li>
               <li>
                 <strong>theme</strong>: JSON object with color settings

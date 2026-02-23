@@ -137,7 +137,7 @@ export default function StandaloneWidgetDocs() {
           <CardContent>
             <ul className="list-disc pl-5 space-y-2">
               <li><strong>api-key</strong>: Your API key for authentication</li>
-              <li><strong>agent-id</strong>: The ElevenLabs agent ID</li>
+              <li><strong>agent-id</strong>: Your agent's unique ID</li>
               <li><strong>theme</strong>: JSON object with color settings</li>
               <li><strong>dark-mode</strong>: Enable dark mode by default</li>
             </ul>

@@ -101,6 +101,8 @@ See `docs/process/new-agent-setup.md` for the full process. Quick steps:
 - A future UI will be built to design and tweak themes of each avatar
 - Documentation must be maintained for every agent and avatar
 - Scalability is a priority — new agents should be easy to add
+- ElevenLabs is a backend supplier — NEVER expose "ElevenLabs" in any client-facing pages, deploy guides, embed code, or widget UI. Use generic terms like "agent ID" instead
+- All widget naming uses the generic `convo-` prefix — never use client-specific prefixes in shared widget code
 
 ## Critical: Solar System Bubble Integrity
 
