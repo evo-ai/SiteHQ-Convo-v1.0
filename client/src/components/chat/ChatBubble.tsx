@@ -503,7 +503,7 @@ export default function ChatBubble({
                 className={`text-sm font-medium mb-1 ${isDarkMode ? "text-white" : ""}`}
                 style={{ color: isDarkMode ? "#fff" : primaryColor }}
               >
-                SiteHQ Assistant
+                {title}
               </h3>
 
               {isTyping ? (

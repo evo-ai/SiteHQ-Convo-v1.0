@@ -452,15 +452,6 @@ export function registerRoutes(app: Express): Server {
     res.sendFile(path.resolve('./client/public/standalone-chat-bubble.js'));
   });
 
-  // Serve the fixed chat bubble script with proper CORS headers
-  app.get('/fixed-standalone-chat-bubble.js', (req, res) => {
-    res.set({
-      'Content-Type': 'application/javascript',
-      'Access-Control-Allow-Origin': '*',
-      'Cache-Control': 'max-age=3600'
-    });
-    res.sendFile(path.resolve('./client/public/fixed-standalone-chat-bubble.js'));
-  });
 
   // Serve the simple-widget-demo.html with environment variables injected
   app.get('/simple-widget-demo.html', (req, res) => {
