@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import ChatBubble from "@/components/chat/ChatBubble";
@@ -13,6 +13,11 @@ export default function AgentLandingPage({ agent }: AgentLandingPageProps) {
   const [activeTab, setActiveTab] = useState<"script" | "iframe">("script");
   const [copied, setCopied] = useState(false);
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+
+  useEffect(() => {
+    document.title = `${agent.name} - Conversational AI`;
+    return () => { document.title = "FuturNod Agent Hub"; };
+  }, [agent.name]);
 
   const scriptCode = `<script src="${baseUrl}/sitehq-widget.js"></script>\n<sitehq-convowidget agent-id="${agent.agentId}"></sitehq-convowidget>`;
 
@@ -191,7 +196,6 @@ export default function AgentLandingPage({ agent }: AgentLandingPageProps) {
           apiKey={agent.apiKey}
           agentId={agent.agentId}
           title={agent.widgetTitle}
-          theme={agent.theme}
           useSolarSystemTheme={true}
         />
       </div>

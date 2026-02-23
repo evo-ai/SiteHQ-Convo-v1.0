@@ -51,7 +51,7 @@ export default function ChatBubble({
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const { toast } = useToast();
-  const primaryColor = theme?.primary || "#5c078c";
+  const primaryColor = theme?.primary || "#F95638";
 
   const conversation = useConversation({
     onConnect: () => {
@@ -326,7 +326,7 @@ export default function ChatBubble({
                 className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
                 style={{
                   background: `radial-gradient(circle at 30% 30%, ${primaryColor}, ${primaryColor}DD)`,
-                  boxShadow: `0 4px 20px rgba(92, 7, 140, 0.3)`,
+                  boxShadow: `0 4px 20px ${primaryColor}4D`,
                 }}
               >
                 <motion.div

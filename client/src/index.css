@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --solar-system-primary: #F95638;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -41,7 +45,7 @@
   width: 2px;
   height: 3px;
   border-radius: 1px;
-  background-color: #5c078c;
+  background-color: var(--solar-system-primary);
   animation: micWaveAnimation 0.5s ease infinite;
 }
 
@@ -62,7 +66,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #5c078c;
+  background-color: var(--solar-system-primary);
   opacity: 0.7;
 }
 
@@ -99,7 +103,7 @@
   position: absolute;
   width: 6px;
   height: 6px;
-  background-color: #5c078c;
+  background-color: var(--solar-system-primary);
   border-radius: 50%;
   opacity: 0.7;
   animation: particleFall 4s linear infinite;
@@ -108,7 +112,7 @@
 .particle:nth-child(1) {
   left: 10%;
   animation-delay: 0s;
-  background-color: rgba(92, 7, 140, 0.7);
+  background-color: rgba(249, 86, 56, 0.7);
 }
 
 .particle:nth-child(2) {
@@ -187,13 +191,11 @@
 
 /* Chat bubble overrides — preserve !important for cross-context rendering */
 .chat-bubble {
-  background-color: var(--sitehq-purple, #5c078c) !important;
   opacity: 1 !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 .terms-agree-button {
-  background-color: var(--sitehq-purple, #5c078c) !important;
   color: white !important;
   border: none !important;
 }

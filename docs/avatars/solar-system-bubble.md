@@ -168,3 +168,6 @@ A planned UI feature will allow users to:
 | 2024-11-01 | Added Solar System themed particles | `85a65b0` |
 | 2026-02-23 | Bug fix: Added agentId to signed URL request | `a8c98d5` |
 | 2026-02-23 | Bug fix: Changed hardcoded "SiteHQ Assistant" to use title prop | `a8c98d5` |
+| 2026-02-23 | Changed default color from #5c078c to #F95638 (original published color) | — |
+| 2026-02-23 | Fixed hardcoded purple boxShadow to use dynamic primaryColor | — |
+| 2026-02-23 | Decoupled bubble color from agent theme — bubble uses its own canonical color | — |
