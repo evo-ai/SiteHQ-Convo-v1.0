@@ -170,7 +170,7 @@ export default function ChatBubble({
   const handleAcceptTerms = useCallback(async () => {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
-      const response = await fetch("/api/get-signed-url", {
+      const response = await fetch(`/api/get-signed-url?agentId=${agentId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,

@@ -9,6 +9,8 @@ export interface AgentConfig {
   slug: string;
   name: string;
   description: string;
+  tagline: string;
+  logoUrl?: string;
   agentId: string;
   apiKey: string;
   avatarId: string;
@@ -25,6 +27,8 @@ const agents: Record<string, AgentConfig> = {
     slug: "sitehq",
     name: "SiteHQ",
     description: "SiteHQ Conversational AI Assistant",
+    tagline: "Australia's Leading Site Solutions Provider",
+    logoUrl: "/SiteHQ-logo.png",
     agentId: "KRGVz0f5HAU0E7u6BbA5",
     apiKey: "sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500",
     avatarId: "solar-system",
@@ -43,6 +47,7 @@ const agents: Record<string, AgentConfig> = {
     slug: "futurnod",
     name: "Nod for FuturNod",
     description: "FuturNod Conversational AI Assistant",
+    tagline: "Intelligent Conversational AI Solutions",
     agentId: "x8uXlbP4xF2fnv352D7P",
     apiKey: "sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500",
     avatarId: "solar-system",
