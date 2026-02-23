@@ -26,7 +26,7 @@ Add a single script tag to your website. The widget will auto-initialize in the 
 
 ```html
 <script 
-  src="https://sitehq-convo-ai.futurnod.com/convo-widget.js" 
+  src="https://convo-ai.futurnod.com/convo-widget.js" 
   data-auto-init="true" 
   data-api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500" 
   data-agent-id="KRGVz0f5HAU0E7u6BbA5"
@@ -40,7 +40,7 @@ Use a custom HTML element for more control over placement and initialization.
 
 ```html
 <!-- Step 1: Include the script -->
-<script src="https://sitehq-convo-ai.futurnod.com/convo-widget.js"></script>
+<script src="https://convo-ai.futurnod.com/convo-widget.js"></script>
 
 <!-- Step 2: Add the custom element anywhere on your page -->
 <convo-chat-widget 
@@ -58,7 +58,7 @@ Use an iframe for complete isolation from your website's styles and scripts.
 
 ```html
 <iframe 
-  src="https://sitehq-convo-ai.futurnod.com/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&title=SiteHQ%20Assistant" 
+  src="https://convo-ai.futurnod.com/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&title=SiteHQ%20Assistant" 
   style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
   allow="microphone">
 </iframe>

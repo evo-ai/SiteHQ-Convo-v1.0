@@ -33,7 +33,7 @@ SiteHQ Conversational AI Assistant — the first agent deployed on the platform.
 |------|-----|
 | Landing Page | `/agents/sitehq` |
 | Deploy Guide | `/agents/sitehq/deploy` |
-| Published Site | `sitehq-convo-ai.futurnod.com` |
+| Published Site | `convo-ai.futurnod.com/agents/sitehq` |
 
 ## ElevenLabs Embed Code
 
@@ -74,4 +74,4 @@ sitehq: {
 - First agent deployed on the platform
 - Uses the Purple Cosmos theme variant of the Solar System Bubble avatar
 - Theme colors are user-configured — subject to change via future theme editor UI
-- Published deployment at `sitehq-convo-ai.futurnod.com` may run an older code version
+- Published deployment at `convo-ai.futurnod.com/agents/sitehq`

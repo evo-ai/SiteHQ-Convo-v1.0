@@ -2,7 +2,6 @@
 
 This guide is for the FuturNod development team to integrate the Conversational AI chat widget into the FuturNod website.
 
-> **Before you begin**: Replace `YOUR_DOMAIN` in the code examples below with the widget hosting URL provided by the FuturNod team (e.g., `your-app.replit.app` or your custom domain).
 
 ---
 
@@ -28,7 +27,7 @@ Add a single script tag to your website. The widget will auto-initialize in the 
 
 ```html
 <script 
-  src="https://YOUR_DOMAIN/convo-widget.js" 
+  src="https://convo-ai.futurnod.com/convo-widget.js" 
   data-auto-init="true" 
   data-api-key="sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500" 
   data-agent-id="x8uXlbP4xF2fnv352D7P"
@@ -42,7 +41,7 @@ Use a custom HTML element for more control over placement and initialization.
 
 ```html
 <!-- Step 1: Include the script -->
-<script src="https://YOUR_DOMAIN/convo-widget.js"></script>
+<script src="https://convo-ai.futurnod.com/convo-widget.js"></script>
 
 <!-- Step 2: Add the custom element anywhere on your page -->
 <convo-chat-widget 
@@ -60,7 +59,7 @@ Use an iframe for complete isolation from your website's styles and scripts.
 
 ```html
 <iframe 
-  src="https://YOUR_DOMAIN/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=x8uXlbP4xF2fnv352D7P&theme=%7B%22primary%22%3A%22%23F95638%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&title=Nod%20for%20FuturNod" 
+  src="https://convo-ai.futurnod.com/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=x8uXlbP4xF2fnv352D7P&theme=%7B%22primary%22%3A%22%23F95638%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&title=Nod%20for%20FuturNod" 
   style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
   allow="microphone">
 </iframe>

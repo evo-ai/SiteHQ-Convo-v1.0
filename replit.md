@@ -111,7 +111,7 @@ The Solar System Bubble chat widget (`client/src/components/chat/ChatBubble.tsx`
 1. **Diff against reference**: `git diff 85a65b0 -- client/src/components/chat/ChatBubble.tsx`
 2. **CSS animations reference**: `git diff fac5155 -- client/src/index.css`
 3. **Full design spec**: See `docs/avatars/solar-system-bubble.md`
-4. **Visual verification**: Compare against published version at sitehq-convo-ai.futurnod.com
+4. **Visual verification**: Compare against published version at convo-ai.futurnod.com
 5. **Only functional fixes allowed** — no visual/animation changes without explicit approval
 
 ## Future Plans
