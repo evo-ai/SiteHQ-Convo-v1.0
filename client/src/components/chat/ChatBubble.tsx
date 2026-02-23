@@ -167,6 +167,18 @@ export default function ChatBubble({
     }
   }, [initiallyOpen]);
 
+  useEffect(() => {
+    if (window.parent !== window) {
+      const isOpen = conversation.status === 'connected' || showTerms;
+      try {
+        const parentOrigin = document.referrer ? new URL(document.referrer).origin : '*';
+        window.parent.postMessage({ type: 'convo-widget-toggle', isOpen }, parentOrigin);
+      } catch {
+        window.parent.postMessage({ type: 'convo-widget-toggle', isOpen }, '*');
+      }
+    }
+  }, [conversation.status, showTerms]);
+
   const handleAcceptTerms = useCallback(async () => {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });

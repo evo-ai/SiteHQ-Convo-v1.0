@@ -14,8 +14,8 @@ export default function WidgetEmbedPage() {
   
   const [useSolarSystemTheme, setUseSolarSystemTheme] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
-  const [initiallyOpen, setInitiallyOpen] = useState(true);
-  const [widgetTitle, setWidgetTitle] = useState("SiteHQ Assistant");
+  const [initiallyOpen, setInitiallyOpen] = useState(false);
+  const [widgetTitle, setWidgetTitle] = useState("AI Assistant");
   
   // Get query parameters from window.location
   const getQueryParams = () => {
@@ -86,13 +86,16 @@ export default function WidgetEmbedPage() {
   console.log('Using agentId:', agentId);
   
   return (
-    <div className="w-full h-screen flex justify-center items-center">
+    <div className="w-full h-screen flex justify-end items-end">
       <style dangerouslySetInnerHTML={{ __html: `
         body {
           margin: 0;
           padding: 0;
           overflow: hidden;
           background-color: transparent;
+        }
+        .dark-mode-toggle {
+          display: none;
         }
       `}} />
       
