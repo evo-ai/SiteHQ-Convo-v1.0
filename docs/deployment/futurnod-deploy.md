@@ -2,6 +2,8 @@
 
 This guide is for the FuturNod development team to integrate the Conversational AI chat widget into the FuturNod website.
 
+> **Before you begin**: Replace `YOUR_DOMAIN` in the code examples below with the widget hosting URL provided by the FuturNod team (e.g., `your-app.replit.app` or your custom domain).
+
 ---
 
 ## Agent Details
