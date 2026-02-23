@@ -8,6 +8,8 @@
 | [Solar System Bubble](avatars/solar-system-bubble.md) | `docs/avatars/` | Flagship avatar design specification & integrity rules |
 | [SiteHQ Agent](agents/sitehq.md) | `docs/agents/` | SiteHQ agent configuration & details |
 | [FuturNod Agent](agents/futurnod.md) | `docs/agents/` | Nod for FuturNod agent configuration & details |
+| [SiteHQ Deploy Guide](deployment/sitehq-deploy.md) | `docs/deployment/` | Client-facing deployment guide for SiteHQ dev team |
+| [FuturNod Deploy Guide](deployment/futurnod-deploy.md) | `docs/deployment/` | Client-facing deployment guide for FuturNod dev team |
 
 ## Directory Structure
 
@@ -15,12 +17,15 @@
 docs/
   README.md                    # This file — documentation index
   process/
-    new-agent-setup.md         # How to add a new agent (6-step guide)
+    new-agent-setup.md         # How to add a new agent (7-step guide)
   avatars/
     solar-system-bubble.md     # Solar System Bubble design spec, version tracking, integrity rules
-  agents/
+  agents/                      # Internal agent docs (ElevenLabs refs OK)
     sitehq.md                  # SiteHQ agent — config, pages, embed code
     futurnod.md                # FuturNod agent — config, pages, embed code
+  deployment/                  # Client-facing deployment guides (NO ElevenLabs refs)
+    sitehq-deploy.md           # Shareable guide for SiteHQ dev team
+    futurnod-deploy.md         # Shareable guide for FuturNod dev team
 ```
 
 ## Source Code Reference
@@ -55,6 +60,7 @@ docs/
 
 ## Adding New Documentation
 
-- **New agent**: Create `docs/agents/{slug}.md` using existing agent docs as template
+- **New agent**: Create `docs/agents/{slug}.md` (internal) using existing agent docs as template
+- **New agent deploy guide**: Create `docs/deployment/{slug}-deploy.md` (client-facing, NO ElevenLabs refs) using existing deploy guides as template
 - **New avatar**: Create `docs/avatars/{avatar-name}.md` with design spec, version refs, and integrity rules
 - **New process**: Create `docs/process/{process-name}.md` with step-by-step instructions

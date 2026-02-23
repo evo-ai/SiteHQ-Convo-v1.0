@@ -84,27 +84,44 @@ After registering, the following pages are automatically available:
 
 ---
 
-## Step 5: Generate Client Deployment Package
+## Step 5: Create Client Deployment Guide (.md)
 
-Navigate to `/agents/{slug}/deploy` and share the deployment guide URL with the client. The page includes:
+Create a shareable deployment guide at `docs/deployment/{slug}-deploy.md` using existing guides as a template (`docs/deployment/sitehq-deploy.md`).
 
-1. **Script Tag** — Single line to add to client's website
-2. **Custom Element** — More control over placement
-3. **IFrame Embed** — Fully isolated widget
-4. **ElevenLabs Native Embed** — Direct ElevenLabs widget
+This is the document you hand to the client's dev team. It must include:
 
-All embed codes are pre-filled with the correct agent ID and configuration.
+1. Agent details table (name, agent ID, API key, widget title, primary color)
+2. All three integration options with pre-filled embed code:
+   - Script Tag (easiest)
+   - Custom Element (more control)
+   - IFrame (fully isolated)
+3. Configuration options table
+4. Theme customization guide
+5. Placement recommendations
+6. Support contact info
+
+**Critical**: This document is client-facing — it must NEVER mention ElevenLabs or any backend supplier names. Use generic terms like "agent ID" instead.
 
 ---
 
-## Step 6: Document the Agent
+## Step 6: Generate In-App Deployment Page
+
+Navigate to `/agents/{slug}/deploy` to verify the in-app deployment guide renders correctly. This page auto-generates from the agent config — no changes needed.
+
+Share the URL with the client as a companion to the .md guide.
+
+---
+
+## Step 7: Document the Agent (Internal)
 
 Create a new file at `docs/agents/{slug}.md` with:
 - Agent name and purpose
 - Client name (if applicable)
-- Agent ID
+- ElevenLabs Agent ID
 - Date created
 - Any special configuration notes
+
+This is an internal doc — ElevenLabs references are fine here.
 
 ---
 
