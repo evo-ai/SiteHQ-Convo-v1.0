@@ -91,6 +91,16 @@ See `docs/process/new-agent-setup.md` for the full process. Quick steps:
 ## User Preferences
 
 - Each agent is autonomous — never modify one agent's config when working on another
-- The Solar System Bubble is the flagship avatar design
+- The Solar System Bubble is the flagship avatar design — NEVER modify without diffing against reference commits
 - Documentation must be maintained for every agent and avatar
 - Scalability is a priority — new agents should be easy to add
+
+## Critical: Solar System Bubble Integrity
+
+The Solar System Bubble chat widget (`client/src/components/chat/ChatBubble.tsx`) is the most important visual asset. Before ANY modification:
+
+1. **Diff against reference**: `git diff 85a65b0 -- client/src/components/chat/ChatBubble.tsx`
+2. **CSS animations reference**: `git diff fac5155 -- client/src/index.css`
+3. **Full design spec**: See `docs/avatars/solar-system-bubble.md`
+4. **Visual verification**: Compare against published version at sitehq-convo-ai.futurnod.com
+5. **Only functional fixes allowed** — no visual/animation changes without explicit approval

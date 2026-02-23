@@ -184,3 +184,16 @@
 .float-animation {
   animation: float 3s ease-in-out infinite;
 }
+
+/* Chat bubble overrides — preserve !important for cross-context rendering */
+.chat-bubble {
+  background-color: var(--sitehq-purple, #5c078c) !important;
+  opacity: 1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.terms-agree-button {
+  background-color: var(--sitehq-purple, #5c078c) !important;
+  color: white !important;
+  border: none !important;
+}
