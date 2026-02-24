@@ -55,26 +55,20 @@ export default function ChatBubble({
 
   const conversation = useConversation({
     onConnect: () => {
-      console.log("Connected to ElevenLabs");
-      // Simulate typing indicator when connected
       setIsTyping(true);
       setTimeout(() => setIsTyping(false), 3000);
     },
     onDisconnect: () => {
-      console.log("Disconnected from ElevenLabs");
       stopMicVisualization();
     },
     onError: (error: Error) => {
-      console.error("Conversation error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to connect to the AI assistant",
         variant: "destructive",
       });
     },
-    onMessage: (message: unknown) => {
-      console.log("Message:", message);
-      // Simulate typing indicator when receiving a message
+    onMessage: () => {
       setIsTyping(true);
       setTimeout(() => setIsTyping(false), 2000);
     },
@@ -92,8 +86,8 @@ export default function ChatBubble({
 
       // Initialize audio context and analyzer if needed
       if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext ||
-          (window as any).webkitAudioContext)();
+        const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioContextRef.current = new AudioContextClass();
         analyserRef.current = audioContextRef.current.createAnalyser();
         analyserRef.current.fftSize = 256;
 
@@ -121,8 +115,8 @@ export default function ChatBubble({
       };
 
       analyzeVolume();
-    } catch (err) {
-      console.error("Error accessing microphone:", err);
+    } catch {
+      // Microphone access denied or unavailable
     }
   };
 
@@ -134,7 +128,7 @@ export default function ChatBubble({
     }
 
     if (audioContextRef.current) {
-      audioContextRef.current.close().catch(console.error);
+      audioContextRef.current.close().catch(() => {});
       audioContextRef.current = null;
       analyserRef.current = null;
     }
@@ -167,15 +161,13 @@ export default function ChatBubble({
     }
   }, [initiallyOpen]);
 
+  // Notify parent window (if in iframe) about widget state changes
   useEffect(() => {
-    if (window.parent !== window) {
+    const isInIframe = window.parent !== window;
+    if (isInIframe) {
       const isOpen = conversation.status === 'connected' || showTerms;
-      try {
-        const parentOrigin = document.referrer ? new URL(document.referrer).origin : '*';
-        window.parent.postMessage({ type: 'convo-widget-toggle', isOpen }, parentOrigin);
-      } catch {
-        window.parent.postMessage({ type: 'convo-widget-toggle', isOpen }, '*');
-      }
+      // Always use '*' for cross-origin iframe communication
+      window.parent.postMessage({ type: 'convo-widget-toggle', isOpen }, '*');
     }
   }, [conversation.status, showTerms]);
 
@@ -200,7 +192,6 @@ export default function ChatBubble({
 
       setShowTerms(false);
     } catch (error) {
-      console.error("Failed to start conversation:", error);
       toast({
         title: "Error",
         description:

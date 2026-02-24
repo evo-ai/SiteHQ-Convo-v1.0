@@ -2,108 +2,161 @@ import { useEffect, useState } from 'react';
 import ChatBubble from '@/components/chat/ChatBubble';
 
 /**
- * This page is specifically for embedding the ChatBubble component in an iframe
- * It will only render the ChatBubble component with no other UI elements
+ * This page is specifically for embedding the ChatBubble component in an iframe.
+ * It renders the ChatBubble with transparent background, positioned at bottom-right.
+ *
+ * Required URL params:
+ * - apiKey: The widget API key for authentication
+ * - agentId: The ElevenLabs agent ID
+ *
+ * Optional URL params:
+ * - theme: JSON encoded theme object {primary, background, text}
+ * - title: Widget title shown when connected
+ * - darkMode: "true" to enable dark mode
+ * - initiallyOpen: "true" to auto-open terms dialog
+ * - solarSystemTheme: "true"/"false" to enable/disable solar system particles
  */
 export default function WidgetEmbedPage() {
   const [theme, setTheme] = useState({
-    primary: '#5c078c', // Updated to use the purple color
+    primary: '#F95638',
     background: '#ffffff',
     text: '#333333'
   });
-  
+
   const [useSolarSystemTheme, setUseSolarSystemTheme] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
   const [initiallyOpen, setInitiallyOpen] = useState(false);
   const [widgetTitle, setWidgetTitle] = useState("AI Assistant");
-  
-  // Get query parameters from window.location
-  const getQueryParams = () => {
-    // Use window.location.search to get the query string
-    return new URLSearchParams(window.location.search);
-  };
-  
-  // Parse URL parameters
+  const [apiKey, setApiKey] = useState<string>('');
+  const [agentId, setAgentId] = useState<string>('');
+  const [isReady, setIsReady] = useState(false);
+
+  // Parse URL parameters on mount
   useEffect(() => {
     try {
-      const searchParams = getQueryParams();
-      console.log('URL parameters:', Object.fromEntries(searchParams.entries()));
-      
+      const searchParams = new URLSearchParams(window.location.search);
+      console.log('Widget embed URL parameters:', Object.fromEntries(searchParams.entries()));
+
+      // Required params
+      const apiKeyParam = searchParams.get('apiKey')?.trim();
+      const agentIdParam = searchParams.get('agentId')?.trim();
+
+      if (!apiKeyParam || !agentIdParam) {
+        console.error('Missing required parameters: apiKey and agentId are required');
+      }
+
+      setApiKey(apiKeyParam || '');
+      setAgentId(agentIdParam || '');
+
       // Parse theme if provided
       const themeParam = searchParams.get('theme');
       if (themeParam) {
         try {
           const parsedTheme = JSON.parse(decodeURIComponent(themeParam));
-          console.log('Parsed theme:', parsedTheme);
-          setTheme({
-            ...theme,
-            ...parsedTheme
-          });
+          setTheme(prev => ({ ...prev, ...parsedTheme }));
         } catch (e) {
           console.error('Error parsing theme parameter:', e);
         }
       }
-      
-      // Check for solar system theme parameter
-      const solarSystemTheme = searchParams.get('solarSystemTheme');
-      if (solarSystemTheme !== null) {
-        console.log('Solar system theme parameter:', solarSystemTheme);
-        setUseSolarSystemTheme(solarSystemTheme === 'true');
+
+      // Optional params
+      const solarSystemParam = searchParams.get('solarSystemTheme');
+      if (solarSystemParam !== null) {
+        setUseSolarSystemTheme(solarSystemParam === 'true');
       }
-      
-      // Check for dark mode parameter
-      const darkModeParam = searchParams.get('darkMode');
-      if (darkModeParam !== null) {
-        console.log('Dark mode parameter:', darkModeParam);
-        setDarkMode(darkModeParam === 'true');
-      }
-      
-      // Check for initiallyOpen parameter
+
       const initiallyOpenParam = searchParams.get('initiallyOpen');
       if (initiallyOpenParam !== null) {
-        console.log('Initially open parameter:', initiallyOpenParam);
         setInitiallyOpen(initiallyOpenParam === 'true');
       }
-      
-      // Check for title parameter
+
       const titleParam = searchParams.get('title');
       if (titleParam) {
-        console.log('Title parameter:', titleParam);
-        setWidgetTitle(titleParam);
+        setWidgetTitle(decodeURIComponent(titleParam));
       }
+
+      setIsReady(true);
     } catch (error) {
       console.error('Error parsing URL parameters:', error);
+      setIsReady(true);
     }
   }, []);
-  
-  // Get API key and agent ID from URL parameters
-  const searchParams = getQueryParams();
-  // Use trim() to remove any spaces that might have been included in the URL params
-  const apiKey = searchParams.get('apiKey')?.trim() || 'demo-key';
-  const agentId = searchParams.get('agentId')?.trim() || 'demo-agent';
-  
-  console.log('Using apiKey:', apiKey);
-  console.log('Using agentId:', agentId);
-  
+
+  // Don't render until params are parsed
+  if (!isReady) {
+    return null;
+  }
+
+  // Show error if missing required params
+  if (!apiKey || !agentId) {
+    return (
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        padding: '16px',
+        background: '#fee2e2',
+        borderRadius: '8px',
+        fontSize: '14px',
+        color: '#991b1b',
+        maxWidth: '300px'
+      }}>
+        <strong>Widget Error:</strong> Missing required parameters (apiKey, agentId).
+        Check the embed code.
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-screen flex justify-end items-end">
+    <>
+      {/* Global styles for iframe embedding */}
       <style dangerouslySetInnerHTML={{ __html: `
-        body {
+        html, body, #root {
           margin: 0;
           padding: 0;
-          overflow: hidden;
-          background-color: transparent;
+          width: 100%;
+          height: 100%;
+          overflow: visible;
+          background: transparent !important;
         }
+
+        /* Position the widget container at bottom-right of iframe */
+        .widget-embed-container {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          z-index: 9999;
+        }
+
+        /* Dark mode toggle - hide in embed context as it's less relevant */
         .dark-mode-toggle {
           display: none;
         }
+
+        /* Ensure dialogs work correctly in iframe */
+        [data-radix-popper-content-wrapper] {
+          z-index: 99999 !important;
+        }
+
+        /* Dialog overlay and content positioning for iframe */
+        [role="dialog"] {
+          position: fixed !important;
+          z-index: 99999 !important;
+        }
+
+        /* Ensure the dialog backdrop covers the iframe */
+        [data-state="open"] > [data-radix-dialog-overlay] {
+          position: fixed !important;
+          inset: 0 !important;
+          background: rgba(0, 0, 0, 0.5) !important;
+        }
+
+        /* Make sure particles don't cause overflow issues */
+        .particles-container {
+          pointer-events: none;
+        }
       `}} />
-      
-      {/* 
-        We render the ChatBubble component with its window already open
-        This way it appears as a standalone chat window in the iframe
-      */}
-      <div className="w-full h-full">
+
+      <div className="widget-embed-container">
         <ChatBubble
           apiKey={apiKey}
           agentId={agentId}
@@ -113,6 +166,6 @@ export default function WidgetEmbedPage() {
           useSolarSystemTheme={useSolarSystemTheme}
         />
       </div>
-    </div>
+    </>
   );
 }

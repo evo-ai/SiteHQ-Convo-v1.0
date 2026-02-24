@@ -18,7 +18,31 @@ import { insertAdminSchema } from '@db/schema';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Store password reset tokens (in production this should be in a database)
+// Types for conversation analytics
+interface ConversationMessage {
+  role: string;
+  content: string;
+  timestamp: string;
+  sentiment?: {
+    score: number;
+    comparative: number;
+    mood: string;
+  };
+}
+
+interface ConversationData {
+  id: number;
+  messages: ConversationMessage[];
+  startedAt: Date | null;
+  endedAt: Date | null;
+  duration: number | null;
+  totalTurns: number | null;
+  interruptions: number | null;
+  overallSentiment: number | null;
+  emotionalStates: unknown[];
+}
+
+// TODO: Move to database for production (tokens lost on server restart)
 const passwordResetTokens = new Map<string, { email: string, expires: Date }>();
 
 export function registerRoutes(app: Express): Server {
@@ -96,13 +120,11 @@ export function registerRoutes(app: Express): Server {
       req.session.adminId = admin.id;
       req.session.save((err) => {
         if (err) {
-          console.error('Session save error:', err);
           return res.status(500).json({ message: 'Error saving session' });
         }
         res.json({ admin: { id: admin.id, email: admin.email } });
       });
     } catch (error) {
-      console.error('Login error:', error);
       res.status(400).json({ message: String(error) });
     }
   });
@@ -138,12 +160,9 @@ export function registerRoutes(app: Express): Server {
       // Store token (in production, this should be in a database)
       passwordResetTokens.set(token, { email, expires });
 
-      // In production, send email with reset link
-      // For demo, we'll just return the token
-      res.json({ 
-        message: 'Password reset instructions sent',
-        token // Remove this in production
-      });
+      // TODO: Send email with reset link containing token
+      // For now, token is stored but email not sent (implement email service)
+      res.json({ message: 'If an account exists with that email, you will receive password reset instructions.' });
     } catch (error) {
       res.status(400).json({ message: String(error) });
     }
@@ -178,16 +197,15 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Widget API keys loaded from environment variable (comma-separated for multiple keys)
+  const VALID_WIDGET_API_KEYS = new Set(
+    (process.env.WIDGET_API_KEYS || '').split(',').filter(Boolean)
+  );
+
   app.get('/api/get-signed-url', async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Access-Control-Allow-Headers', 'Authorization');
-
-    console.log('Request to /api/get-signed-url arrived!', {
-      headers: req.headers,
-      query: req.query,
-      timestamp: new Date().toISOString()
-    });
 
     try {
       // Validate Authorization header
@@ -196,9 +214,8 @@ export function registerRoutes(app: Express): Server {
         return res.status(401).json({ message: 'Authorization header missing or invalid' });
       }
 
-      const providedApiKey = authHeader.split('Bearer ')[1];
-      const expectedApiKey = 'sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500'; // For testing
-      if (providedApiKey !== expectedApiKey) {
+      const providedApiKey = authHeader.split('Bearer ')[1]?.trim();
+      if (!providedApiKey || !VALID_WIDGET_API_KEYS.has(providedApiKey)) {
         return res.status(401).json({ message: 'Invalid API key' });
       }
 
@@ -208,35 +225,33 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ message: 'Agent ID is required' });
       }
 
-      // For testing, return a mock signed URL if ElevenLabs API key isn't set
-      const apiKey = process.env.ELEVENLABS_API_KEY;
-      if (!apiKey) {
-        console.warn('ElevenLabs API key not configured, returning mock signed URL for testing');
-        const mockSignedUrl = `wss://${req.headers.host}/api/chat?agentId=${agentId}`;
-        return res.json({ signedUrl: mockSignedUrl });
+      // Check for ElevenLabs API key
+      const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
+      if (!elevenLabsApiKey) {
+        // Fallback to public WebSocket URL for public agents
+        const publicWsUrl = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${agentId}`;
+        return res.json({ signedUrl: publicWsUrl });
       }
 
-      // Fetch signed URL from ElevenLabs
+      // Fetch signed URL from ElevenLabs (for private agents)
       const response = await fetch(
         `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${agentId}`,
         {
           headers: {
-            'xi-api-key': apiKey
+            'xi-api-key': elevenLabsApiKey
           }
         }
       );
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('ElevenLabs API error:', response.status, errorText);
-        throw new Error(`Failed to get signed URL from ElevenLabs: ${errorText}`);
+        // Fallback to public URL if signed URL fails
+        const publicWsUrl = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${agentId}`;
+        return res.json({ signedUrl: publicWsUrl });
       }
 
       const data = await response.json();
-      console.log('Successfully retrieved signed URL:', data.signed_url);
       return res.json({ signedUrl: data.signed_url });
     } catch (error) {
-      console.error('Error getting signed URL:', error);
       return res.status(500).json({
         message: error instanceof Error ? error.message : 'Failed to get signed URL'
       });
@@ -308,7 +323,6 @@ export function registerRoutes(app: Express): Server {
         emotionalStateDistribution
       });
     } catch (error) {
-      console.error('Error fetching analytics metrics:', error);
       res.status(500).json({ message: 'Failed to fetch analytics metrics' });
     }
   });
@@ -336,7 +350,6 @@ export function registerRoutes(app: Express): Server {
         recentFeedback
       });
     } catch (error) {
-      console.error('Error fetching feedback data:', error);
       res.status(500).json({ message: 'Failed to fetch feedback data' });
     }
   });
@@ -366,24 +379,6 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ message: 'Conversation not found' });
       }
 
-      // Define the conversation type
-      interface ConversationMessage {
-        role: string;
-        content: string;
-        timestamp: string;
-        sentiment?: {
-          score: number;
-          comparative: number;
-          mood: string;
-        };
-      }
-
-      interface ConversationData {
-        id: number;
-        messages: ConversationMessage[];
-        [key: string]: any; // Allow for other properties
-      }
-
       const conversationData = conversation[0] as ConversationData;
 
       const transformedMessages = Array.isArray(conversationData.messages) 
@@ -401,18 +396,16 @@ export function registerRoutes(app: Express): Server {
         }
       });
     } catch (error) {
-      console.error('Error fetching conversation flow data:', error);
       res.status(500).json({ message: 'Failed to fetch conversation flow data' });
     }
   });
 
   // Serve the embed page for all routes starting with /embed
   app.get('/embed*', (req, res) => {
-    // Redirect to widget-embed instead to avoid loading the entire landing page
-    const queryParams = req.url.includes('?') ? req.url.split('?')[1] : '';
-    const redirectUrl = req.url.replace('/embed', '/widget-embed');
-    const fullRedirectUrl = queryParams ? `${redirectUrl}?${queryParams}` : redirectUrl;
-    res.redirect(307, fullRedirectUrl);
+    // Redirect to widget-embed, preserving query parameters correctly
+    const urlParts = req.url.split('?');
+    const queryString = urlParts.length > 1 ? '?' + urlParts[1] : '';
+    res.redirect(307, '/widget-embed' + queryString);
   });
 
   // WebSocket setup for chat
@@ -431,5 +424,14 @@ export function registerRoutes(app: Express): Server {
 }
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
-const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-secret-key-change-in-production';
 const MemoryStoreSession = MemoryStore(session);
+
+function getCookieSecret(): string {
+  const secret = process.env.COOKIE_SECRET;
+  if (!secret) {
+    throw new Error('COOKIE_SECRET environment variable is required');
+  }
+  return secret;
+}
+
+const COOKIE_SECRET = getCookieSecret();

@@ -21,6 +21,9 @@ export interface AgentConfig {
   createdAt: string;
 }
 
+// API key should be provided via VITE_WIDGET_API_KEY environment variable
+const WIDGET_API_KEY = import.meta.env.VITE_WIDGET_API_KEY || '';
+
 const agents: Record<string, AgentConfig> = {
   sitehq: {
     id: "sitehq",
@@ -30,7 +33,7 @@ const agents: Record<string, AgentConfig> = {
     tagline: "Australia's Leading Site Solutions Provider",
     logoUrl: "/SiteHQ-logo.png",
     agentId: "KRGVz0f5HAU0E7u6BbA5",
-    apiKey: "sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500",
+    apiKey: WIDGET_API_KEY,
     avatarId: "solar-system",
     theme: {
       primary: "#5c078c",
@@ -49,7 +52,7 @@ const agents: Record<string, AgentConfig> = {
     description: "FuturNod Conversational AI Assistant",
     tagline: "Intelligent Conversational AI Solutions",
     agentId: "x8uXlbP4xF2fnv352D7P",
-    apiKey: "sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500",
+    apiKey: WIDGET_API_KEY,
     avatarId: "solar-system",
     theme: {
       primary: "#F95638",

@@ -87,6 +87,8 @@ See `docs/process/new-agent-setup.md` for the full process. Quick steps:
 
 ## Recent Changes
 
+- **2026-02-24**: Fixed widget embed system — resolved WebSocket localhost errors, iframe sizing issues, positioning problems. See `docs/dev/2026-02-24-widget-embed-fixes.md` for details.
+- **2026-02-24**: Created comprehensive documentation — philosophy, architecture, roadmap. See `docs/README.md` for full index.
 - **2026-02-23**: Major refactor — cleaned up dead code, created agent registry system, avatar config system, reusable landing page and deploy guide components, structured docs directory. Added FuturNod agent.
 - **2026-02-23**: Restored chat bubble CSS overrides from deleted styles.css. Created comprehensive Solar System Bubble design reference documentation with version tracking.
 - **2026-02-23**: Full documentation pass — enriched agent docs, created docs index, documented theme system architecture.
@@ -117,6 +119,20 @@ The Solar System Bubble chat widget (`client/src/components/chat/ChatBubble.tsx`
 
 ## Future Plans
 
-- **Theme Editor UI**: Visual interface for designing and tweaking avatar theme variants per agent
-- **New Avatar Designs**: Additional avatar types beyond the Solar System Bubble
-- **Avatar Preview**: Real-time preview of theme changes on avatars
+See `docs/roadmap/future-features.md` for the complete product roadmap.
+
+**Phase 1 (Q2 2026)**: Theme Editor UI — Visual interface for designing and tweaking avatar theme variants per agent
+**Phase 2 (Q3 2026)**: Multiple Avatar Designs — Additional avatar types beyond the Solar System Bubble
+**Phase 3 (Q4 2026)**: Self-Service Agent Creation — Allow clients to create agents without FuturNod intervention
+**Phase 4 (Q1 2027)**: Advanced Analytics — Conversation intelligence and actionable insights
+**Phase 5 (Q2 2027)**: Enterprise Features — Multi-tenant, white-label, API access
+**Phase 6 (Q3 2027)**: AI Enhancement — Conversation coaching, A/B testing, multi-language
+
+## Comprehensive Documentation
+
+For detailed documentation, see `docs/README.md`:
+
+- **Philosophy & Vision**: `docs/overview/philosophy.md`
+- **System Architecture**: `docs/architecture/system-architecture.md`
+- **Product Roadmap**: `docs/roadmap/future-features.md`
+- **Development Work**: `docs/dev/` (bug fixes, feature implementations)

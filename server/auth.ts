@@ -10,6 +10,12 @@ declare module 'express-session' {
   }
 }
 
+declare module 'express' {
+  interface Request {
+    admin?: { id: number; email: string };
+  }
+}
+
 export async function requireAuth(
   req: Request,
   res: Response,
@@ -17,7 +23,6 @@ export async function requireAuth(
 ) {
   try {
     if (!req.session.adminId) {
-      console.log('No session found, redirecting to login');
       return res.status(401).json({ message: 'Unauthorized', redirect: '/admin/login' });
     }
 
@@ -26,18 +31,13 @@ export async function requireAuth(
     });
 
     if (!admin) {
-      // Clear invalid session
-      req.session.destroy((err) => {
-        if (err) console.error('Error destroying invalid session:', err);
-      });
+      req.session.destroy(() => {});
       return res.status(401).json({ message: 'Unauthorized', redirect: '/admin/login' });
     }
 
-    // Attach admin to request for use in protected routes
-    (req as any).admin = { id: admin.id, email: admin.email };
+    req.admin = { id: admin.id, email: admin.email };
     next();
   } catch (error) {
-    console.error('Auth middleware error:', error);
     next(error);
   }
 }

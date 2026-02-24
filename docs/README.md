@@ -1,66 +1,181 @@
 # FuturNod Agent Hub — Documentation Index
 
+**Last Updated**: 2026-02-24
+
+---
+
+## Start Here
+
+| Document | Purpose |
+|----------|---------|
+| [Philosophy & Vision](overview/philosophy.md) | Why we built this, core principles, business model |
+| [System Architecture](architecture/system-architecture.md) | Technical architecture, data flow, components |
+| [Future Roadmap](roadmap/future-features.md) | Planned features, phases, product vision |
+
+---
+
 ## Quick Links
+
+### Operational Guides
 
 | Document | Path | Purpose |
 |----------|------|---------|
 | [New Agent Setup](process/new-agent-setup.md) | `docs/process/` | Step-by-step guide for adding a new agent |
 | [Solar System Bubble](avatars/solar-system-bubble.md) | `docs/avatars/` | Flagship avatar design specification & integrity rules |
+
+### Agent Documentation
+
+| Document | Path | Purpose |
+|----------|------|---------|
 | [SiteHQ Agent](agents/sitehq.md) | `docs/agents/` | SiteHQ agent configuration & details |
 | [FuturNod Agent](agents/futurnod.md) | `docs/agents/` | Nod for FuturNod agent configuration & details |
+
+### Client Deployment Guides
+
+| Document | Path | Purpose |
+|----------|------|---------|
 | [SiteHQ Deploy Guide](deployment/sitehq-deploy.md) | `docs/deployment/` | Client-facing deployment guide for SiteHQ dev team |
 | [FuturNod Deploy Guide](deployment/futurnod-deploy.md) | `docs/deployment/` | Client-facing deployment guide for FuturNod dev team |
+
+---
+
+## Development Work
+
+| Document | Date | Summary |
+|----------|------|---------|
+| [Codebase Cleanup](dev/2026-02-24-codebase-cleanup.md) | 2026-02-24 | Removed 39 unused files, fixed security issues, improved type safety |
+| [Widget Embed Fixes](dev/2026-02-24-widget-embed-fixes.md) | 2026-02-24 | Fixed embeddable widget system (WebSocket errors, iframe sizing, positioning) |
+
+---
 
 ## Directory Structure
 
 ```
 docs/
-  README.md                    # This file — documentation index
-  process/
-    new-agent-setup.md         # How to add a new agent (7-step guide)
-  avatars/
-    solar-system-bubble.md     # Solar System Bubble design spec, version tracking, integrity rules
-  agents/                      # Internal agent docs (ElevenLabs refs OK)
-    sitehq.md                  # SiteHQ agent — config, pages, embed code
-    futurnod.md                # FuturNod agent — config, pages, embed code
-  deployment/                  # Client-facing deployment guides (NO ElevenLabs refs)
-    sitehq-deploy.md           # Shareable guide for SiteHQ dev team
-    futurnod-deploy.md         # Shareable guide for FuturNod dev team
+├── README.md                           # This file — documentation index
+│
+├── overview/                           # Platform overview & vision
+│   └── philosophy.md                   # Philosophy, principles, business model
+│
+├── architecture/                       # Technical documentation
+│   └── system-architecture.md          # System architecture, data flow, tech stack
+│
+├── roadmap/                            # Future planning
+│   └── future-features.md              # Product roadmap, planned features
+│
+├── process/                            # Operational guides
+│   └── new-agent-setup.md              # How to add a new agent (7-step guide)
+│
+├── avatars/                            # Avatar design specifications
+│   └── solar-system-bubble.md          # Flagship avatar design spec & integrity rules
+│
+├── agents/                             # Internal agent docs (ElevenLabs refs OK)
+│   ├── sitehq.md                       # SiteHQ agent documentation
+│   └── futurnod.md                     # FuturNod agent documentation
+│
+├── deployment/                         # Client-facing deployment guides (NO ElevenLabs refs)
+│   ├── sitehq-deploy.md                # SiteHQ deployment guide
+│   └── futurnod-deploy.md              # FuturNod deployment guide
+│
+└── dev/                                # Development work documentation
+    ├── 2026-02-24-codebase-cleanup.md    # Codebase cleanup & production hardening
+    └── 2026-02-24-widget-embed-fixes.md  # Widget embed system fixes
 ```
+
+---
 
 ## Source Code Reference
 
 | File | Purpose |
 |------|---------|
 | `client/src/config/agents.ts` | Agent registry — all agent configurations live here |
-| `client/src/config/avatars.ts` | Avatar registry — avatar designs and theme variants |
-| `client/src/components/chat/ChatBubble.tsx` | Solar System Bubble component (605 lines) |
+| `client/src/components/chat/ChatBubble.tsx` | Solar System Bubble component |
 | `client/src/index.css` | CSS animations for chat bubble (keyframes, particles, dark mode) |
+| `client/src/pages/widget-embed.tsx` | Standalone widget for iframe embedding |
 | `client/src/pages/agents/AgentLandingPage.tsx` | Reusable landing page template |
 | `client/src/pages/agents/AgentDeployGuide.tsx` | Reusable deployment guide template |
 | `client/src/pages/agents/AgentPage.tsx` | Route handler — `/agents/:slug` |
 | `client/src/pages/agents/AgentDeployPage.tsx` | Route handler — `/agents/:slug/deploy` |
+| `client/public/convo-widget.js` | Embeddable widget loader script |
 | `server/routes.ts` | Server API routes (signed URL endpoint) |
+| `server/index.ts` | Express server initialization |
+| `db/schema.ts` | Database schema (Drizzle ORM) |
+
+---
 
 ## How Things Connect
 
-1. **Agent Registry** (`agents.ts`) holds all agent configs — name, agent ID, API key, theme, avatar choice
-2. **Avatar Registry** (`avatars.ts`) defines avatar designs with color theme variants
-3. **Landing Pages** are auto-generated from agent config — no per-agent pages needed
-4. **Deploy Guides** are auto-generated with pre-filled embed codes
-5. **Routes** are dynamic — adding an agent to the registry automatically creates all routes
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        CONFIGURATION                                 │
+│  agents.ts ──┬── name, description, theme                           │
+│              ├── ElevenLabs agent ID                                │
+│              ├── widget API key                                     │
+│              └── avatar selection                                   │
+└─────────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    AUTO-GENERATED ROUTES                             │
+│  /agents/{slug}        → Landing page (AgentLandingPage.tsx)        │
+│  /agents/{slug}/deploy → Deploy guide (AgentDeployGuide.tsx)        │
+│  /widget-embed         → Embeddable widget (widget-embed.tsx)       │
+└─────────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      CLIENT DEPLOYMENT                               │
+│  Option 1: <script src="convo-widget.js" data-auto-init="true">     │
+│  Option 2: <convo-chat-widget agent-id="...">                       │
+│  Option 3: <iframe src="/widget-embed?...">                         │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
 
 ## Key Principles
 
-- **Each agent is autonomous** — never modify one agent when working on another
-- **The Solar System Bubble design is locked** — only colors change per agent, not the structure/animations
-- **Theme colors are user-controlled** — a future UI will let users design and tweak theme variants
-- **Documentation must exist for every agent and avatar** — create a doc file when adding either
-- **Version tracking** — ChatBubble.tsx canonical reference is commit `85a65b0`, CSS is `fac5155`
+1. **Configuration Over Code** — Adding a new agent requires zero code changes, just config
+2. **Avatar-First Design** — The Solar System Bubble is the flagship visual identity
+3. **Supplier Abstraction** — ElevenLabs is never exposed in client-facing content
+4. **User-Controlled Theming** — Theme choices belong to clients, not us
+5. **Autonomous Agents** — Each agent is isolated and independent
+6. **Documentation as Product** — If it's not documented, it doesn't exist
+
+See [Philosophy & Vision](overview/philosophy.md) for detailed explanation.
+
+---
+
+## Version Tracking
+
+| Component | Canonical Commit | Purpose |
+|-----------|------------------|---------|
+| ChatBubble.tsx | `85a65b0` | Solar System theme reference |
+| index.css animations | `fac5155` | CSS keyframes reference |
+
+Before modifying these files, always diff against reference:
+```bash
+git diff 85a65b0 -- client/src/components/chat/ChatBubble.tsx
+git diff fac5155 -- client/src/index.css
+```
+
+---
 
 ## Adding New Documentation
 
-- **New agent**: Create `docs/agents/{slug}.md` (internal) using existing agent docs as template
-- **New agent deploy guide**: Create `docs/deployment/{slug}-deploy.md` (client-facing, NO ElevenLabs refs) using existing deploy guides as template
-- **New avatar**: Create `docs/avatars/{avatar-name}.md` with design spec, version refs, and integrity rules
-- **New process**: Create `docs/process/{process-name}.md` with step-by-step instructions
+| Type | Location | Template |
+|------|----------|----------|
+| New agent | `docs/agents/{slug}.md` | Copy existing agent doc |
+| New deploy guide | `docs/deployment/{slug}-deploy.md` | Copy existing deploy guide (NO ElevenLabs refs) |
+| New avatar | `docs/avatars/{avatar-name}.md` | Include design spec, version refs, integrity rules |
+| New process | `docs/process/{process-name}.md` | Step-by-step instructions |
+| Dev work | `docs/dev/{YYYY-MM-DD}-{feature-name}.md` | Root cause, fixes, verification steps |
+
+---
+
+## External References
+
+- **Production URL**: https://convo-ai.futurnod.com
+- **Company Website**: https://www.futurnod.com
+- **Replit Project**: (internal)
+- **GitHub Repository**: (internal)

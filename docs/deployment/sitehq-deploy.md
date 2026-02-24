@@ -54,14 +54,35 @@ Use a custom HTML element for more control over placement and initialization.
 
 ### Option 3: IFrame (Fully Isolated)
 
-Use an iframe for complete isolation from your website's styles and scripts.
+Use an iframe for complete isolation from your website's styles and scripts. The iframe starts collapsed (showing just the chat bubble) and expands when the user interacts.
 
 ```html
-<iframe 
-  src="https://convo-ai.futurnod.com/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&title=SiteHQ%20Assistant" 
-  style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
-  allow="microphone">
+<!-- Convo Widget IFrame Embed -->
+<iframe
+  id="convo-widget-iframe"
+  src="https://convo-ai.futurnod.com/widget-embed?apiKey=sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500&agentId=KRGVz0f5HAU0E7u6BbA5&theme=%7B%22primary%22%3A%22%235c078c%22%2C%22background%22%3A%22%23ffffff%22%2C%22text%22%3A%22%23333333%22%7D&title=SiteHQ%20Assistant"
+  style="position: fixed; bottom: 0; right: 0; width: 260px; height: 140px; border: none; background: transparent; z-index: 2147483647;"
+  allow="microphone"
+  scrolling="no"
+  frameborder="0">
 </iframe>
+<script>
+  // Listen for widget state changes to resize iframe
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'convo-widget-toggle') {
+      var iframe = document.getElementById('convo-widget-iframe');
+      if (iframe) {
+        if (e.data.isOpen) {
+          iframe.style.width = Math.min(420, window.innerWidth - 20) + 'px';
+          iframe.style.height = Math.min(700, window.innerHeight - 20) + 'px';
+        } else {
+          iframe.style.width = '260px';
+          iframe.style.height = '140px';
+        }
+      }
+    }
+  });
+</script>
 ```
 
 ---

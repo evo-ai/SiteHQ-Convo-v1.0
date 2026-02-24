@@ -7,8 +7,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
@@ -16,22 +14,92 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/ui/date-range-picker";
-import { Activity, MessageCircle, ThumbsUp, Timer, Smile } from "lucide-react";
+import { Activity, MessageCircle, Timer, Smile } from "lucide-react";
 import { format } from "date-fns";
 import ConversationFlow from "@/components/conversation/ConversationFlow";
+import type { ReactNode } from "react";
+
+interface SentimentTrendItem {
+  timestamp: string;
+  sentiment: number;
+}
+
+interface EmotionalStateItem {
+  mood: string;
+  value: number;
+}
+
+interface MetricsData {
+  totalConversations: number;
+  avgDuration: number;
+  avgEngagement: number;
+  overallSentiment: number;
+  sentimentTrend: SentimentTrendItem[];
+  emotionalStateDistribution: EmotionalStateItem[];
+}
+
+interface SentimentDistributionItem {
+  name: string;
+  value: number;
+}
+
+interface FeedbackItem {
+  id: number;
+  rating: number;
+  feedback: string;
+  sentiment: string;
+  created_at: string;
+}
+
+interface FeedbackData {
+  sentimentDistribution: SentimentDistributionItem[];
+  recentFeedback: FeedbackItem[];
+}
+
+interface ConversationFlowMessage {
+  id: string;
+  source: 'user' | 'ai';
+  message: string;
+  timestamp: string;
+}
+
+interface ConversationFlowData {
+  messages: ConversationFlowMessage[];
+}
+
+interface ApiConversationMessage {
+  id: string;
+  role: string;
+  content: string;
+  timestamp: string;
+}
+
+interface ConversationApiData {
+  conversation: {
+    id: number;
+    messages: ApiConversationMessage[];
+  };
+}
+
+interface MetricCardProps {
+  title: string;
+  value: string | number;
+  icon: ReactNode;
+  trend: number;
+}
 
 export default function AnalyticsDashboard() {
-  const { data: metricsData, isLoading: isLoadingMetrics } = useQuery({
+  const { data: metricsData, isLoading: isLoadingMetrics } = useQuery<MetricsData>({
     queryKey: ["/api/analytics/metrics"],
-    refetchInterval: 5000 // Refetch every 5 seconds for real-time updates
+    refetchInterval: 5000
   });
 
-  const { data: feedbackData, isLoading: isLoadingFeedback } = useQuery({
+  const { data: feedbackData, isLoading: isLoadingFeedback } = useQuery<FeedbackData>({
     queryKey: ["/api/analytics/feedback"],
     refetchInterval: 5000
   });
 
-  const { data: conversationData, isLoading: isLoadingConversation } = useQuery({
+  const { data: conversationData, isLoading: isLoadingConversation } = useQuery<ConversationApiData>({
     queryKey: ["/api/analytics/conversation"],
     refetchInterval: 5000
   });
@@ -91,7 +159,16 @@ export default function AnalyticsDashboard() {
         </CardHeader>
         <CardContent>
           {conversationData?.conversation && (
-            <ConversationFlow conversation={conversationData.conversation} />
+            <ConversationFlow
+              conversation={{
+                messages: conversationData.conversation.messages.map((msg) => ({
+                  id: msg.id,
+                  source: msg.role === 'user' ? 'user' : 'ai',
+                  message: msg.content,
+                  timestamp: msg.timestamp,
+                }))
+              }}
+            />
           )}
         </CardContent>
       </Card>
@@ -141,11 +218,11 @@ export default function AnalyticsDashboard() {
                     outerRadius={100}
                     label
                   >
-                    {(metricsData?.emotionalStateDistribution || []).map((entry: any, index: number) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={entry.mood === 'positive' ? '#00C49F' : 
-                             entry.mood === 'negative' ? '#FF8042' : 
+                    {(metricsData?.emotionalStateDistribution || []).map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.mood === 'positive' ? '#00C49F' :
+                             entry.mood === 'negative' ? '#FF8042' :
                              '#FFBB28'}
                       />
                     ))}
@@ -176,7 +253,7 @@ export default function AnalyticsDashboard() {
                     outerRadius={100}
                     label
                   >
-                    {(feedbackData?.sentimentDistribution || []).map((_, index) => (
+                    {(feedbackData?.sentimentDistribution || []).map((_entry, index) => (
                       <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
                     ))}
                   </Pie>
@@ -193,7 +270,7 @@ export default function AnalyticsDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4 max-h-[300px] overflow-auto">
-              {(feedbackData?.recentFeedback || []).map((feedback: any) => (
+              {(feedbackData?.recentFeedback || []).map((feedback) => (
                 <div
                   key={feedback.id}
                   className="p-4 rounded-lg border bg-card text-card-foreground"
@@ -219,7 +296,7 @@ export default function AnalyticsDashboard() {
   );
 }
 
-function MetricCard({ title, value, icon, trend }: any) {
+function MetricCard({ title, value, icon, trend }: MetricCardProps) {
   return (
     <Card>
       <CardContent className="p-6">

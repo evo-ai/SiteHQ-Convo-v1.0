@@ -171,3 +171,4 @@ A planned UI feature will allow users to:
 | 2026-02-23 | Changed default color from #5c078c to #F95638 (original published color) | — |
 | 2026-02-23 | Fixed hardcoded purple boxShadow to use dynamic primaryColor | — |
 | 2026-02-23 | Decoupled bubble color from agent theme — bubble uses its own canonical color | — |
+| 2026-02-24 | Simplified postMessage to use '*' for cross-origin iframe communication | — |

@@ -40,11 +40,33 @@ export default function AgentDeployGuide({ agent }: AgentDeployGuideProps) {
   dark-mode="false">
 </convo-chat-widget>`;
 
-  const iframeCode = `<iframe 
-  src="${baseUrl}/widget-embed?apiKey=${agent.apiKey}&agentId=${agent.agentId}&theme=${encodeURIComponent(JSON.stringify(agent.theme))}&title=${encodeURIComponent(agent.widgetTitle)}" 
-  style="width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999;" 
-  allow="microphone">
-</iframe>`;
+  // IFrame embed - starts collapsed, expands when user interacts
+  const iframeCode = `<!-- Convo Widget IFrame Embed -->
+<iframe
+  id="convo-widget-iframe"
+  src="${baseUrl}/widget-embed?apiKey=${agent.apiKey}&agentId=${agent.agentId}&theme=${encodeURIComponent(JSON.stringify(agent.theme))}&title=${encodeURIComponent(agent.widgetTitle)}"
+  style="position: fixed; bottom: 0; right: 0; width: 260px; height: 140px; border: none; background: transparent; z-index: 2147483647;"
+  allow="microphone"
+  scrolling="no"
+  frameborder="0">
+</iframe>
+<script>
+  // Listen for widget state changes to resize iframe
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'convo-widget-toggle') {
+      var iframe = document.getElementById('convo-widget-iframe');
+      if (iframe) {
+        if (e.data.isOpen) {
+          iframe.style.width = Math.min(420, window.innerWidth - 20) + 'px';
+          iframe.style.height = Math.min(700, window.innerHeight - 20) + 'px';
+        } else {
+          iframe.style.width = '260px';
+          iframe.style.height = '140px';
+        }
+      }
+    }
+  });
+</script>`;
 
   const copyToClipboard = (text: string, tab: string) => {
     navigator.clipboard.writeText(text);

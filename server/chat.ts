@@ -3,19 +3,82 @@ import { db } from '@db';
 import { conversations, conversationMetrics } from '@db/schema';
 import { eq } from 'drizzle-orm';
 import natural from 'natural';
+
 const Analyzer = natural.SentimentAnalyzer;
 const stemmer = natural.PorterStemmer;
 const analyzer = new Analyzer("English", stemmer, "afinn");
+
+type Mood = 'positive' | 'negative' | 'neutral';
+
+interface SentimentResult {
+  score: number;
+  comparative: number;
+  mood: Mood;
+}
 
 interface Message {
   role: 'user' | 'ai';
   content: string;
   timestamp: string;
-  sentiment?: {
-    score: number;
-    comparative: number;
-    mood: 'positive' | 'negative' | 'neutral';
+  sentiment?: SentimentResult;
+}
+
+interface ConversationRecord {
+  messages: unknown;
+  sentimentTrend: unknown;
+  emotionalStates: unknown;
+}
+
+function analyzeSentiment(content: string): SentimentResult {
+  const words = content.toLowerCase().split(' ');
+  const score = analyzer.getSentiment(words);
+  const mood: Mood = score > 0.2 ? 'positive' : score < -0.2 ? 'negative' : 'neutral';
+  return {
+    score,
+    comparative: words.length > 0 ? score / words.length : 0,
+    mood
   };
+}
+
+function ensureArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function calculateOverallSentiment(messages: Message[]): number {
+  if (messages.length === 0) return 0;
+  const total = messages.reduce((acc, msg) => acc + (msg.sentiment?.score || 0), 0);
+  return total / messages.length;
+}
+
+async function updateConversationWithMessage(
+  conversationId: number,
+  conversation: ConversationRecord,
+  newMessage: Message,
+  messageCount: number
+): Promise<void> {
+  const currentMessages = ensureArray<Message>(conversation.messages);
+  const updatedMessages = [...currentMessages, newMessage];
+  const overallSentiment = calculateOverallSentiment(updatedMessages);
+
+  const currentSentimentTrend = ensureArray<unknown>(conversation.sentimentTrend);
+  const currentEmotionalStates = ensureArray<unknown>(conversation.emotionalStates);
+
+  await db.update(conversations)
+    .set({
+      messages: updatedMessages,
+      totalTurns: messageCount,
+      updatedAt: new Date(),
+      overallSentiment,
+      sentimentTrend: [
+        ...currentSentimentTrend,
+        { timestamp: new Date().toISOString(), sentiment: newMessage.sentiment?.score || 0 }
+      ],
+      emotionalStates: [
+        ...currentEmotionalStates,
+        { timestamp: new Date().toISOString(), sentiment: newMessage.sentiment?.score || 0, mood: newMessage.sentiment?.mood || 'neutral' }
+      ]
+    })
+    .where(eq(conversations.id, conversationId));
 }
 
 export function setupChatWebSocket(ws: WebSocket) {
@@ -27,234 +90,103 @@ export function setupChatWebSocket(ws: WebSocket) {
   ws.on('message', async (data) => {
     try {
       const message = JSON.parse(data.toString());
-      console.log('Received websocket message:', message);
 
       if (message.type === 'init') {
         startTime = Date.now();
-        // Create new conversation
+
         const [newConversation] = await db.insert(conversations)
           .values({
             configId: 1,
             agentId: message.agentId || 'default-agent',
-            messages: [], // Initialize as empty array
+            messages: [],
             startedAt: new Date(),
             totalTurns: 0,
             interruptions: 0,
             overallSentiment: 0,
-            sentimentTrend: [], // Initialize as empty array
-            emotionalStates: [] // Initialize as empty array
+            sentimentTrend: [],
+            emotionalStates: []
           })
           .returning();
 
-        console.log('Created new conversation:', newConversation.id);
         conversationId = newConversation.id;
-
-        // Connect to ElevenLabs
         elevenlabsWs = new WebSocket(message.signedUrl);
 
-        elevenlabsWs.on('message', async (data) => {
+        elevenlabsWs.on('message', async (wsData) => {
           try {
-            // First, pass the original message to the client
-            ws.send(data.toString());
-            
-            const elevenlabsMessage = JSON.parse(data.toString());
-            console.log('ElevenLabs WebSocket message:', elevenlabsMessage);
-            
-            // Check for status indicators from ElevenLabs
+            ws.send(wsData.toString());
+
+            const elevenlabsMessage = JSON.parse(wsData.toString());
+
+            // Forward voice status updates to client
             if (elevenlabsMessage.type === 'status') {
-              console.log('ElevenLabs status update:', elevenlabsMessage);
-              
-              // Send voice-specific status updates to the client
-              if (elevenlabsMessage.status === 'listening') {
-                console.log('Sending LISTENING status to client');
-                ws.send(JSON.stringify({
-                  type: 'voice_status',
-                  status: 'listening'
-                }));
-              } else if (elevenlabsMessage.status === 'speaking') {
-                console.log('Sending SPEAKING status to client');
-                ws.send(JSON.stringify({
-                  type: 'voice_status',
-                  status: 'speaking'
-                }));
-              } else if (elevenlabsMessage.status === 'thinking') {
-                console.log('Sending THINKING status to client');
-                ws.send(JSON.stringify({
-                  type: 'voice_status',
-                  status: 'thinking'
-                }));
+              const status = elevenlabsMessage.status;
+              if (['listening', 'speaking', 'thinking'].includes(status)) {
+                ws.send(JSON.stringify({ type: 'voice_status', status }));
               }
             }
-            
-            // For demo purposes, manually simulate voice status events if they're missing
-            // This is only a fallback to ensure the UI shows the animations
-            if (elevenlabsMessage.content && !elevenlabsMessage.type) {
-              // Simulate speaking state when we receive AI content
-              console.log('Simulating SPEAKING status for content message');
-              ws.send(JSON.stringify({
-                type: 'voice_status',
-                status: 'speaking'
-              }));
-              
-              // After a delay, simulate listening state
-              setTimeout(() => {
-                console.log('Simulating LISTENING status after AI response');
-                ws.send(JSON.stringify({
-                  type: 'voice_status',
-                  status: 'listening'
-                }));
-              }, 2000);
+
+            if (!conversationId) return;
+
+            const content = elevenlabsMessage.content || elevenlabsMessage.text;
+            if (!content) return;
+
+            const sentiment = analyzeSentiment(content);
+            messageCount++;
+
+            const currentConversation = await db.query.conversations.findFirst({
+              where: eq(conversations.id, conversationId)
+            });
+
+            if (currentConversation) {
+              const newMessage: Message = {
+                role: 'ai',
+                content,
+                timestamp: new Date().toISOString(),
+                sentiment
+              };
+
+              await updateConversationWithMessage(
+                conversationId,
+                currentConversation,
+                newMessage,
+                messageCount
+              );
             }
-
-            if (conversationId) {
-              const aiMessage = elevenlabsMessage;
-              const content = aiMessage.content || aiMessage.text;
-              
-              // Only process content messages, not status updates
-              if (!content) return;
-
-              // Analyze sentiment
-              const words = content.toLowerCase().split(' ');
-              const sentiment = analyzer.getSentiment(words);
-              const mood = sentiment > 0.2 ? 'positive' : sentiment < -0.2 ? 'negative' : 'neutral';
-
-              messageCount++;
-
-              const currentConversation = await db.query.conversations.findFirst({
-                where: eq(conversations.id, conversationId)
-              });
-
-              if (currentConversation) {
-                const messageWithSentiment: Message = {
-                  role: 'ai',
-                  content,
-                  timestamp: new Date().toISOString(),
-                  sentiment: {
-                    score: sentiment,
-                    comparative: sentiment / words.length,
-                    mood
-                  }
-                };
-
-                // Ensure messages is an array
-                const currentMessages = Array.isArray(currentConversation.messages) 
-                  ? currentConversation.messages 
-                  : [];
-
-                const updatedMessages = [...currentMessages, messageWithSentiment];
-                const overallSentiment = updatedMessages.reduce((acc, msg: any) => 
-                  acc + (msg.sentiment?.score || 0), 0) / updatedMessages.length;
-
-                // Ensure arrays are properly initialized
-                const currentSentimentTrend = Array.isArray(currentConversation.sentimentTrend)
-                  ? currentConversation.sentimentTrend
-                  : [];
-
-                const currentEmotionalStates = Array.isArray(currentConversation.emotionalStates)
-                  ? currentConversation.emotionalStates
-                  : [];
-
-                await db.update(conversations)
-                  .set({
-                    messages: updatedMessages,
-                    totalTurns: messageCount,
-                    updatedAt: new Date(),
-                    overallSentiment,
-                    sentimentTrend: [
-                      ...currentSentimentTrend,
-                      { timestamp: new Date().toISOString(), sentiment }
-                    ],
-                    emotionalStates: [
-                      ...currentEmotionalStates,
-                      { timestamp: new Date().toISOString(), sentiment, mood }
-                    ]
-                  })
-                  .where(eq(conversations.id, conversationId));
-
-                console.log('Updated conversation with AI message:', { 
-                  conversationId,
-                  messageCount,
-                  overallSentiment
-                });
-              }
-            }
-          } catch (error) {
-            console.error('Error processing AI message:', error);
+          } catch {
+            // Silent fail for message processing errors
           }
         });
 
       } else if (message.type === 'message' && elevenlabsWs) {
-        elevenlabsWs.send(JSON.stringify({
-          text: message.content
-        }));
+        elevenlabsWs.send(JSON.stringify({ text: message.content }));
 
         if (conversationId) {
           messageCount++;
-          const words = message.content.toLowerCase().split(' ');
-          const sentiment = analyzer.getSentiment(words);
-          const mood = sentiment > 0.2 ? 'positive' : sentiment < -0.2 ? 'negative' : 'neutral';
+          const sentiment = analyzeSentiment(message.content);
 
           const currentConversation = await db.query.conversations.findFirst({
             where: eq(conversations.id, conversationId)
           });
 
           if (currentConversation) {
-            const messageWithSentiment: Message = {
+            const newMessage: Message = {
               role: 'user',
               content: message.content,
               timestamp: new Date().toISOString(),
-              sentiment: {
-                score: sentiment,
-                comparative: sentiment / words.length,
-                mood
-              }
+              sentiment
             };
 
-            // Ensure messages is an array
-            const currentMessages = Array.isArray(currentConversation.messages) 
-              ? currentConversation.messages 
-              : [];
-
-            const updatedMessages = [...currentMessages, messageWithSentiment];
-            const overallSentiment = updatedMessages.reduce((acc, msg: any) => 
-              acc + (msg.sentiment?.score || 0), 0) / updatedMessages.length;
-
-            // Ensure arrays are properly initialized
-            const currentSentimentTrend = Array.isArray(currentConversation.sentimentTrend)
-              ? currentConversation.sentimentTrend
-              : [];
-
-            const currentEmotionalStates = Array.isArray(currentConversation.emotionalStates)
-              ? currentConversation.emotionalStates
-              : [];
-
-            await db.update(conversations)
-              .set({
-                messages: updatedMessages,
-                totalTurns: messageCount,
-                updatedAt: new Date(),
-                overallSentiment,
-                sentimentTrend: [
-                  ...currentSentimentTrend,
-                  { timestamp: new Date().toISOString(), sentiment }
-                ],
-                emotionalStates: [
-                  ...currentEmotionalStates,
-                  { timestamp: new Date().toISOString(), sentiment, mood }
-                ]
-              })
-              .where(eq(conversations.id, conversationId));
-
-            console.log('Updated conversation with user message:', { 
+            await updateConversationWithMessage(
               conversationId,
-              messageCount,
-              overallSentiment
-            });
+              currentConversation,
+              newMessage,
+              messageCount
+            );
           }
         }
       }
-    } catch (error) {
-      console.error('Error processing websocket message:', error);
+    } catch {
+      // Silent fail for websocket message errors
     }
   });
 
@@ -267,7 +199,6 @@ export function setupChatWebSocket(ws: WebSocket) {
       if (conversationId && startTime) {
         const duration = Math.floor((Date.now() - startTime) / 1000);
 
-        // Update conversation end data
         await db.update(conversations)
           .set({
             endedAt: new Date(),
@@ -275,7 +206,6 @@ export function setupChatWebSocket(ws: WebSocket) {
           })
           .where(eq(conversations.id, conversationId));
 
-        // Create conversation metrics
         await db.insert(conversationMetrics)
           .values({
             conversationId,
@@ -283,15 +213,9 @@ export function setupChatWebSocket(ws: WebSocket) {
             userEngagementScore: Math.min(100, Math.floor((messageCount * 20))),
             completionRate: 100
           });
-
-        console.log('Conversation ended and metrics saved:', {
-          conversationId,
-          duration,
-          messageCount
-        });
       }
-    } catch (error) {
-      console.error('Error closing websocket connection:', error);
+    } catch {
+      // Silent fail for close errors
     }
   });
 }

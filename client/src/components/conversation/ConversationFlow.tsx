@@ -61,7 +61,12 @@ interface ConversationFlowProps {
   };
 }
 
-const UserNode = ({ data }: any) => {
+interface NodeData {
+  message: string;
+  timestamp: string;
+}
+
+function UserNode({ data }: { data: NodeData }) {
   return (
     <Card className="p-4 border-2 border-blue-500 bg-blue-50">
       <div className="font-medium text-sm text-blue-700">User Message</div>
@@ -69,9 +74,9 @@ const UserNode = ({ data }: any) => {
       <div className="mt-2 text-xs text-gray-500">{data.timestamp}</div>
     </Card>
   );
-};
+}
 
-const AINode = ({ data }: any) => {
+function AINode({ data }: { data: NodeData }) {
   return (
     <Card className="p-4 border-2 border-purple-500 bg-purple-50">
       <div className="font-medium text-sm text-purple-700">AI Response</div>
@@ -79,7 +84,7 @@ const AINode = ({ data }: any) => {
       <div className="mt-2 text-xs text-gray-500">{data.timestamp}</div>
     </Card>
   );
-};
+}
 
 const nodeTypes = {
   user: UserNode,

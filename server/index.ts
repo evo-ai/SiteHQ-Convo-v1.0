@@ -23,49 +23,8 @@ app.use(express.urlencoded({ extended: false }));
 // Serve static files from client/public directory
 app.use(express.static(path.join(__dirname, '../client/public')));
 
-// Add the /api/get-signed-url endpoint
-app.get('/api/get-signed-url', async (req: Request, res: Response) => {
-  // Log the incoming headers for debugging
-  console.log('Incoming headers:', req.headers);
-
-  // Extract the Authorization header
-  const authHeader = req.headers.authorization;
-  console.log('Authorization header:', authHeader);
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    console.log('Missing or invalid Authorization header');
-    return res.status(401).json({ error: 'Unauthorized: Missing or invalid Authorization header' });
-  }
-
-  const apiKey = authHeader.split('Bearer ')[1];
-  if (!apiKey) {
-    console.log('No API key found in Authorization header');
-    return res.status(401).json({ error: 'Unauthorized: No API key provided' });
-  }
-
-  console.log('Extracted API key:', apiKey);
-
-  // Get the agentId from query parameters
-  const agentId = req.query.agentId as string;
-  if (!agentId) {
-    console.log('Missing agentId query parameter');
-    return res.status(400).json({ error: 'Missing agentId query parameter' });
-  }
-
-  console.log('Agent ID:', agentId);
-
-  try {
-    // Construct the WebSocket URL for ElevenLabs conversational AI agent
-    // For now, use the public agent URL format; we'll adjust for private agents if needed
-    const signedUrl = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${agentId}`;
-    console.log('Generated signed URL:', signedUrl);
-
-    res.json({ signedUrl });
-  } catch (error: any) {
-    console.error('Error generating signed URL:', error.message);
-    res.status(500).json({ error: 'Failed to generate signed URL' });
-  }
-});
+// Note: The /api/get-signed-url endpoint is defined in routes.ts
+// It handles API key validation and ElevenLabs signed URL generation
 
 app.use((req, res, next) => {
   const start = Date.now();
