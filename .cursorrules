@@ -1,0 +1,129 @@
+# Cursor Rules for SiteHQ Convo
+
+## Rule Sync Protocol (CRITICAL)
+
+**These rules MUST stay in sync with `CLAUDE.md`.**
+
+When modifying this file (`.cursorrules`):
+1. Apply the same changes to `CLAUDE.md`
+2. Keep both files structurally aligned
+3. Update the "Last Synced" timestamp in both files
+
+When you notice `CLAUDE.md` has changes not reflected here:
+1. Pull those changes into this file
+2. Ensure consistency between both rule sets
+
+**Last Synced**: 2026-02-24
+
+---
+
+## Handshake Protocol (CRITICAL)
+
+**At the START of every work session:**
+1. Read `docs/HANDSHAKE.md` to understand current project state
+2. Check the "Recent Changes Log" for context on recent work
+3. Review "Pending Tasks" to see what needs attention
+4. Note any "Known Issues & Gotchas" before making changes
+
+**At the END of every work session:**
+1. Update `docs/HANDSHAKE.md`:
+   - Update "Last Updated" date and "Updated By" field
+   - Update "Quick Status" table if app state changed
+   - Add entry to "Recent Changes Log" describing your work
+   - Update "Pending Tasks" (complete items, add new ones)
+   - Document any new issues discovered
+2. Run `npm run check` to verify TypeScript compiles
+3. Run `npm run build` to verify build succeeds
+
+## Project Context
+
+This is the SiteHQ Convo project - an embeddable AI chat widget platform.
+
+Key documentation:
+- `docs/HANDSHAKE.md` - Living doc for AI assistant coordination
+- `docs/dev/2026-02-24-codebase-cleanup.md` - Recent major cleanup
+- `docs/dev/2026-02-24-widget-embed-redesign.md` - Widget architecture
+
+## Code Standards
+
+### TypeScript
+- Use strict TypeScript - no `any` types without justification
+- Add proper interfaces for all data structures
+- Use type imports: `import type { Foo } from './bar'`
+
+### File Organization
+- Keep components small and focused
+- Extract utilities to separate files when reused
+- Don't create files unless necessary - prefer editing existing
+
+### Security
+- NEVER hardcode secrets or API keys
+- Use environment variables via `process.env` (server) or `import.meta.env` (client)
+- Validate all external input
+
+### Styling
+- Use TailwindCSS for styling
+- Follow existing patterns in the codebase
+- Widget uses separate CSS in `client/src/widget/styles.css`
+
+## Architecture Awareness
+
+### Main App (React)
+- Entry: `client/src/main.tsx`
+- Config: `vite.config.ts`
+- Uses React 18, Radix UI, TailwindCSS
+
+### Widget (Preact)
+- Entry: `client/src/widget/index.tsx`
+- Config: `widget.vite.config.ts`
+- Uses Preact, Shadow DOM, self-contained CSS
+- Bundle must stay under 30KB gzipped
+
+### Server
+- Entry: `server/index.ts`
+- Routes: `server/routes.ts`
+- Uses Express, TypeScript
+
+## Common Tasks
+
+### Adding a new API endpoint
+1. Add route in `server/routes.ts`
+2. Add types if needed
+3. Update HANDSHAKE.md if it's a significant addition
+
+### Modifying the widget
+1. Edit files in `client/src/widget/`
+2. Test with `npm run dev:widget`
+3. Check bundle size after changes
+4. Update widget design doc if architecture changes
+
+### Environment variables
+1. Add to `.env.example` with description
+2. Document in `docs/HANDSHAKE.md` under Environment & Secrets
+3. Add to Replit Secrets if deploying there
+
+## Don't Do
+
+- Don't remove code without understanding its purpose
+- Don't add dependencies without checking bundle impact
+- Don't modify `.replit` or `replit.nix` unless necessary
+- Don't skip the handshake document update
+- Don't use console.log in production code (use proper logging)
+- Don't commit `.env` files (use `.env.example` as template)
+
+## Collaboration Notes
+
+This codebase is shared between:
+- **Claude Code / Cursor** - Feature development, refactoring
+- **Replit AI** - Deployment, environment configuration
+
+### Key Coordination Files
+
+| File | Purpose | Sync With |
+|------|---------|-----------|
+| `docs/HANDSHAKE.md` | Living project state | — (single source of truth) |
+| `.cursorrules` | Cursor AI rules | `CLAUDE.md` |
+| `CLAUDE.md` | Claude Code rules | `.cursorrules` |
+| `replit.md` | Replit AI context | — |
+
+**Remember**: When updating `.cursorrules` or `CLAUDE.md`, always update BOTH files to keep them in sync!

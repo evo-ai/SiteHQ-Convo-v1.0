@@ -4,6 +4,18 @@
 
 ---
 
+## AI Assistant Coordination
+
+> **IMPORTANT**: If you are an AI assistant (Claude, Cursor, Replit AI), read the handshake document first.
+
+| Document | Purpose |
+|----------|---------|
+| **[HANDSHAKE.md](HANDSHAKE.md)** | **Living doc for AI coordination — read this first** |
+| [CLAUDE.md](../CLAUDE.md) | Claude Code specific instructions |
+| [.cursorrules](../.cursorrules) | Cursor AI specific rules |
+
+---
+
 ## Start Here
 
 | Document | Purpose |
@@ -43,6 +55,7 @@
 
 | Document | Date | Summary |
 |----------|------|---------|
+| [Widget Embed Redesign](dev/2026-02-24-widget-embed-redesign.md) | 2026-02-24 | **Implemented** — Shadow DOM + Preact widget, eliminates white card problem |
 | [Codebase Cleanup](dev/2026-02-24-codebase-cleanup.md) | 2026-02-24 | Removed 39 unused files, fixed security issues, improved type safety |
 | [Widget Embed Fixes](dev/2026-02-24-widget-embed-fixes.md) | 2026-02-24 | Fixed embeddable widget system (WebSocket errors, iframe sizing, positioning) |
 
@@ -53,6 +66,7 @@
 ```
 docs/
 ├── README.md                           # This file — documentation index
+├── HANDSHAKE.md                        # AI assistant coordination (living doc)
 │
 ├── overview/                           # Platform overview & vision
 │   └── philosophy.md                   # Philosophy, principles, business model
@@ -78,8 +92,9 @@ docs/
 │   └── futurnod-deploy.md              # FuturNod deployment guide
 │
 └── dev/                                # Development work documentation
-    ├── 2026-02-24-codebase-cleanup.md    # Codebase cleanup & production hardening
-    └── 2026-02-24-widget-embed-fixes.md  # Widget embed system fixes
+    ├── 2026-02-24-widget-embed-redesign.md  # Shadow DOM + Preact widget (IMPLEMENTED)
+    ├── 2026-02-24-codebase-cleanup.md       # Codebase cleanup & production hardening
+    └── 2026-02-24-widget-embed-fixes.md     # Widget embed system fixes (superseded)
 ```
 
 ---
@@ -89,14 +104,21 @@ docs/
 | File | Purpose |
 |------|---------|
 | `client/src/config/agents.ts` | Agent registry — all agent configurations live here |
-| `client/src/components/chat/ChatBubble.tsx` | Solar System Bubble component |
+| `client/src/components/chat/ChatBubble.tsx` | Solar System Bubble component (main app) |
 | `client/src/index.css` | CSS animations for chat bubble (keyframes, particles, dark mode) |
-| `client/src/pages/widget-embed.tsx` | Standalone widget for iframe embedding |
+| `client/src/pages/widget-embed.tsx` | Standalone widget for iframe embedding (legacy) |
 | `client/src/pages/agents/AgentLandingPage.tsx` | Reusable landing page template |
 | `client/src/pages/agents/AgentDeployGuide.tsx` | Reusable deployment guide template |
 | `client/src/pages/agents/AgentPage.tsx` | Route handler — `/agents/:slug` |
 | `client/src/pages/agents/AgentDeployPage.tsx` | Route handler — `/agents/:slug/deploy` |
-| `client/public/convo-widget.js` | Embeddable widget loader script |
+| **Widget (Preact/Shadow DOM)** | |
+| `client/src/widget/index.tsx` | Widget entry point — Shadow DOM injection |
+| `client/src/widget/ChatBubble.tsx` | Preact version of ChatBubble |
+| `client/src/widget/styles.css` | Widget CSS (injected into Shadow DOM) |
+| `client/src/widget/useConversation.ts` | Custom hook wrapping @11labs/client |
+| `widget.vite.config.ts` | Vite config for widget bundle |
+| `dist/widget/convo-widget.js` | Built widget (~16KB gzipped) |
+| **Server** | |
 | `server/routes.ts` | Server API routes (signed URL endpoint) |
 | `server/index.ts` | Express server initialization |
 | `db/schema.ts` | Database schema (Drizzle ORM) |
@@ -126,8 +148,11 @@ docs/
 ┌─────────────────────────────────────────────────────────────────────┐
 │                      CLIENT DEPLOYMENT                               │
 │  Option 1: <script src="convo-widget.js" data-auto-init="true">     │
+│            (Shadow DOM injection — recommended)                      │
 │  Option 2: <convo-chat-widget agent-id="...">                       │
-│  Option 3: <iframe src="/widget-embed?...">                         │
+│            (Custom element — also uses Shadow DOM)                   │
+│  Option 3: ConvoWidget.init({ agentId, apiKey })                    │
+│            (Programmatic initialization)                             │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 

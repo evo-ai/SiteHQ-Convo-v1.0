@@ -1,5 +1,11 @@
 # FuturNod Agent Hub
 
+## AI Assistant Coordination
+
+> **IMPORTANT FOR REPLIT AI**: Read `docs/HANDSHAKE.md` before making changes.
+> This is a living document for coordination between AI assistants (Claude Code, Cursor, Replit AI).
+> Update it after any significant work.
+
 ## Overview
 
 Multi-agent platform for deploying ElevenLabs Conversational AI chat widgets to client websites. Each prospect/client gets their own agent with a dedicated landing page, chat widget, and deployment package.
@@ -14,10 +20,16 @@ client/src/
     agents.ts           # Central agent registry (add new agents here)
   components/
     chat/
-      ChatBubble.tsx    # Solar System Bubble avatar (main widget)
+      ChatBubble.tsx    # Solar System Bubble avatar (main app)
     conversation/
       ConversationFlow.tsx  # Analytics visualization
     ui/                 # shadcn UI components (trimmed to only used ones)
+  widget/               # Embeddable widget (Shadow DOM + Preact)
+    index.tsx           # Entry point — Shadow DOM injection
+    ChatBubble.tsx      # Preact version of ChatBubble
+    useConversation.ts  # Custom hook for @11labs/client
+    styles.css          # All widget CSS (injected into Shadow DOM)
+    types.ts            # TypeScript interfaces
   pages/
     agents/
       AgentLandingPage.tsx   # Reusable landing page template
@@ -27,7 +39,7 @@ client/src/
     admin/              # Admin auth pages
     analytics.tsx       # Analytics dashboard
     demo.tsx            # Agent hub/directory (home page)
-    widget-embed.tsx    # Standalone widget embed page
+    widget-embed.tsx    # Standalone widget embed page (legacy iframe)
     standalone-widget-docs.tsx  # Widget integration docs
     not-found.tsx       # 404 page
   hooks/
@@ -44,6 +56,7 @@ db/
   index.ts              # Database connection
 docs/
   README.md             # Documentation index / map
+  HANDSHAKE.md          # AI assistant coordination (living doc)
   overview/             # Platform philosophy & vision
   architecture/         # System architecture docs
   process/
@@ -56,6 +69,9 @@ docs/
   deployment/           # Client-facing deployment guides
   roadmap/              # Future feature planning
   dev/                  # Development change logs
+widget.vite.config.ts   # Vite config for widget bundle (separate from main app)
+dist/widget/            # Built widget output
+  convo-widget.js       # Self-contained widget (~16KB gzipped)
 ```
 
 ### Key Concepts
@@ -80,7 +96,8 @@ See `docs/process/new-agent-setup.md` for the full process. Quick steps:
 | `/` | Agent Hub — lists all deployed agents |
 | `/agents/:slug` | Agent landing page |
 | `/agents/:slug/deploy` | Agent deployment guide |
-| `/widget-embed` | Standalone widget embed (for iframes) |
+| `/convo-widget.js` | Embeddable widget script (Shadow DOM) |
+| `/widget-embed` | Legacy iframe widget (backup) |
 | `/widget-docs` | Widget integration documentation |
 | `/admin/login` | Admin login |
 | `/admin/analytics` | Analytics dashboard |
@@ -94,6 +111,8 @@ See `docs/process/new-agent-setup.md` for the full process. Quick steps:
 
 ## Recent Changes
 
+- **2026-02-24**: Widget embed redesign — Replaced iframe with Shadow DOM + Preact injection. Eliminates white card problem, ~16KB bundle. See `docs/dev/2026-02-24-widget-embed-redesign.md`.
+- **2026-02-24**: Added AI coordination system — Created `docs/HANDSHAKE.md` (living doc), `CLAUDE.md`, `.cursorrules` for seamless handoffs between AI assistants.
 - **2026-02-24**: Production hardening — removed 39 unused files, fixed 5 security issues (hardcoded API keys moved to env vars, cookie secret required, token leak removed), fixed 14 type safety violations, removed 30+ debug console statements, extracted duplicate code. See `docs/dev/2026-02-24-codebase-cleanup.md` for details.
 - **2026-02-24**: Fixed widget embed system — resolved WebSocket localhost errors, iframe sizing issues, positioning problems. See `docs/dev/2026-02-24-widget-embed-fixes.md` for details.
 - **2026-02-24**: Created comprehensive documentation — philosophy, architecture, roadmap. See `docs/README.md` for full index.
@@ -145,7 +164,9 @@ See `docs/roadmap/future-features.md` for the complete product roadmap.
 
 For detailed documentation, see `docs/README.md`:
 
+- **AI Coordination**: `docs/HANDSHAKE.md` (living doc for AI assistants)
 - **Philosophy & Vision**: `docs/overview/philosophy.md`
 - **System Architecture**: `docs/architecture/system-architecture.md`
 - **Product Roadmap**: `docs/roadmap/future-features.md`
+- **Widget Architecture**: `docs/dev/2026-02-24-widget-embed-redesign.md`
 - **Development Work**: `docs/dev/` (bug fixes, feature implementations)
