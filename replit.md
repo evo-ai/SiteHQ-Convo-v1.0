@@ -12,14 +12,12 @@ Multi-agent platform for deploying ElevenLabs Conversational AI chat widgets to 
 client/src/
   config/
     agents.ts           # Central agent registry (add new agents here)
-    avatars.ts          # Avatar designs & theme variants
   components/
-    avatars/            # Future avatar components
     chat/
       ChatBubble.tsx    # Solar System Bubble avatar (main widget)
     conversation/
       ConversationFlow.tsx  # Analytics visualization
-    ui/                 # shadcn UI components
+    ui/                 # shadcn UI components (trimmed to only used ones)
   pages/
     agents/
       AgentLandingPage.tsx   # Reusable landing page template
@@ -32,6 +30,10 @@ client/src/
     widget-embed.tsx    # Standalone widget embed page
     standalone-widget-docs.tsx  # Widget integration docs
     not-found.tsx       # 404 page
+  hooks/
+    use-toast.ts        # Toast notification hook
+  types/
+    dagre.d.ts          # Type declarations for dagre library
 server/
   routes.ts             # Express API routes
   auth.ts               # Admin authentication
@@ -42,6 +44,8 @@ db/
   index.ts              # Database connection
 docs/
   README.md             # Documentation index / map
+  overview/             # Platform philosophy & vision
+  architecture/         # System architecture docs
   process/
     new-agent-setup.md  # Step-by-step guide for adding new agents
   agents/
@@ -49,6 +53,9 @@ docs/
     futurnod.md         # FuturNod agent documentation
   avatars/
     solar-system-bubble.md  # Solar System Bubble avatar design spec & integrity rules
+  deployment/           # Client-facing deployment guides
+  roadmap/              # Future feature planning
+  dev/                  # Development change logs
 ```
 
 ### Key Concepts
@@ -87,14 +94,20 @@ See `docs/process/new-agent-setup.md` for the full process. Quick steps:
 
 ## Recent Changes
 
+- **2026-02-24**: Production hardening — removed 39 unused files, fixed 5 security issues (hardcoded API keys moved to env vars, cookie secret required, token leak removed), fixed 14 type safety violations, removed 30+ debug console statements, extracted duplicate code. See `docs/dev/2026-02-24-codebase-cleanup.md` for details.
 - **2026-02-24**: Fixed widget embed system — resolved WebSocket localhost errors, iframe sizing issues, positioning problems. See `docs/dev/2026-02-24-widget-embed-fixes.md` for details.
 - **2026-02-24**: Created comprehensive documentation — philosophy, architecture, roadmap. See `docs/README.md` for full index.
-- **2026-02-23**: Major refactor — cleaned up dead code, created agent registry system, avatar config system, reusable landing page and deploy guide components, structured docs directory. Added FuturNod agent.
-- **2026-02-23**: Restored chat bubble CSS overrides from deleted styles.css. Created comprehensive Solar System Bubble design reference documentation with version tracking.
-- **2026-02-23**: Full documentation pass — enriched agent docs, created docs index, documented theme system architecture.
-- **2026-02-23**: Standardized widget naming convention — replaced all `sitehq-` prefixes with generic `convo-` prefix for scalability. Widget file is now `convo-widget.js`, custom element is `<convo-chat-widget>`.
-- **2026-02-23**: Rebuilt convo-widget.js as lightweight iframe loader (~140 lines) embedding the real Solar System Bubble via /widget-embed. Added secure postMessage resize communication.
-- **2026-02-23**: Complete legacy cleanup — removed all old text-based chatbot code, demo HTML pages, webpack config, old deployment guides, SiteHQChatController, and legacy server routes. Only the Solar System Bubble (and future avatars) remain.
+- **2026-02-23**: Major refactor — cleaned up dead code, created agent registry system, reusable landing page and deploy guide components, structured docs directory. Added FuturNod agent.
+
+## Required Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `COOKIE_SECRET` | Session encryption (server crashes without it) |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `WIDGET_API_KEYS` | Comma-separated valid API keys for widget auth (server-side) |
+| `VITE_WIDGET_API_KEY` | Widget API key for client-side use |
+| `ELEVENLABS_API_KEY` | Optional — for private ElevenLabs agents. Falls back to public WebSocket URL |
 
 ## User Preferences
 

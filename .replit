@@ -40,3 +40,10 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[userenv]
+
+[userenv.shared]
+COOKIE_SECRET = "175129b0986f943046b0db9b71ce2d4b9166bea9bf17beb15388012f19d671cc"
+WIDGET_API_KEYS = "sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
+VITE_WIDGET_API_KEY = "sk_d30f51b33804638dd5e2af1f942f1685ccacd0d95ef30500"
