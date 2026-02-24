@@ -1,8 +1,53 @@
 # Widget Embed Redesign: Eliminating the White Card Problem
 
-**Date**: 2026-02-24  
-**Status**: Proposal (Phase 1 — Documentation Only)  
+**Date**: 2026-02-24
+**Status**: ✅ Implemented (Phase 2 Complete)
 **Related**: [Previous Widget Embed Fixes](./2026-02-24-widget-embed-fixes.md)
+
+---
+
+## Implementation Summary
+
+**Completed**: 2026-02-24
+**Approach Used**: Option C (Preact + Shadow DOM)
+**Bundle Size**: ~16KB gzipped (better than 30KB target)
+
+### Files Created
+
+| File | Purpose |
+|------|---------|
+| `widget.vite.config.ts` | Separate Vite build config for widget bundle |
+| `client/src/widget/index.tsx` | Shadow DOM injection entry point |
+| `client/src/widget/ChatBubble.tsx` | Preact version of ChatBubble component |
+| `client/src/widget/useConversation.ts` | Custom hook wrapping @11labs/client |
+| `client/src/widget/styles.css` | All widget CSS (animations, dialog, themes) |
+| `client/src/widget/types.ts` | TypeScript interfaces |
+
+### Key Implementation Details
+
+1. **Shadow DOM Isolation**: Widget creates `#convo-widget-root` with attached Shadow DOM
+2. **CSS Injection**: All styles bundled and injected into shadow root via `vite-plugin-css-injected-by-js`
+3. **Preact + compat**: Uses `preact/compat` aliases so @11labs/client works unchanged
+4. **CSS Animations**: Replaced Framer Motion with pure CSS (bubbleEnter, float, pulse, soundWave, etc.)
+5. **Custom Dialog**: Simple dialog component replaces Radix (no external dependencies)
+6. **Inline SVGs**: Icons inlined instead of lucide-react dependency
+
+### Build Commands
+
+```bash
+npm run build:widget    # Build standalone widget
+npm run dev:widget      # Watch mode for development
+```
+
+### Output
+
+```
+dist/widget/convo-widget.js  # Self-contained IIFE bundle (~16KB gzipped)
+```
+
+### Rollback
+
+Old iframe-based script backed up at `client/public/convo-widget-iframe-backup.js`
 
 ---
 
@@ -265,16 +310,18 @@ The embed code looks identical to what we already provide. Customers don't need 
 
 ---
 
-## Next Steps (Phase 2 — Implementation)
+## Next Steps (Phase 3 — Verification & Deployment)
 
-Once this design is approved:
+**Phase 2 Complete** ✅ All implementation tasks finished.
 
-1. Create a Vite build config for the standalone widget bundle
-2. Build the shadow DOM container and style injection in `convo-widget.js`
-3. Create the widget entry point that mounts ChatBubble into the shadow root
-4. Update the deploy guide pages with new embed instructions
-5. Test on various host pages (light/dark themes, different CSP policies)
-6. Update deployment documentation
+Remaining tasks:
+
+1. ~~Create a Vite build config for the standalone widget bundle~~ ✅
+2. ~~Build the shadow DOM container and style injection in `convo-widget.js`~~ ✅
+3. ~~Create the widget entry point that mounts ChatBubble into the shadow root~~ ✅
+4. Test on various host pages (light/dark themes, different CSP policies)
+5. Update deployment documentation with new bundle location
+6. Deploy to production CDN
 
 ---
 
